@@ -1,138 +1,129 @@
 var roleHealer = {
 
-    /** @param {Creep} creep **/
-    run: function(creep) {
-
-        if (creep.memory.boost){
-            for (var i in creep.body){
-                var part = creep.body[i];
-                if (!part.boost && part.type === HEAL){
-                    this.boost(creep, RESOURCE_LEMERGIUM_OXIDE);
-                    return;
-                }
-            }
-
-            creep.memory.boost = false;
+  /** @param {Creep} creep **/
+  run: function (creep) {
+    if (creep.memory.boost) {
+      for (var i in creep.body) {
+        var part = creep.body[i]
+        if (!part.boost && part.type === HEAL) {
+          this.boost(creep, RESOURCE_LEMERGIUM_OXIDE)
+          return
         }
+      }
 
+      creep.memory.boost = false
+    }
 
-        var actiondone = this.act(creep);
-        if (actiondone){
-            return;
-        }
-        if (!creep.room.controller || (creep.room.controller && !creep.room.controller.safeMode)){
-            if(creep.room.name === creep.memory.room){
-                actiondone = this.afteract(creep);
-            }
-            if(actiondone){
-                return;
-            }
-        }
+    var actiondone = this.act(creep)
+    if (actiondone) {
+      return
+    }
+    if (!creep.room.controller || (creep.room.controller && !creep.room.controller.safeMode)) {
+      if (creep.room.name === creep.memory.room) {
+        actiondone = this.afteract(creep)
+      }
+      if (actiondone) {
+        return
+      }
+    }
 
+    if (creep.memory.gatheringpoint) {
+      var pos = new RoomPosition(creep.memory.gatheringpoint.x, creep.memory.gatheringpoint.y, creep.memory.gatheringpoint.roomName)
+      creep.goTo(pos)
+      // var res = creep.moveTo(pos, {ignoreCreeps: true});
+      return
+    }
 
-        if (creep.memory.gatheringpoint){
-            var pos = new RoomPosition (creep.memory.gatheringpoint.x , creep.memory.gatheringpoint.y , creep.memory.gatheringpoint.roomName );
-            creep.goTo(pos);
-            // var res = creep.moveTo(pos, {ignoreCreeps: true});
-            return;
-        }
+    if (creep.memory.room !== creep.room.name) {
+      var roompos = new RoomPosition(25, 25, creep.memory.room)
+      if (creep.memory.lasttarget && creep.memory.lasttarget.roomName === creep.memory.room) {
+        roompos = new RoomPosition(creep.memory.lasttarget.x, creep.memory.lasttarget.y, creep.memory.lasttarget.roomName)
+      }
+      creep.goTo(roompos)
 
-        if (creep.memory.room !== creep.room.name){
+      return
+    }
 
-            var roompos = new RoomPosition(25,25, creep.memory.room);
-            if (creep.memory.lasttarget && creep.memory.lasttarget.roomName === creep.memory.room){
-                roompos = new RoomPosition(creep.memory.lasttarget.x, creep.memory.lasttarget.y, creep.memory.lasttarget.roomName);
-            }
-            creep.goTo(roompos);
+    this.afteract(creep)
+  },
 
-            return;
-        }
+  act: function (creep) {
+    var healpower = creep.getActiveBodyparts(HEAL) * 12
+    // console.log('healpower');
+    // heal prio
+    var target = creep.pos.findClosestByRange(FIND_MY_CREEPS, {
+      filter: function (mc) { return mc.hits + healpower * 5 <= mc.hitsMax }
+    })
 
-        this.afteract(creep);
+    // console.log(JSON.stringify(target));
+    if (target) {
+      if (creep.heal(target) === ERR_NOT_IN_RANGE) {
+        creep.rangedHeal(target)
+        creep.moveTo(target, { reusePath: 0 })
+      } else {
+        this.afteract(creep)
+      }
+      return true
+    }
 
-    },
+    // heal all
+    var target = creep.pos.findClosestByRange(FIND_MY_CREEPS, {
+      filter: function (mc) { return mc.hits < mc.hitsMax }
+    })
 
-    act: function(creep) {
+    // console.log(JSON.stringify(target));
+    if (target) {
+      if (creep.heal(target) === ERR_NOT_IN_RANGE) {
+        creep.rangedHeal(target)
+        creep.moveTo(target, { reusePath: 0 })
+      } else {
+        this.afteract(creep)
+      }
+      return true
+    }
+  },
 
-        var healpower = creep.getActiveBodyparts(HEAL)*12;
-        // console.log('healpower');
-        // heal prio
-        var target = creep.pos.findClosestByRange(FIND_MY_CREEPS, {
-            filter: function (mc) { return mc.hits + healpower*5 <= mc.hitsMax; }
-        });
+  afteract: function (creep) {
+    var healpower = creep.getActiveBodyparts(HEAL) * 12
+    // heal prio
+    var target = creep.pos.findClosestByRange(FIND_MY_CREEPS, {
+      filter: function (mc) { return mc.hits + healpower <= mc.hitsMax }
+    })
 
-        // console.log(JSON.stringify(target));
-        if (target) {
-            if (creep.heal(target) === ERR_NOT_IN_RANGE) {
-                creep.rangedHeal(target);
-                creep.moveTo(target, { reusePath: 0 });
-            } else {
-                this.afteract(creep);
-            }
-            return true;
-        }
+    if (target) {
+      creep.moveTo(target, { reusePath: 0 })
+      return true
+    }
 
-        // heal all
-        var target = creep.pos.findClosestByRange(FIND_MY_CREEPS, {
-            filter: function (mc) { return mc.hits < mc.hitsMax; }
-        });
-
-        // console.log(JSON.stringify(target));
-        if (target) {
-            if (creep.heal(target) === ERR_NOT_IN_RANGE) {
-                creep.rangedHeal(target);
-                creep.moveTo(target, { reusePath: 0 });
-            } else {
-                this.afteract(creep);
-            }
-            return true;
-        }
-
-    },
-
-    afteract: function(creep){
-
-        var healpower = creep.getActiveBodyparts(HEAL)*12;
-        // heal prio
-        var target = creep.pos.findClosestByRange(FIND_MY_CREEPS, {
-            filter: function (mc) { return mc.hits + healpower <= mc.hitsMax; }
-        });
-
-        if (target) {
-            creep.moveTo(target, { reusePath: 0 });
-            return true;
-        }
-
-        /*
+    /*
         var towers = creep.room.find(FIND_HOSTILE_STRUCTURES,{
             filter: (structure) => {
                 return (structure.structureType === STRUCTURE_TOWER);
             }
-        });*/
+        }); */
 
-
-        var target = creep.pos.findClosestByRange(FIND_MY_CREEPS, {
-            filter: function (mc) { return mc.memory.role === 'attacker' || mc.memory.role === 'dismantler'}
-        });
-        if (target !== null) {
-            creep.moveTo(target, { reusePath: 0 });
-            // console.log('move after');
-            return true;
-        }
-        return false;
-    },
-
-    boost: function(creep , mineraltype){
-        var lab = creep.pos.findClosestByRange(FIND_MY_STRUCTURES, {
-            filter: function(lab){
-                return lab.mineralType === mineraltype && lab.mineralAmount > 100;
-            }
-        });
-        if (lab){
-            creep.moveTo(lab);
-            lab.boostCreep(creep);
-        }
+    var target = creep.pos.findClosestByRange(FIND_MY_CREEPS, {
+      filter: function (mc) { return mc.memory.role === 'attacker' || mc.memory.role === 'dismantler' }
+    })
+    if (target !== null) {
+      creep.moveTo(target, { reusePath: 0 })
+      // console.log('move after');
+      return true
     }
-};
+    return false
+  },
 
-module.exports = roleHealer;
+  boost: function (creep, mineraltype) {
+    var lab = creep.pos.findClosestByRange(FIND_MY_STRUCTURES, {
+      filter: function (lab) {
+        return lab.mineralType === mineraltype && lab.mineralAmount > 100
+      }
+    })
+    if (lab) {
+      creep.moveTo(lab)
+      lab.boostCreep(creep)
+    }
+  }
+}
+
+module.exports = roleHealer
