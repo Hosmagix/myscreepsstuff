@@ -365,7 +365,7 @@ var roleMineral = {
         var target = creep.pos.findClosestByRange(targets)
         if (target.mineralAmount < (target.mineralCapacity)) {
           // console.log('lab not full yet -> fill');
-          if (creep.transfer(target, mineral) == ERR_NOT_IN_RANGE) {
+          if (creep.transfer(target, mineral) === ERR_NOT_IN_RANGE) {
             creep.moveTo(target)
           }
           return
@@ -380,7 +380,7 @@ var roleMineral = {
         })
         if (targets.length > 0) {
           var target = creep.pos.findClosestByRange(targets)
-          if (creep.transfer(target, mineral) == ERR_NOT_IN_RANGE) {
+          if (creep.transfer(target, mineral) === ERR_NOT_IN_RANGE) {
             creep.moveTo(target)
           }
           return
@@ -390,7 +390,7 @@ var roleMineral = {
 
     if (creep.room.terminal && mineral && that.terminalneeds(mineral)) {
       var terminal = creep.room.terminal
-      if (creep.transfer(terminal, mineral) == ERR_NOT_IN_RANGE) {
+      if (creep.transfer(terminal, mineral) === ERR_NOT_IN_RANGE) {
         creep.moveTo(terminal)
       }
       return
@@ -399,7 +399,7 @@ var roleMineral = {
     // bring energy to Storage
     if (creep.room.storage) {
       var storage = creep.room.storage
-      if (creep.transfer(storage, mineral) == ERR_NOT_IN_RANGE) {
+      if (creep.transfer(storage, mineral) === ERR_NOT_IN_RANGE) {
         creep.moveTo(storage)
       }
       return

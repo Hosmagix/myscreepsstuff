@@ -7,11 +7,11 @@ var roleClaim = {
 
       if (creep.memory.role === 'reserver') {
         // console.log('bla');
-        if (creep.reserveController(creep.room.controller) == ERR_NOT_IN_RANGE) {
+        if (creep.reserveController(creep.room.controller) === ERR_NOT_IN_RANGE) {
           creep.goTo(creep.room.controller.pos, 1, 3)
         }
       } else {
-        if (creep.claimController(creep.room.controller) == ERR_NOT_IN_RANGE) {
+        if (creep.claimController(creep.room.controller) === ERR_NOT_IN_RANGE) {
           creep.goTo(creep.room.controller.pos, 1, 3)
         }
       }

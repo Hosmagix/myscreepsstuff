@@ -20,7 +20,7 @@ var roleDismantler = {
     var target = creep.pos.findClosestByRange(priorityTargets)
     if (target !== null) {
       if (creep.dismantle(target) !== OK) {
-        if (creep.moveTo(target, {reusePath: 0}) == OK) {
+        if (creep.moveTo(target, {reusePath: 0}) === OK) {
           creep.dismantle(target)
         }
       }
@@ -37,7 +37,7 @@ var roleDismantler = {
     if (nearbybuildings.length > 0) {
       var target = creep.pos.findClosestByRange(nearbybuildings)
       if (creep.dismantle(target) !== OK) {
-        if (creep.moveTo(target, {reusePath: 0}) == OK) {
+        if (creep.moveTo(target, {reusePath: 0}) === OK) {
           creep.dismantle(target)
         }
       }
@@ -53,7 +53,7 @@ var roleDismantler = {
     if (towers.length > 0) {
       var target = creep.pos.findClosestByRange(towers)
       if (creep.dismantle(target) !== OK) {
-        if (creep.moveTo(target, {reusePath: 0}) == OK) {
+        if (creep.moveTo(target, {reusePath: 0}) === OK) {
           creep.dismantle(target)
         }
       }
@@ -69,7 +69,7 @@ var roleDismantler = {
     if (structures.length > 0) {
       var target = creep.pos.findClosestByRange(structures)
       if (creep.dismantle(target) !== OK) {
-        if (creep.moveTo(target, {reusePath: 0}) == OK) {
+        if (creep.moveTo(target, {reusePath: 0}) === OK) {
           creep.dismantle(target)
         }
       }
@@ -88,7 +88,7 @@ var roleDismantler = {
             // console.log('hi');
             var target = creep.pos.findClosestByRange(targets);
             if(creep.dismantle(target )!== OK){
-                if (creep.moveTo(target,{reusePath: 0}) == OK){
+                if (creep.moveTo(target,{reusePath: 0}) === OK){
                     creep.dismantle(target);
                 }
 

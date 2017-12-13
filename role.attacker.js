@@ -25,7 +25,7 @@ var roleAttacker = {
     var target = creep.pos.findClosestByRange(priorityTargets)
     if (target !== null) {
       if (creep.attack(target) !== OK) {
-        if (creep.moveTo(target, {reusePath: 0}) == OK) {
+        if (creep.moveTo(target, {reusePath: 0}) === OK) {
           creep.attack(target)
         }
       }
@@ -48,7 +48,7 @@ var roleAttacker = {
     if (targets.length > 0) {
       var target = creep.pos.findClosestByRange(targets)
       if (creep.attack(target) !== OK) {
-        if (creep.moveTo(target, {reusePath: 0}) == OK) {
+        if (creep.moveTo(target, {reusePath: 0}) === OK) {
           creep.attack(target)
         }
       }
@@ -79,7 +79,7 @@ var roleAttacker = {
     if (creepsandtowers.length > 0) {
       var target = creep.pos.findClosestByRange(creepsandtowers)
       if (creep.attack(target) !== OK) {
-        if (creep.moveTo(target, {reusePath: 0}) == OK) {
+        if (creep.moveTo(target, {reusePath: 0}) === OK) {
           creep.attack(target)
         }
       }
@@ -108,7 +108,7 @@ var roleAttacker = {
     if (both.length > 0) {
       var target = creep.pos.findClosestByRange(both)
       if (creep.attack(target) !== OK) {
-        if (creep.moveTo(target, {reusePath: 0}) == OK) {
+        if (creep.moveTo(target, {reusePath: 0}) === OK) {
           creep.attack(target)
         }
       }
@@ -127,7 +127,7 @@ var roleAttacker = {
             // console.log('hi');
             var target = creep.pos.findClosestByRange(targets);
             if(creep.attack(target )!== OK){
-                if (creep.moveTo(target,{reusePath: 0}) == OK){
+                if (creep.moveTo(target,{reusePath: 0}) === OK){
                     creep.attack(target);
                 }
 

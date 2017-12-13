@@ -726,7 +726,7 @@ module.exports.loop = function () {
     }
 
     var links = room.find(FIND_STRUCTURES, {
-      filter: (i) => i.structureType == STRUCTURE_LINK
+      filter: (i) => i.structureType === STRUCTURE_LINK
     })
 
     if (links.length >= 2 && room.storage) {
@@ -1153,7 +1153,7 @@ var createClaimCreep = function (spawn) {
 var positionFree = function (roomposition) {
   console.log('roomposition:' + roomposition)
   var terrain = roomposition.lookFor(LOOK_TERRAIN)
-  if (terrain.length > 0 && terrain[0] == 'wall') {
+  if (terrain.length > 0 && terrain[0] === 'wall') {
     console.log('terrain is wall: ' + JSON.stringify(terrain))
     return false
   }

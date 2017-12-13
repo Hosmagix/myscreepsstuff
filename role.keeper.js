@@ -13,7 +13,7 @@ var roleKeeper = {
     if (targets.length > 0) {
       var target = creep.pos.findClosestByRange(targets)
       if (creep.attack(target) !== OK) {
-        if (creep.moveTo(target, {reusePath: 0}) == OK) {
+        if (creep.moveTo(target, {reusePath: 0}) === OK) {
           creep.attack(target)
         }
         this.afteract(creep)
@@ -72,7 +72,7 @@ var roleKeeper = {
       var target = creep.pos.findClosestByRange(targets)
       if (creep.attack(target) !== OK) {
         // console.log('blaaa');
-        if (creep.moveTo(target, {reusePath: 0}) == OK) {
+        if (creep.moveTo(target, {reusePath: 0}) === OK) {
           creep.attack(target)
         }
         creep.memory.lasttarget = target.pos
