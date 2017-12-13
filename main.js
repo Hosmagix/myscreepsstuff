@@ -1,12 +1,8 @@
-var roleUpgrader = require('role.upgrader');
-var roleBuilder = require('role.builder');
-var roleTransporter = require('role.transporter');
-var roleAttacker = require('role.attacker');
-var roleClaim = require('role.claim');
-var roleHealer = require('role.healer');
-var roleMineral = require('role.mineral');
-var roleDismantler = require('role.dismantler');
-var roleKeeper = require('role.keeper');
+
+
+var handleFlags = require('handleFlags');
+var moveCreeps = require('moveCreeps');
+var sellResources = require('sellResources');
 
 module.exports.loop = function () {
 
@@ -31,119 +27,8 @@ module.exports.loop = function () {
     var warroom = null;
     var attackingcreeps = _.filter(Game.creeps, (creep) => creep.memory.role === 'attacker' || creep.memory.role === 'healer' || creep.memory.role === 'dismantler');
 
-    var removeflags = (Game.cpu.bucket < 300);
 
-
-    for(let flagN in Game.flags){
-        let flag = Game.flags[flagN];
-
-        if (flag.memory.remove){
-            flag.remove();
-            continue;
-        }
-
-        if (flag.color === COLOR_WHITE) {
-            if (removeflags){
-                flag.remove();
-            }
-
-            if (Game.time % 200 === 0){
-                var terrain = Game.map.getTerrainAt(flag.pos);
-                var visited = flag.memory.visited? flag.memory.visited : 1;
-                var timeout = flag.memory.timeout? flag.memory.timeout : 0;
-                var diff  = visited - timeout;
-                if (diff >= 1){
-                    flag.memory.timeout = (terrain === 'swamp')? timeout + 4 : timeout +1;
-                    // console.log('reducing visited count');
-                } else{
-                    // console.log('flag was not visited enough -> remove flag');
-                    flag.memory.remove = true;
-                    flag.remove();
-                }
-            }
-        }
-
-        else if(flag.color === COLOR_YELLOW){
-            Memory.gatheringpoint = flag.pos;
-            flag.memory.remove = true;
-            flag.remove();
-        }
-        else if(flag.color === COLOR_GREEN){
-            warroom = flag.pos.roomName;
-            Memory.warroom = flag.pos.roomName;
-            flag.remove();
-
-        }
-        else if(flag.color === COLOR_BROWN && !flag.memory.remove){
-            var sourceroomname = findClosestRoom(flag.pos);
-            // console.log(sourceroomname);
-            if (sourceroomname){
-                var slaverooms = Game.rooms[sourceroomname].memory.slaverooms || [];
-                slaverooms.push(flag.pos);
-                Game.rooms[sourceroomname].memory.slaverooms = slaverooms;
-                flag.memory.remove = true;
-                flag.remove();
-            }
-        }
-        else if(flag.color === COLOR_BLUE && !flag.memory.remove){
-            var sourceroomname = findClosestRoom(flag.pos);
-            console.log('found claimroom: ' + sourceroomname);
-            Game.rooms[sourceroomname].memory.claimroom = flag.pos.roomName;
-            flag.memory.remove = true;
-            flag.remove();
-        }
-        else if(flag.color === COLOR_GREY){
-
-            if (flag.secondaryColor === COLOR_RED){
-                // console.log('flag detected');
-
-                var sourceroomname = findClosestRoom(flag.pos);
-                Game.rooms[sourceroomname].memory.lootroom = flag.pos.roomName;
-                flag.memory.remove = true;
-                flag.remove();
-            } else if (flag.secondaryColor === COLOR_BLUE){
-                flag.room.memory.upgradepos = flag.pos;
-                flag.remove();
-            }
-        }
-        else if(flag.color === COLOR_ORANGE){
-            var sourceroomname = findClosestRoom(flag.pos);
-            Game.rooms[sourceroomname].memory.attackinprogress = true;
-            Game.rooms[sourceroomname].memory.warroom = flag.pos.roomName;
-            flag.remove();
-        }
-        else if (flag.color === COLOR_RED){
-            var sourceroomname = findClosestRoom(flag.pos)
-            Game.rooms[sourceroomname].memory.guidedattack = true;
-            // Memory.attackinprogress = true;
-            flag.remove();
-            Memory.gatheringpoint = null;
-        }
-
-        else if (flag.color === COLOR_CYAN && !flag.memory.remove){
-            var sourceroomname = findClosestRoom(flag.pos);
-
-            var cords = flag.pos.roomName.substr(1).replace('N',',').replace('S',',').split(',');
-            if (Number(cords[0])%10 === 5 && Number(cords[1])%10 === 5 ){
-                centralroom = true;
-                console.log('add central room to list');
-                Game.rooms[sourceroomname].memory.centralroom = flag.pos.roomName;
-            } else {
-                var keeperrooms = Game.rooms[sourceroomname].memory.keeperrooms || [];
-                keeperrooms.push(flag.pos.roomName);
-                Game.rooms[sourceroomname].memory.keeperrooms = keeperrooms;
-            }
-
-            // console.log('keeperrooms: ' + JSON.stringify8keeperrooms);
-            flag.memory.remove = true;
-            flag.remove();
-        }
-
-        else if(flag.color === COLOR_PURPLE){
-            // flag.remove();
-            // TODO: remove if no building
-        }
-    }
+    handleFlags.handleflags();
 
     var flagcpu = Game.cpu.getUsed();
 
@@ -189,64 +74,12 @@ module.exports.loop = function () {
 
     }
 
+    moveCreeps.moveCreeps();
 
-    // creeps
-
-    var attackers = 0, healers = 0, claimers = 0, mineralguys = 0, dismantler = 0, keeper = 0, builder = 0, transporter = 0, sltransporter = 0, harvester = 0, outsider = 0, gatherers = 0;
-    var total = 0;
-    var maxcpu = 0;
-    var maxcreep = '';
-    for(var name in Game.creeps) {
-
-        var before = Game.cpu.getUsed();
-        var creep = Game.creeps[name];
-        if (creep.spawning){
-            continue;
-        }
-        if (creep.memory.role === 'attacker' || creep.memory.role === 'defender' || creep.memory.role === 'Specialdefender'){
-            roleAttacker.run(creep);
-        } else if (creep.memory.role === 'healer'){
-            roleHealer.run(creep);
-        } else if (creep.memory.role === 'reserver' || creep.memory.role === 'claim'){
-            roleClaim.run(creep);
-        } else if (creep.memory.role === 'mineral' || creep.memory.role === 'mineraltransporter'){
-            roleMineral.run(creep);
-        } else if (creep.memory.role === 'dismantler'){
-            roleDismantler.run(creep);
-        } else if (creep.memory.role === 'keeper'){
-
-            roleKeeper.run(creep);
-            //var diff = Game.cpu.getUsed() - before;
-            //keeper++;
-            //total += diff;
-        } else {
-            roleBuilder.run(creep);
-            var diff = Game.cpu.getUsed() - before;
-            if (diff > maxcpu){
-                maxcpu = diff;
-                maxcreep = creep;
-            }
-            keeper++;
-            total += diff;
-        }
-        var creeproom = creep.room;
-        if (!creeproom.memory.sources){
-            var sources = creeproom.find(FIND_SOURCES).map(function(source){
-                return source.pos;
-            });
-            creeproom.memory.sources = sources;
-        }
-    }
-    if (keeper > 0){
-        var average = total / keeper;
-        console.log( keeper + 'builders used ' + average + ' cpu on average per creep');
-        if (maxcpu > 10){
-            maxcreep.log(' I am ashamed for using ' + maxcpu);
-        }
-    }
 
     var creepscpu = Game.cpu.getUsed();
 
+    var targets;
     for (var room_id in Game.rooms) {
         let room = Game.rooms[room_id];
 
@@ -266,7 +99,7 @@ module.exports.loop = function () {
         // activate safemode
 
         var danger = false;
-        var targets = room.find(FIND_HOSTILE_CREEPS);
+        targets = room.find(FIND_HOSTILE_CREEPS);
         var numinvaders = targets.length;
 
         var towers = room.find(FIND_MY_STRUCTURES, {
@@ -401,101 +234,8 @@ module.exports.loop = function () {
         // sell ressources
         if (Game.time %50 === 1){
 
+            sellResources.sellResources();
 
-
-            var oxygen = room.terminal.store[RESOURCE_OXYGEN];
-            var storageoxygen = room.storage.store[RESOURCE_OXYGEN];
-
-            // room.log('selling' + oxygen + ' storage: ' + storageoxygen);
-            if (oxygen > 5000 && room.terminal.store.energy >= 30000 && storageoxygen > 50000){
-                var orders = Game.market.getAllOrders().filter(function(order){
-                    return order.resourceType === RESOURCE_OXYGEN && order.type === ORDER_BUY && Game.market.calcTransactionCost(1000, room.name, order.roomName) < 2000;
-                });
-                console.log('orders:' + JSON.stringify(orders));
-
-                var price = 0;
-                var orderid = null;
-                var maxamount = 0;
-                orders.forEach(function(order){
-                    if (order.price > price){
-                        price = order.price;
-                        orderid = order.id;
-                        maxamount = order.amount;
-                    }
-                });
-                if (orderid){
-
-
-                    var amount = Math.min(Math.min(maxamount, oxygen), 15000);
-                    room.log('maxamount: ' + maxamount + ' oxygen: ' + oxygen + 'resultingamount: ' + amount);
-
-                    var result = Game.market.deal(orderid, amount, room.name);
-                    room.log('selling oxygen: ' + amount + ' result: ' + result);
-                }
-            }
-
-
-            var oxygen = room.terminal.store[RESOURCE_LEMERGIUM_OXIDE];
-            var storageoxygen = room.storage.store[RESOURCE_LEMERGIUM_OXIDE];
-
-            // room.log('selling' + oxygen + ' storage: ' + storageoxygen);
-            if (oxygen > 5000 && room.terminal.store.energy >= 30000 && storageoxygen > 500000){
-                var orders = Game.market.getAllOrders().filter(function(order){
-                    return order.resourceType === RESOURCE_LEMERGIUM_OXIDE && order.type === ORDER_BUY && Game.market.calcTransactionCost(1000, room.name, order.roomName) < 2000;
-                });
-                console.log('orders:' + JSON.stringify(orders));
-
-                var price = 0;
-                var orderid = null;
-                var maxamount = 0;
-                orders.forEach(function(order){
-                    if (order.price > price){
-                        price = order.price;
-                        orderid = order.id;
-                        maxamount = order.amount;
-                    }
-                });
-                if (orderid){
-
-
-                    var amount = Math.min(Math.min(maxamount, oxygen), 15000);
-                    room.log('maxamount: ' + maxamount + ' RESOURCE_LEMERGIUM_OXIDE: ' + oxygen + 'resultingamount: ' + amount);
-
-                    var result = Game.market.deal(orderid, amount, room.name);
-                    room.log('selling RESOURCE_LEMERGIUM_OXIDE: ' + amount + ' result: ' + result);
-                }
-            }
-
-
-
-
-
-
-            var oxygen = room.terminal.store[RESOURCE_ZYNTHIUM];
-            if (oxygen > 50000 && room.terminal.store.energy >= 30000){
-                var orders = Game.market.getAllOrders().filter(function(order){
-                    return order.resourceType === RESOURCE_ZYNTHIUM && order.type === ORDER_BUY && Game.market.calcTransactionCost(1000, room.name, order.roomName) < 1000;
-                });
-                // console.log('orders:' + JSON.stringify(orders));
-
-                var price = 0;
-                var orderid = null;
-                var maxamount = 0;
-                orders.forEach(function(order){
-                    if (order.price > price){
-                        price = order.price;
-                        orderid = order.id;
-                        maxamount = order.amount;
-                    }
-                });
-                if (orderid){
-
-                    var amount = Math.min(Math.max(maxamount, oxygen -20000), 30000);
-
-                    var result = Game.market.deal(orderid, amount, room.name);
-                    console.log('selling zynthium: ' + amount + ' result: ' + result);
-                }
-            }
         }
         /*if (room.name === "W15N67" && Game.time %50 === 9){
             var oxygen = room.terminal.store[RESOURCE_LEMERGIUM];
