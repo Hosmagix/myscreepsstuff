@@ -1,3 +1,5 @@
+var Utils = require('utils')
+
 exports.handleflags = function () {
   var removeflags = (Game.cpu.bucket < 300)
 
@@ -37,7 +39,7 @@ exports.handleflags = function () {
       Memory.warroom = flag.pos.roomName
       flag.remove()
     } else if (flag.color === COLOR_BROWN && !flag.memory.remove) {
-      var sourceroomname = findClosestRoom(flag.pos)
+      var sourceroomname = Utils.findClosestRoom(flag.pos)
       // console.log(sourceroomname);
       if (sourceroomname) {
         var slaverooms = Game.rooms[sourceroomname].memory.slaverooms || []
@@ -47,7 +49,7 @@ exports.handleflags = function () {
         flag.remove()
       }
     } else if (flag.color === COLOR_BLUE && !flag.memory.remove) {
-      var sourceroomname = findClosestRoom(flag.pos)
+      var sourceroomname = Utils.findClosestRoom(flag.pos)
       console.log('found claimroom: ' + sourceroomname)
       Game.rooms[sourceroomname].memory.claimroom = flag.pos.roomName
       flag.memory.remove = true
@@ -56,7 +58,7 @@ exports.handleflags = function () {
       if (flag.secondaryColor === COLOR_RED) {
         // console.log('flag detected');
 
-        var sourceroomname = findClosestRoom(flag.pos)
+        var sourceroomname = Utils.findClosestRoom(flag.pos)
         Game.rooms[sourceroomname].memory.lootroom = flag.pos.roomName
         flag.memory.remove = true
         flag.remove()
@@ -65,18 +67,18 @@ exports.handleflags = function () {
         flag.remove()
       }
     } else if (flag.color === COLOR_ORANGE) {
-      var sourceroomname = findClosestRoom(flag.pos)
+      var sourceroomname = Utils.findClosestRoom(flag.pos)
       Game.rooms[sourceroomname].memory.attackinprogress = true
       Game.rooms[sourceroomname].memory.warroom = flag.pos.roomName
       flag.remove()
     } else if (flag.color === COLOR_RED) {
-      var sourceroomname = findClosestRoom(flag.pos)
+      var sourceroomname = Utils.findClosestRoom(flag.pos)
       Game.rooms[sourceroomname].memory.guidedattack = true
       // Memory.attackinprogress = true;
       flag.remove()
       Memory.gatheringpoint = null
     } else if (flag.color === COLOR_CYAN && !flag.memory.remove) {
-      var sourceroomname = findClosestRoom(flag.pos)
+      var sourceroomname = Utils.findClosestRoom(flag.pos)
 
       var cords = flag.pos.roomName.substr(1).replace('N', ',').replace('S', ',').split(',')
       if (Number(cords[0]) % 10 === 5 && Number(cords[1]) % 10 === 5) {
