@@ -49,9 +49,11 @@ exports.overridePrototypes = function () {
         }
       })
 
-      /* this.find(FIND_CONSTRUCTION_SITES).forEach(function(construcitonsite){
-                costs.set(construcitonsite.pos.x, construcitonsite.pos.y, 0xff);
-            }) */
+      this.find(FIND_CONSTRUCTION_SITES).forEach(function(construcitonsite){
+        if (construcitonsite.structureType !== STRUCTURE_ROAD){
+          costs.set(construcitonsite.pos.x, construcitonsite.pos.y, 0xff);
+        }
+      })
 
       this.matrix1 = costs
       var storedmatrix = {}
