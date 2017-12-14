@@ -210,7 +210,7 @@ module.exports.loop = function () {
 
     // sell ressources
     if (Game.time % 50 === 1) {
-      sellResources.sellResources()
+      //    sellResources.sellResources()
     }
     /* if (room.name === "W15N67" && Game.time %50 === 9){
             var oxygen = room.terminal.store[RESOURCE_LEMERGIUM];
