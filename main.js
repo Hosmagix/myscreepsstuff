@@ -1,32 +1,32 @@
 
-var handleFlags = require('handleFlags');
-var moveCreeps = require('moveCreeps');
-var sellResources = require('sellResources');
-var overridePrototypes = require('OverridePrototypes');
+let handleFlags = require('handleFlags')
+let moveCreeps = require('moveCreeps')
+let sellResources = require('sellResources')
+let overridePrototypes = require('OverridePrototypes')
 
 module.exports.loop = function () {
-  var startcpu = Game.cpu.getUsed();
+  let startcpu = Game.cpu.getUsed()
 
-  overridePrototypes.overridePrototypes();
+  overridePrototypes.overridePrototypes()
 
   for (var name in Memory.creeps) {
     if (!Game.creeps[name]) {
-      delete Memory.creeps[name];
+      delete Memory.creeps[name]
     }
   }
   for (var name in Memory.flags) {
     if (!Game.flags[name]) {
-      delete Memory.flags[name];
+      delete Memory.flags[name]
     }
   }
 
-  var gatheringpoint = Memory.gatheringpoint
-  var warroom = null
-  var attackingcreeps = _.filter(Game.creeps, (creep) => creep.memory.role === 'attacker' || creep.memory.role === 'healer' || creep.memory.role === 'dismantler')
+  let gatheringpoint = Memory.gatheringpoint
+  let warroom = null
+  let attackingcreeps = _.filter(Game.creeps, (creep) => creep.memory.role === 'attacker' || creep.memory.role === 'healer' || creep.memory.role === 'dismantler')
 
   handleFlags.handleflags()
 
-  var flagcpu = Game.cpu.getUsed()
+  let flagcpu = Game.cpu.getUsed()
 
   // Global level decisions
 
@@ -47,8 +47,8 @@ module.exports.loop = function () {
   }
 
   if (Game.time % 100 === 3 || !Memory.energytarget) {
-    var mincontrollerlevel = 8
-    var progress = 0
+    let mincontrollerlevel = 8
+    let progress = 0
     var roomname = ''
     for (var room_id in Game.rooms) {
       let room = Game.rooms[room_id]
@@ -70,9 +70,9 @@ module.exports.loop = function () {
 
   moveCreeps.moveCreeps()
 
-  var creepscpu = Game.cpu.getUsed()
+  let creepscpu = Game.cpu.getUsed()
 
-  var targets
+  let targets
   for (var room_id in Game.rooms) {
     let room = Game.rooms[room_id]
 
@@ -92,9 +92,9 @@ module.exports.loop = function () {
 
     var danger = false
     targets = room.find(FIND_HOSTILE_CREEPS)
-    var numinvaders = targets.length
+    let numinvaders = targets.length
 
-    var towers = room.find(FIND_MY_STRUCTURES, {
+    let towers = room.find(FIND_MY_STRUCTURES, {
       filter: (structure) => {
         return (structure.structureType === STRUCTURE_TOWER)
       }
@@ -120,7 +120,7 @@ module.exports.loop = function () {
       }
 
       towers.forEach(function (tower) {
-        var closest = tower.pos.findClosestByRange(FIND_HOSTILE_CREEPS)
+        let closest = tower.pos.findClosestByRange(FIND_HOSTILE_CREEPS)
         console.log('attacking closest enemy')
         tower.attack(closest)
       })
@@ -131,7 +131,7 @@ module.exports.loop = function () {
 
       if (damagedCreeps.length > 0) {
         towers.forEach(function (tower) {
-          var closestCreep = tower.pos.findClosestByRange(damagedCreeps)
+          let closestCreep = tower.pos.findClosestByRange(damagedCreeps)
           if (closestCreep) {
             tower.heal(closestCreep)
           }
@@ -139,8 +139,8 @@ module.exports.loop = function () {
       }
     }
 
-    var spawns = room.find(FIND_MY_SPAWNS)
-    var spawn = spawns[0]
+    let spawns = room.find(FIND_MY_SPAWNS)
+    let spawn = spawns[0]
     if (!spawn) {
       continue
     }
@@ -152,22 +152,22 @@ module.exports.loop = function () {
       //   console.log(JSON.stringify(room.terminal));
       Object.keys(room.terminal.store).forEach(function (key) {
         // key: the name of the object key
-        var amount = room.terminal.store[key]
+        let amount = room.terminal.store[key]
         if (amount < 1000 || transitiondone || key === RESOURCE_ENERGY) return
         if (room.memory.reaction && (room.memory.reaction.m1 === key || room.memory.reaction.m2 === key)) {
           return
         }
 
         if (Memory.requesting && Memory.requesting[key]) {
-          var rooms = Memory.requesting[key]
+          let rooms = Memory.requesting[key]
           //  room.log('requesting rooms are: ' + rooms);
-          var targetroom = null // only transfer up to 10k minerals
-          var mineral = 9000
-          for (var i in rooms) {
-            var name = rooms[i]
-            var roomi = Game.rooms[name]
+          let targetroom = null // only transfer up to 10k minerals
+          let mineral = 9000
+          for (let i in rooms) {
+            let name = rooms[i]
+            let roomi = Game.rooms[name]
             // console.log('roomi: ' + JSON.stringify(roomi));
-            var minerals = roomi.terminal.store[key] || 0
+            let minerals = roomi.terminal.store[key] || 0
             // console.log('minerals: ' + minerals);
             if (minerals < mineral && (name !== room.name)) {
               mineral = minerals
@@ -184,7 +184,7 @@ module.exports.loop = function () {
           // Game.rooms[room_id]
 
           if (targetroom && !transitiondone && key !== RESOURCE_ENERGY) {
-            var res = room.terminal.send(key, amount, targetroom)
+            let res = room.terminal.send(key, amount, targetroom)
             transitiondone = true
             room.log('transfering ' + amount + ' ' + key + ' to ' + targetroom + ': ' + res)
           }
@@ -197,10 +197,10 @@ module.exports.loop = function () {
 
     if (room.terminal && room.terminal.store.energy > 70000 && room.controller.level === 8 && Game.time % 50 === 0 && Memory.energytarget) {
       room.log(room.name + ': found level 8 room -> prepare sending energy away')
-      var targetroom = Game.rooms[Memory.energytarget]
+      let targetroom = Game.rooms[Memory.energytarget]
       if (targetroom.terminal && targetroom.terminal.store.energy < 150000) {
-        var destination = Memory.energytarget
-        var amount = 30000
+        let destination = Memory.energytarget
+        let amount = 30000
         room.terminal.send('energy', amount, destination)
         transitiondone = true
         room.log('transfering ' + amount + ' energy to ' + destination)
@@ -261,7 +261,7 @@ module.exports.loop = function () {
         }
         // TODO: calculate distance
 
-        var room2 = Game.rooms[slaveroom.roomName]
+        let room2 = Game.rooms[slaveroom.roomName]
         // console.log('room2.memory.dangertill' + room2.memory.dangertill);
         if (room2 && room2.memory.dangertill && (room2.memory.dangertill > Game.time)) {
           slaveroomindanger = true
@@ -280,7 +280,7 @@ module.exports.loop = function () {
     }
 
     // getting first free spawn
-    var firstfreespawn = -1
+    let firstfreespawn = -1
     if (spawns[0] && !spawns[0].spawning) {
       firstfreespawn = 0
     } else if (spawns[1] && !spawns[1].spawning) {
@@ -290,7 +290,7 @@ module.exports.loop = function () {
     }
 
     if (firstfreespawn >= 0) {
-      var roomcreeps = _.filter(Game.creeps, (creep) => creep.memory.home === room.name && (creep.ticksToLive > 100 || creep.spawning))
+      let roomcreeps = _.filter(Game.creeps, (creep) => creep.memory.home === room.name && (creep.ticksToLive > 100 || creep.spawning))
       // console.log(JSON.stringify(roomcreeps));
       var builders = 0, upgraders = 0, harvesters = 0, transporters = 0, reserver = 0, defenders = 0, attackers = 0, healers = 0,
         specialbuilders = 0, mineral = 0, mineraltransporters = 0, dismantlers = 0, specialdefenders = 0, looters = 0
@@ -306,7 +306,7 @@ module.exports.loop = function () {
             return
           }
           // var roomName = roompos.roomName + ',' + roompos.x +',' + roompos.y;
-          var roomName = JSON.stringify(roompos)
+          let roomName = JSON.stringify(roompos)
           slaves[roomName] = 0
           if (roompos.container) {
             slavetransporter[roomName] = 0
@@ -393,41 +393,41 @@ module.exports.loop = function () {
       // console.log('keepers' + JSON.stringify(keepers));
       // console.log('gatherers' + JSON.stringify(gatherers));
 
-      var slaveid = ''
+      let slaveid = ''
       for (var x in slaves) {
         if (slaves[x] < 1) {
           slaveid = x
         }
       }
-      var slavetransid = ''
+      let slavetransid = ''
       for (var x in slavetransporter) {
         if (slavetransporter[x] < 1) {
           slavetransid = x
         }
       }
 
-      var keeperid = ''
+      let keeperid = ''
       for (var x in keepers) {
         if (keepers[x] < 1) {
           keeperid = x
         }
       }
 
-      var gathererid = ''
+      let gathererid = ''
       for (var x in gatherers) {
         if (gatherers[x] < 1) {
           gathererid = x
         }
       }
 
-      var roomtoreserve = null
-      var singleroomreserve = null
+      let roomtoreserve = null
+      let singleroomreserve = null
 
       // console.log('reserving: ' + JSON.stringify(reserving));
 
       for (var y in room.memory.slaverooms) {
         var name = room.memory.slaverooms[y].roomName
-        var claimroom = Game.rooms[name]
+        let claimroom = Game.rooms[name]
 
         if (claimroom && claimroom.controller) {
           // console.log('controller is here');
@@ -442,18 +442,18 @@ module.exports.loop = function () {
       }
       // console.log('roomtoreserve:' + roomtoreserve);
 
-      var maxattackers = 1
-      var maxhealers = 3
-      var maxdismantlers = 2
+      let maxattackers = 1
+      let maxhealers = 3
+      let maxdismantlers = 2
       if (attackers >= maxattackers && healers >= maxhealers && dismantlers >= maxdismantlers) {
         // Memory.attackinprogress = false;
         room.memory.guidedattack = false
       }
       // Memory.attackinprogress = false;
-      var war = Memory.attackinprogress && room.controller.level >= 7 || room.memory.guidedattack
-      var numbuilder = 3
-      var specializedbuilders = 0
-      var numupgrader = 1
+      let war = Memory.attackinprogress && room.controller.level >= 7 || room.memory.guidedattack
+      let numbuilder = 3
+      let specializedbuilders = 0
+      let numupgrader = 1
       if (room.memory.haslinks) {
         numbuilder = 0
         specializedbuilders = 1
@@ -469,7 +469,7 @@ module.exports.loop = function () {
       } else if (room.controller.level < 5) {
         numbuilder = 3
       }
-      var constrsites = room.find(FIND_CONSTRUCTION_SITES)
+      let constrsites = room.find(FIND_CONSTRUCTION_SITES)
       if (constrsites.length === 0 && numbuilder > 0) {
         numupgrader += 2
       }
@@ -484,7 +484,7 @@ module.exports.loop = function () {
         }
       }
 
-      var normalcreeps = roomcreeps.filter(function (creep) {
+      let normalcreeps = roomcreeps.filter(function (creep) {
         return creep.memory.role !== 'outsider' && creep.memory.role !== 'defender' && creep.memory.role !== 'attacker' && creep.memory.role !== 'sltrans'
       })
       if (normalcreeps.length > 0) {
@@ -492,7 +492,7 @@ module.exports.loop = function () {
       }
 
       if (normalcreeps.length === 0) {
-        var capa = spawn.room.energyAvailable
+        let capa = spawn.room.energyAvailable
         if (capa < 300) {
           capa = 300
         }
@@ -572,7 +572,7 @@ module.exports.loop = function () {
         var newName = spawns[firstfreespawn].createCreep(components, undefined, {role: 'upgrader', home: room.name })
         room.log('Spawning new upgrader: ' + newName)
       } else if (attackers < 1 && room.memory.attackinprogress) {
-        var body = createRangedCreep(spawn)
+        let body = createRangedCreep(spawn)
         var creationpossible = spawns[firstfreespawn].canCreateCreep(body)
         if (creationpossible === OK) {
           var newName = spawns[firstfreespawn].createCreep(body, undefined, {role: 'attacker', room: room.memory.warroom, home: room.name})
@@ -605,7 +605,7 @@ module.exports.loop = function () {
         } else {
           components = createCreepComponents(spawn)
         }
-        var dump = !!roompos.container
+        let dump = !!roompos.container
         sourcepos.container = roompos.container
 
         var newName = spawns[firstfreespawn].createCreep(components, undefined, {role: 'outsider', room: roompos.roomName, home: room.name, sourcepos: sourcepos, dump: dump, nofear: centralroom })
@@ -670,25 +670,25 @@ module.exports.loop = function () {
     if (room.memory.buildstuff) {
       room.log('level up -> build stuff')
 
-      var sx = spawn.pos.x
-      var sy = spawn.pos.y
+      let sx = spawn.pos.x
+      let sy = spawn.pos.y
 
-      var ring = room.memory.ring
+      let ring = room.memory.ring
 
       console.log('spawnpos:' + sx + '/' + sy)
 
       for (var x = (sx - ring); x <= (sx + ring); x++) {
         for (var y = (sy - ring); y <= (sy + ring); y++) {
-          var pos = new RoomPosition(x, y, room.name)
+          let pos = new RoomPosition(x, y, room.name)
           if (((x + y) % 2 === 1) && positionFree(pos)) {
             // check all 4 neighboring tiles
             // console.log('Free spot: ' + JSON.stringify(spot));
-            var north = new RoomPosition(x, y + 1, room.name)
-            var south = new RoomPosition(x, y - 1, room.name)
-            var east = new RoomPosition(x + 1, y, room.name)
-            var west = new RoomPosition(x - 1, y, room.name)
+            let north = new RoomPosition(x, y + 1, room.name)
+            let south = new RoomPosition(x, y - 1, room.name)
+            let east = new RoomPosition(x + 1, y, room.name)
+            let west = new RoomPosition(x - 1, y, room.name)
 
-            var numfree = 0
+            let numfree = 0
             if (positionFree(north)) {
               numfree++
             }
@@ -724,7 +724,7 @@ module.exports.loop = function () {
       }
     }
 
-    var links = room.find(FIND_STRUCTURES, {
+    let links = room.find(FIND_STRUCTURES, {
       filter: (i) => i.structureType === STRUCTURE_LINK
     })
 
@@ -744,7 +744,7 @@ module.exports.loop = function () {
           return
         }
         if (link.cooldown === 0 && link.energy >= 200) {
-          var isspawnlink = false, isconlink = false
+          let isspawnlink = false, isconlink = false
           if (link.pos.x === spawnlink.pos.x && link.pos.y === spawnlink.pos.y) {
             // console.log('link is spawnlink');
             isspawnlink = true
@@ -786,7 +786,7 @@ module.exports.loop = function () {
     if (labs.length > 0 && Game.time % 10 === 0) {
       room.memory.haslabs = true
 
-      var requesting = {}
+      let requesting = {}
       requesting.O = ['W15N67']
       requesting.L = ['W15N67', 'W17N68']
       requesting.Z = ['W14N69']
@@ -800,10 +800,10 @@ module.exports.loop = function () {
       requesting.U = ['W17N68']
       Memory.requesting = requesting
 
-      var fullreaction = function (mineral1, mineral2, result) {
-        var lab1 = null
-        var lab2 = null
-        var targets = []
+      let fullreaction = function (mineral1, mineral2, result) {
+        let lab1 = null
+        let lab2 = null
+        let targets = []
         labs.forEach(function (lab) {
           if (!lab.mineralType) {
             targets.push(lab)
@@ -868,7 +868,7 @@ module.exports.loop = function () {
 }
 
 var createCreepComponents = function (spawn, maxcapacity) {
-  var capacity = spawn.room.energyCapacityAvailable
+  let capacity = spawn.room.energyCapacityAvailable
   if (maxcapacity && capacity > maxcapacity) {
     capacity = maxcapacity
   }
@@ -878,8 +878,8 @@ var createCreepComponents = function (spawn, maxcapacity) {
   }
   // capacity = spawn.room.energyAvailable;
   // console.log('Room capacity' + capacity);
-  var components = [CARRY, MOVE, WORK]
-  var remainingcapacity = capacity - 200
+  let components = [CARRY, MOVE, WORK]
+  let remainingcapacity = capacity - 200
 
   while (remainingcapacity >= 200) {
     components.push(WORK)
@@ -905,21 +905,21 @@ var createCreepComponents = function (spawn, maxcapacity) {
 }
 
 var createWorkFocussedCreep = function (spawn, maxcapacity) {
-  var capacity = spawn.room.energyCapacityAvailable
+  let capacity = spawn.room.energyCapacityAvailable
   if (maxcapacity && capacity > maxcapacity) {
     capacity = maxcapacity
   }
 
-  var work = 1
-  var move = 1
-  var carry = 1
+  let work = 1
+  let move = 1
+  let carry = 1
 
-  var components = []
+  let components = []
 
   if (capacity >= 3500) {
     capacity = 3500
   }
-  var remainingcapacity = capacity - 200
+  let remainingcapacity = capacity - 200
 
   while (remainingcapacity >= 450) {
     work += 3
@@ -965,15 +965,15 @@ var createWorkFocussedCreep = function (spawn, maxcapacity) {
 
 var createDismantleCreep = function (spawn, boostlevel) {
   // boostlevel 1 , 2, 3
-  var capacity = spawn.room.energyCapacityAvailable
+  let capacity = spawn.room.energyCapacityAvailable
   var boostlevel = boostlevel || 0
 
-  var work = 0
-  var move = 0
-  var parts = 0
+  let work = 0
+  let move = 0
+  let parts = 0
 
-  var components = []
-  var remainingcapacity = capacity
+  let components = []
+  let remainingcapacity = capacity
 
   while (remainingcapacity >= 150 && parts <= 48) {
     work += boostlevel + 1
@@ -998,18 +998,18 @@ var createDismantleCreep = function (spawn, boostlevel) {
 }
 
 var createWarCreep = function (spawn) {
-  var capacity = spawn.room.energyCapacityAvailable
+  let capacity = spawn.room.energyCapacityAvailable
   console.log(capacity)
 
   if (capacity > 3250) {
     capacity = 3250
   }
 
-  var tough = 0
-  var move = 0
-  var attack = 0
+  let tough = 0
+  let move = 0
+  let attack = 0
 
-  var remainingcapacity = capacity
+  let remainingcapacity = capacity
 
   while (remainingcapacity >= 130) {
     move++
@@ -1022,7 +1022,7 @@ var createWarCreep = function (spawn) {
     remainingcapacity -= 60
   }
 
-  var components = []
+  let components = []
 
   for (var i = 0; i < tough; i++) {
     components.push(TOUGH)
@@ -1039,15 +1039,15 @@ var createWarCreep = function (spawn) {
 }
 
 var createRangedCreep = function (spawn, someheal) {
-  var capacity = spawn.room.energyCapacityAvailable
+  let capacity = spawn.room.energyCapacityAvailable
   console.log(capacity)
 
-  var tough = 0
-  var move = 0
-  var rangedattack = 0
-  var parts = 0
-  var heal = 0
-  var remainingcapacity = capacity
+  let tough = 0
+  let move = 0
+  let rangedattack = 0
+  let parts = 0
+  let heal = 0
+  let remainingcapacity = capacity
 
   if (someheal) {
     parts = 2
@@ -1068,7 +1068,7 @@ var createRangedCreep = function (spawn, someheal) {
     parts += 2
   }
 
-  var components = []
+  let components = []
 
   for (var i = 0; i < tough; i++) {
     components.push(TOUGH)
@@ -1088,15 +1088,15 @@ var createRangedCreep = function (spawn, someheal) {
 }
 
 var createHealCreep = function (spawn) {
-  var capacity = spawn.room.energyCapacityAvailable
+  let capacity = spawn.room.energyCapacityAvailable
   // console.log(capacity);
 
-  var tough = 0
-  var move = 0
-  var heal = 0
-  var parts = 0
+  let tough = 0
+  let move = 0
+  let heal = 0
+  let parts = 0
 
-  var remainingcapacity = capacity
+  let remainingcapacity = capacity
 
   while (remainingcapacity >= 300 && parts <= 48) {
     move++
@@ -1111,7 +1111,7 @@ var createHealCreep = function (spawn) {
     parts += 2
   }
 
-  var components = []
+  let components = []
 
   for (var i = 0; i < tough; i++) {
     components.push(TOUGH)
@@ -1128,14 +1128,14 @@ var createHealCreep = function (spawn) {
 }
 
 var createClaimCreep = function (spawn) {
-  var capacity = spawn.room.energyCapacityAvailable
+  let capacity = spawn.room.energyCapacityAvailable
   if (capacity > 4000) {
     capacity = 4000
   }
   // capacity = spawn.room.energyAvailable;
   // console.log('Room capacity' + capacity);
-  var components = []
-  var remainingcapacity = capacity
+  let components = []
+  let remainingcapacity = capacity
 
   while (remainingcapacity >= 700) {
     components.push(CLAIM)
@@ -1151,17 +1151,17 @@ var createClaimCreep = function (spawn) {
 
 var positionFree = function (roomposition) {
   console.log('roomposition:' + roomposition)
-  var terrain = roomposition.lookFor(LOOK_TERRAIN)
+  let terrain = roomposition.lookFor(LOOK_TERRAIN)
   if (terrain.length > 0 && terrain[0] === 'wall') {
     console.log('terrain is wall: ' + JSON.stringify(terrain))
     return false
   }
-  var structure = roomposition.lookFor(LOOK_STRUCTURES)
+  let structure = roomposition.lookFor(LOOK_STRUCTURES)
   if (structure.length > 0 && structure[0].structureType !== STRUCTURE_ROAD) {
     console.log('structure on it: ' + JSON.stringify(structure))
     return false
   }
-  var constsite = roomposition.lookFor(LOOK_CONSTRUCTION_SITES)
+  let constsite = roomposition.lookFor(LOOK_CONSTRUCTION_SITES)
   if (constsite.length > 0) {
     console.log('constsite on it: ' + JSON.stringify(constsite))
     return false
@@ -1171,11 +1171,11 @@ var positionFree = function (roomposition) {
 }
 
 var getHarvestID = function (room) {
-  var creeplist = room.find(FIND_MY_CREEPS)
-  var count1 = creeplist.filter(function (creep) { return creep.memory.source === 1 && (creep.ticksToLive > 100 || creep.spawning) && (creep.memory.role === 'builder' || creep.memory.role === 'upgrader' || creep.memory.role === 'harvester') }).length
-  var count0 = creeplist.filter(function (creep) { return creep.memory.source === 0 && (creep.ticksToLive > 100 || creep.spawning) && (creep.memory.role === 'builder' || creep.memory.role === 'upgrader' || creep.memory.role === 'harvester') }).length
+  let creeplist = room.find(FIND_MY_CREEPS)
+  let count1 = creeplist.filter(function (creep) { return creep.memory.source === 1 && (creep.ticksToLive > 100 || creep.spawning) && (creep.memory.role === 'builder' || creep.memory.role === 'upgrader' || creep.memory.role === 'harvester') }).length
+  let count0 = creeplist.filter(function (creep) { return creep.memory.source === 0 && (creep.ticksToLive > 100 || creep.spawning) && (creep.memory.role === 'builder' || creep.memory.role === 'upgrader' || creep.memory.role === 'harvester') }).length
   // console.log('count 0: ' + count0 + ' count1: ' + count1);
-  var res = (count1 >= count0) ? 0 : 1
+  let res = (count1 >= count0) ? 0 : 1
   // console.log('Target source for new creep:' + res);
 
   return res

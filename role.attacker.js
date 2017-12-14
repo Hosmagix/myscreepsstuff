@@ -1,17 +1,17 @@
-var roleAttacker = {
+let roleAttacker = {
 
   act: function (creep) {
     // console.log('roleAttacker act called');
     if (creep.memory.ranged) {
-      var result = this.ranged_act(creep)
+      let result = this.ranged_act(creep)
       this.afteract(creep)
       return result
     }
 
-    var priorityTargets = []
+    let priorityTargets = []
 
-    for (var flagN in Game.flags) {
-      var flag = Game.flags[flagN]
+    for (let flagN in Game.flags) {
+      let flag = Game.flags[flagN]
       if (flag.color === COLOR_PURPLE && creep.room.name === flag.pos.roomName) {
         var targets = flag.pos.lookFor(LOOK_STRUCTURES, {
           filter: {function (s) { return s.structureType !== STRUCTURE_ROAD }}
@@ -34,7 +34,7 @@ var roleAttacker = {
 
     // adjacent creeps
     var targets = creep.room.find(FIND_HOSTILE_CREEPS).filter(function (hc) {
-      var structures = hc.pos.lookFor(LOOK_STRUCTURES, {
+      let structures = hc.pos.lookFor(LOOK_STRUCTURES, {
         filter: {function (s) { return s.structureType !== STRUCTURE_ROAD }}
       })
       return structures.length === 0
@@ -57,7 +57,7 @@ var roleAttacker = {
 
     // offensive creeps
     var targets = creep.room.find(FIND_HOSTILE_CREEPS).filter(function (hc) {
-      var structures = hc.pos.lookFor(LOOK_STRUCTURES, {
+      let structures = hc.pos.lookFor(LOOK_STRUCTURES, {
         filter: {function (s) { return s.structureType !== STRUCTURE_ROAD }}
       })
       return structures.length === 0
@@ -68,13 +68,13 @@ var roleAttacker = {
       })
     }
 
-    var towers = creep.room.find(FIND_HOSTILE_STRUCTURES, {
+    let towers = creep.room.find(FIND_HOSTILE_STRUCTURES, {
       filter: (structure) => {
         return (structure.structureType === STRUCTURE_TOWER)
       }
     })
 
-    var creepsandtowers = targets.concat(towers)
+    let creepsandtowers = targets.concat(towers)
 
     if (creepsandtowers.length > 0) {
       var target = creep.pos.findClosestByRange(creepsandtowers)
@@ -88,7 +88,7 @@ var roleAttacker = {
 
     // normal creeps
     var targets = creep.room.find(FIND_HOSTILE_CREEPS).filter(function (hc) {
-      var structures = hc.pos.lookFor(LOOK_STRUCTURES, {
+      let structures = hc.pos.lookFor(LOOK_STRUCTURES, {
         filter: {function (s) { return s.structureType !== STRUCTURE_ROAD }}
       })
       return structures.length === 0
@@ -98,12 +98,12 @@ var roleAttacker = {
         return (hc.owner.username !== 'Source Keeper' || creep.pos.inRangeTo(hc, 4))
       })
     }
-    var structures = creep.room.find(FIND_HOSTILE_STRUCTURES, {
+    let structures = creep.room.find(FIND_HOSTILE_STRUCTURES, {
       filter: (structure) => {
         return (structure.structureType !== STRUCTURE_CONTROLLER && structure.structureType !== STRUCTURE_RAMPART && structure.structureType !== STRUCTURE_STORAGE && structure.structureType !== STRUCTURE_TERMINAL && structure.structureType !== STRUCTURE_KEEPER_LAIR)
       }
     })
-    var both = targets.concat(structures)
+    let both = targets.concat(structures)
     // var both = structures;
     if (both.length > 0) {
       var target = creep.pos.findClosestByRange(both)
@@ -151,9 +151,9 @@ var roleAttacker = {
 
       if (creep.memory.home && creep.memory.home !== creep.room.name) {
         // console.log('creep is outside -> go home');
-        var homeroom = Game.rooms[creep.memory.home]
-        var exitDir = creep.room.findExitTo(homeroom)
-        var exit = creep.pos.findClosestByRange(exitDir)
+        let homeroom = Game.rooms[creep.memory.home]
+        let exitDir = creep.room.findExitTo(homeroom)
+        let exit = creep.pos.findClosestByRange(exitDir)
         creep.moveTo(exit)
         return
       } else {
@@ -187,7 +187,7 @@ var roleAttacker = {
     if (targets.length > 0 && creep.memory.role !== 'attacker') {
       var dmg = 0
       targets.forEach(function (hc) {
-        var distance = creep.pos.getRangeTo(hc)
+        let distance = creep.pos.getRangeTo(hc)
         if (distance === 1) {
           dmg += 10
         } else if (distance === 2) {
@@ -230,8 +230,8 @@ var roleAttacker = {
     }
     var targets = creep.pos.findInRange(FIND_HOSTILE_CREEPS, 3)
     if (creep.memory.role === 'attacker') {
-      var newtargets = targets.filter(function (hc) {
-        var structures = hc.pos.lookFor(LOOK_STRUCTURES, {
+      let newtargets = targets.filter(function (hc) {
+        let structures = hc.pos.lookFor(LOOK_STRUCTURES, {
           filter: {function (s) { return s.structureType !== STRUCTURE_ROAD }}
         })
         return structures.length === 0
@@ -242,7 +242,7 @@ var roleAttacker = {
 
         var dmg = 0
         newtargets.forEach(function (hc) {
-          var distance = creep.pos.getRangeTo(hc)
+          let distance = creep.pos.getRangeTo(hc)
           if (distance === 1) {
             dmg += 10
           } else if (distance === 2) {
@@ -273,7 +273,7 @@ var roleAttacker = {
     }
 
     if (targets.length > 0) {
-      var healers = targets.filter(function (hc) {
+      let healers = targets.filter(function (hc) {
         return hc.getActiveBodyparts(HEAL) > 0
       })
       var target = creep.pos.findClosestByRange(targets)
@@ -283,7 +283,7 @@ var roleAttacker = {
       } else {
         var dmg = 0
         targets.forEach(function (hc) {
-          var distance = creep.pos.getRangeTo(hc)
+          let distance = creep.pos.getRangeTo(hc)
           if (distance === 1) {
             dmg += 10
           } else if (distance === 2) {
@@ -322,9 +322,9 @@ var roleAttacker = {
 
       if (creep.memory.home && creep.memory.home !== creep.room.name) {
         // console.log('creep is outside -> go home');
-        var homeroom = Game.rooms[creep.memory.home]
-        var exitDir = creep.room.findExitTo(homeroom)
-        var exit = creep.pos.findClosestByRange(exitDir)
+        let homeroom = Game.rooms[creep.memory.home]
+        let exitDir = creep.room.findExitTo(homeroom)
+        let exit = creep.pos.findClosestByRange(exitDir)
         creep.moveTo(exit)
         return
       } else {
@@ -334,10 +334,10 @@ var roleAttacker = {
       return true
     }
 
-    var priorityTargets = []
+    let priorityTargets = []
 
-    for (var flagN in Game.flags) {
-      var flag = Game.flags[flagN]
+    for (let flagN in Game.flags) {
+      let flag = Game.flags[flagN]
       if (flag.color === COLOR_PURPLE && creep.room.name === flag.pos.roomName) {
         var targets = flag.pos.lookFor(LOOK_STRUCTURES, {
           filter: {function (s) { return s.structureType !== STRUCTURE_ROAD }}
@@ -362,7 +362,7 @@ var roleAttacker = {
 
       var target = creep.pos.findClosestByRange(targets)
       // creep.log('target.pos: ' + JSON.stringify(target.pos));
-      var result = creep.goTo(target.pos)
+      let result = creep.goTo(target.pos)
       creep.log(result)
 
       creep.rangedAttack(target)
@@ -400,7 +400,7 @@ var roleAttacker = {
 
   init: function (creep) {
     creep.memory.init = true
-    var rangedparts = creep.getActiveBodyparts(RANGED_ATTACK)
+    let rangedparts = creep.getActiveBodyparts(RANGED_ATTACK)
     if (rangedparts > 0) {
       creep.memory.ranged = true
     }
@@ -424,7 +424,7 @@ var roleAttacker = {
       this.init(creep)
     }
     // if (!(creep.memory.gatheringpoint !== creep.room.roomName && creep.memory.role === 'attacker')){
-    var actiondone = this.act(creep)
+    let actiondone = this.act(creep)
     if (actiondone) {
       // console.log('bla' + creep.name);
       return
@@ -435,14 +435,14 @@ var roleAttacker = {
 
     if (Game.time % 5 === 0 && creep.memory.role === 'Specialdefender') {
       // console.log('check for rooms to defend');
-      var roomname = creep.memory.room
-      var cords = roomname.substr(1).replace('N', ',').replace('S', ',').split(',')
+      let roomname = creep.memory.room
+      let cords = roomname.substr(1).replace('N', ',').replace('S', ',').split(',')
       // console.log('cords: ' + JSON.stringify(cords));
-      var north = roomname.includes('N')
-      var west = roomname.includes('W')
-      for (var x = Number(cords[0]) - 1; x <= Number(cords[0]) + 1; x++) {
-        for (var y = Number(cords[1]) - 1; y <= Number(cords[1]) + 1; y++) {
-          var str = west ? 'W' : 'E'
+      let north = roomname.includes('N')
+      let west = roomname.includes('W')
+      for (let x = Number(cords[0]) - 1; x <= Number(cords[0]) + 1; x++) {
+        for (let y = Number(cords[1]) - 1; y <= Number(cords[1]) + 1; y++) {
+          let str = west ? 'W' : 'E'
           str += x
           str += north ? 'N' : 'S'
           str += y
@@ -506,7 +506,7 @@ var roleAttacker = {
 
       // else go to room
       var roompos = new RoomPosition(25, 25, creep.memory.room)
-      var targetroom = Game.rooms[creep.memory.room]
+      let targetroom = Game.rooms[creep.memory.room]
       if (creep.memory.lasttarget && creep.memory.lasttarget.roomName === creep.memory.room) {
         roompos = new RoomPosition(creep.memory.lasttarget.x, creep.memory.lasttarget.y, creep.memory.lasttarget.roomName)
       } else if (targetroom && targetroom.storage) {

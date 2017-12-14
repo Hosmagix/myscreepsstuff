@@ -1,7 +1,7 @@
 
-var that = null
+let that = null
 
-var roleMineral = {
+let roleMineral = {
 
   // assume: memory.mineral // mineraltype
   // memory.room -> targetroom
@@ -9,29 +9,29 @@ var roleMineral = {
   // memory.mineralpos -> mineralpos
 
   labneeds: function (mineral) {
-    var room = that.creep.room
-    var res = room.memory.reaction && (room.memory.reaction.m1 === mineral || room.memory.reaction.m2 === mineral) || room.memory.display
+    let room = that.creep.room
+    let res = room.memory.reaction && (room.memory.reaction.m1 === mineral || room.memory.reaction.m2 === mineral) || room.memory.display
     // that.creep.log('labneeds: ' + res + ' reaction: ' + JSON.stringify(room.memory.reaction));
     return res
   },
 
   terminalneeds: function (mineral) {
-    var room = that.creep.room
+    let room = that.creep.room
 
-    var res = room.terminal && (!room.terminal.store[mineral] || room.terminal.store[mineral] < 10000)
+    let res = room.terminal && (!room.terminal.store[mineral] || room.terminal.store[mineral] < 10000)
     // that.creep.log(mineral + ' ' + res);
     return res
   },
 
   harvest: function (creep) {
     if (!creep.memory.dump) {
-      var resources = creep.room.find(FIND_DROPPED_RESOURCES).filter(function (res) {
+      let resources = creep.room.find(FIND_DROPPED_RESOURCES).filter(function (res) {
         return res.resourceType === creep.memory.mineral
       })
 
       var target = creep.pos.findClosestByRange(resources)
       if (target) {
-        var range = creep.pos.getRangeTo(target)
+        let range = creep.pos.getRangeTo(target)
         if (range <= 1) {
           creep.pickup(target)
           // creep.moveTo(target);
@@ -48,7 +48,7 @@ var roleMineral = {
       if (creep.memory.sourcepos) {
         roompos = new RoomPosition(creep.memory.sourcepos.x, creep.memory.sourcepos.y, creep.memory.room)
       }
-      var result = creep.moveTo(roompos)
+      let result = creep.moveTo(roompos)
       if (result !== 0 && result !== -4) {
         // console.log(creep.name + ' could not find ists way because:'+result);
       }
@@ -63,7 +63,7 @@ var roleMineral = {
       })
       if (container && container.length > 0) {
         // console.log(creep.name + ' sltrans founc container');
-        var con = container[0]
+        let con = container[0]
 
         if (creep.withdraw(con, creep.memory.mineral) !== OK) {
           creep.moveTo(con)
@@ -77,11 +77,11 @@ var roleMineral = {
 
       var roompos = new RoomPosition(creep.memory.mineralpos.x, creep.memory.mineralpos.y, creep.memory.room)
       // var source = roompos.lookFor(LOOK_SOURCES)[0];
-      var source = roompos.findClosestByRange(FIND_MINERALS)
+      let source = roompos.findClosestByRange(FIND_MINERALS)
 
-      var harvestresult = creep.harvest(source)
+      let harvestresult = creep.harvest(source)
       if (harvestresult === ERR_NOT_IN_RANGE || harvestresult === ERR_INVALID_TARGET) {
-        var status = creep.moveTo(source)
+        let status = creep.moveTo(source)
         if (status !== OK) {
           // console.log(creep.name + 'cannot move to target ' + source.pos +' because: ' + status);
           creep.moveTo(creep.room.controller)
@@ -116,23 +116,23 @@ var roleMineral = {
 
     // storage
 
-    var terminal = creep.room.terminal
+    let terminal = creep.room.terminal
 
-    var storage = creep.room.storage
+    let storage = creep.room.storage
     if (storage) {
       // creep.log('rolemineraL:storage');
       var mineral = null
       Object.keys(storage.store).forEach(function (key) {
-        var amount = storage.store[key]
+        let amount = storage.store[key]
 
-        var structurefull = false
-        var targets = creep.room.find(FIND_STRUCTURES, {
+        let structurefull = false
+        let targets = creep.room.find(FIND_STRUCTURES, {
           filter: (structure) => {
             return (structure.structureType === STRUCTURE_LAB) && structure.mineralType && structure.mineralType === key
           }
         })
         if (targets.length > 0) {
-          var target = creep.pos.findClosestByRange(targets)
+          let target = creep.pos.findClosestByRange(targets)
           // console.log('lab with mineral found + target.minerlAmount' + target.mineralAmount + 'target.mineralcapacity ' + target.mineralCapacity);
           if (target.mineralAmount > (target.mineralCapacity - 1000)) {
             structurefull = true
@@ -153,15 +153,15 @@ var roleMineral = {
 
     if (terminal) {
       Object.keys(terminal.store).forEach(function (key) {
-        var amount = terminal.store[key]
-        var structurefull = false
-        var targets = creep.room.find(FIND_STRUCTURES, {
+        let amount = terminal.store[key]
+        let structurefull = false
+        let targets = creep.room.find(FIND_STRUCTURES, {
           filter: (structure) => {
             return (structure.structureType === STRUCTURE_LAB) && structure.mineralType && structure.mineralType === key
           }
         })
         if (targets.length > 0) {
-          var target = creep.pos.findClosestByRange(targets)
+          let target = creep.pos.findClosestByRange(targets)
           // console.log('lab with mineral found + target.minerlAmount' + target.mineralAmount + 'target.mineralcapacity ' + target.mineralCapacity);
           if (target.mineralAmount > (target.mineralCapacity - 1000)) {
             structurefull = true
@@ -179,7 +179,7 @@ var roleMineral = {
       }
     }
 
-    var targets = creep.room.find(FIND_STRUCTURES, {
+    let targets = creep.room.find(FIND_STRUCTURES, {
       filter: (structure) => {
         return (structure.structureType === STRUCTURE_LAB) && structure.mineralType && creep.room.memory.reaction && structure.mineralType === creep.room.memory.reaction.res && (structure.mineralAmount > 2000)
       }
@@ -196,16 +196,16 @@ var roleMineral = {
   },
 
   build_roads: function (creep) {
-    var structures = creep.pos.lookFor(LOOK_STRUCTURES).filter(function (structure) {
+    let structures = creep.pos.lookFor(LOOK_STRUCTURES).filter(function (structure) {
       return structure.structureType === STRUCTURE_ROAD
     })
     if (structures.length === 0 && creep.pos.lookFor(LOOK_CONSTRUCTION_SITES).length === 0) {
-      var flags = creep.pos.lookFor(LOOK_FLAGS)
+      let flags = creep.pos.lookFor(LOOK_FLAGS)
       if (flags.length > 0) {
-        var flag = flags[0]
-        var terrain = Game.map.getTerrainAt(flag.pos)
-        var visited = flag.memory.visited ? flag.memory.visited : 0
-        var effectivevisited = (terrain === 'swamp') ? visited / 3 : visited
+        let flag = flags[0]
+        let terrain = Game.map.getTerrainAt(flag.pos)
+        let visited = flag.memory.visited ? flag.memory.visited : 0
+        let effectivevisited = (terrain === 'swamp') ? visited / 3 : visited
 
         if (flag.memory.visited && effectivevisited >= 4) {
           if (creep.pos.createConstructionSite(STRUCTURE_ROAD) === OK) {
@@ -214,7 +214,7 @@ var roleMineral = {
           }
         } else {
           // console.log('updating flag visited');
-          var extra = (creep.memory.role === 'harvester') ? 2 : 1
+          let extra = (creep.memory.role === 'harvester') ? 2 : 1
 
           flag.memory.visited = flag.memory.visited ? flag.memory.visited + extra : extra
         }
@@ -223,7 +223,7 @@ var roleMineral = {
         // console.log('creating Flag at' +creep.pos);
       }
     } else if (structures.length >= 1) {
-      var road = structures[0]
+      let road = structures[0]
       if (road.hits < road.hitsMax / 2) {
         if (creep.getActiveBodyparts(WORK) > 0 && creep.carry.energy > 0) {
           creep.repair(road)
@@ -235,8 +235,8 @@ var roleMineral = {
   init: function (creep) {
     if (creep.memory.role !== 'mineraltransporter') {
       // TODO: fixme -> other room compatible
-      var mineral = creep.room.find(FIND_MINERALS)
-      var mineraltype = mineral[0].mineralType
+      let mineral = creep.room.find(FIND_MINERALS)
+      let mineraltype = mineral[0].mineralType
       creep.memory.mineral = mineraltype
       creep.memory.mineralpos = mineral[0].pos
     }
@@ -250,7 +250,7 @@ var roleMineral = {
 
   checkforEnemies: function (creep) {
     if (creep.memory.home && creep.room.name !== creep.memory.home) {
-      var targets = creep.room.find(FIND_HOSTILE_CREEPS).filter(function (hc) {
+      let targets = creep.room.find(FIND_HOSTILE_CREEPS).filter(function (hc) {
         return (hc.getActiveBodyparts(ATTACK) > 0) || (hc.getActiveBodyparts(RANGED_ATTACK) > 0) || (hc.getActiveBodyparts(HEAL) > 0)
       })
       // var targets = creep.room.find(FIND_HOSTILE_CREEPS);
@@ -261,11 +261,11 @@ var roleMineral = {
         creep.memory.dangertill = Game.time + 50
         // going home
 
-        var homeroom = Game.rooms[creep.memory.home]
+        let homeroom = Game.rooms[creep.memory.home]
         // console.log('homeroom' +JSON.stringify(homeroom));
 
-        var exitDir = creep.room.findExitTo(homeroom)
-        var exit = creep.pos.findClosestByRange(exitDir)
+        let exitDir = creep.room.findExitTo(homeroom)
+        let exit = creep.pos.findClosestByRange(exitDir)
         creep.moveTo(exit)
         return true
       } else {
@@ -297,7 +297,7 @@ var roleMineral = {
 
     this.build_roads(creep)
 
-    var totalcarrying = _.sum(creep.carry)
+    let totalcarrying = _.sum(creep.carry)
 
     if (creep.memory.building && totalcarrying === 0) { // !(creep.carry[creep.memory.mineral])
       creep.memory.building = false
@@ -313,9 +313,9 @@ var roleMineral = {
     // console.log('carrykeys: ' + JSON.stringify(Object.keys(creep.carry)));
 
     if (creep.memory.building) {
-      var mineral = null
+      let mineral = null
       Object.keys(creep.carry).forEach(function (key) {
-        var amount = creep.carry[key]
+        let amount = creep.carry[key]
         if (amount > 0 && key !== 'energy') {
           mineral = key
         }
@@ -331,16 +331,16 @@ var roleMineral = {
     if (creep.memory.role === 'mineraloutsider' && creep.memory.dump && creep.memory.mineralpos && creep.memory.room === creep.room.name) {
       // role: sltrans
       // console.log('outsider ready to dump');
-      var roompos = new RoomPosition(creep.memory.mineralpos.x, creep.memory.mineralpos.y, creep.memory.room)
-      var container = roompos.findInRange(FIND_STRUCTURES, 2).filter(function (structure) {
+      let roompos = new RoomPosition(creep.memory.mineralpos.x, creep.memory.mineralpos.y, creep.memory.room)
+      let container = roompos.findInRange(FIND_STRUCTURES, 2).filter(function (structure) {
         return structure.structureType === STRUCTURE_CONTAINER
       })
       if (container && container.length > 0) {
-        var con = container[0]
-        var range = creep.pos.getRangeTo(con.pos)
+        let con = container[0]
+        let range = creep.pos.getRangeTo(con.pos)
 
         if (range <= 1) {
-          var result = creep.transfer(con, creep.memory.mineral)
+          let result = creep.transfer(con, creep.memory.mineral)
           if (result !== OK) {
             creep.drop(creep.memory.mineral, creep.carry[creep.memory.mineral])
           }
@@ -389,7 +389,7 @@ var roleMineral = {
     }
 
     if (creep.room.terminal && mineral && that.terminalneeds(mineral)) {
-      var terminal = creep.room.terminal
+      let terminal = creep.room.terminal
       if (creep.transfer(terminal, mineral) === ERR_NOT_IN_RANGE) {
         creep.moveTo(terminal)
       }
@@ -398,7 +398,7 @@ var roleMineral = {
 
     // bring energy to Storage
     if (creep.room.storage) {
-      var storage = creep.room.storage
+      let storage = creep.room.storage
       if (creep.transfer(storage, mineral) === ERR_NOT_IN_RANGE) {
         creep.moveTo(storage)
       }
@@ -409,9 +409,9 @@ var roleMineral = {
     if (creep.memory.home && creep.memory.home !== creep.room.name) {
       // console.log(creep.name + ' not in homeroom');
 
-      var homeroom = Game.rooms[creep.memory.home]
+      let homeroom = Game.rooms[creep.memory.home]
 
-      var exitDir = creep.room.findExitTo(homeroom)
+      let exitDir = creep.room.findExitTo(homeroom)
       if (homeroom.storage) {
         creep.moveTo(homeroom.storage)
       } else {

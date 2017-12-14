@@ -1,4 +1,4 @@
-var roleKeeper = {
+let roleKeeper = {
 
   act: function (creep) {
     if (creep.memory.ranged) {
@@ -87,9 +87,9 @@ var roleKeeper = {
 
       if (creep.memory.home && creep.memory.home !== creep.room.name) {
         // console.log('creep is outside -> go home');
-        var homeroom = Game.rooms[creep.memory.home]
-        var exitDir = creep.room.findExitTo(homeroom)
-        var exit = creep.pos.findClosestByRange(exitDir)
+        let homeroom = Game.rooms[creep.memory.home]
+        let exitDir = creep.room.findExitTo(homeroom)
+        let exit = creep.pos.findClosestByRange(exitDir)
         creep.moveTo(exit)
         return
       } else {
@@ -153,7 +153,7 @@ var roleKeeper = {
     if (targets.length > 0) {
       console.log('targets detected')
 
-      var target = creep.pos.findClosestByRange(targets)
+      let target = creep.pos.findClosestByRange(targets)
       if (creep.moveTo(target, {reusePath: 0}) === OK) {
         creep.rangedAttack(target)
       }
@@ -166,9 +166,9 @@ var roleKeeper = {
 
       if (creep.memory.home && creep.memory.home !== creep.room.name) {
         // console.log('creep is outside -> go home');
-        var homeroom = Game.rooms[creep.memory.home]
-        var exitDir = creep.room.findExitTo(homeroom)
-        var exit = creep.pos.findClosestByRange(exitDir)
+        let homeroom = Game.rooms[creep.memory.home]
+        let exitDir = creep.room.findExitTo(homeroom)
+        let exit = creep.pos.findClosestByRange(exitDir)
         creep.moveTo(exit)
         return
       } else {
@@ -183,7 +183,7 @@ var roleKeeper = {
 
   init: function (creep) {
     creep.memory.init = true
-    var rangedparts = creep.getActiveBodyparts(RANGED_ATTACK)
+    let rangedparts = creep.getActiveBodyparts(RANGED_ATTACK)
     if (rangedparts > 0) {
       creep.memory.ranged = true
     }
@@ -206,7 +206,7 @@ var roleKeeper = {
 
     // this.afteract(creep);
 
-    var actiondone = this.act(creep)
+    let actiondone = this.act(creep)
 
     if (actiondone) {
       return
@@ -215,7 +215,7 @@ var roleKeeper = {
     this.afteract(creep)
 
     if (creep.room.name !== creep.memory.room) {
-      var roompos = new RoomPosition(25, 25, creep.memory.room)
+      let roompos = new RoomPosition(25, 25, creep.memory.room)
 
       if (creep.memory.lasttarget && creep.memory.lasttarget.roomName === creep.memory.room) {
         roompos = new RoomPosition(creep.memory.lasttarget.x, creep.memory.lasttarget.y, creep.memory.lasttarget.roomName)
@@ -225,9 +225,9 @@ var roleKeeper = {
       return
     }
 
-    var lowestrespawntime = 1000
-    var nextrespawn = null
-    var lairs = creep.room.find(FIND_HOSTILE_STRUCTURES).filter(function (structure) {
+    let lowestrespawntime = 1000
+    let nextrespawn = null
+    let lairs = creep.room.find(FIND_HOSTILE_STRUCTURES).filter(function (structure) {
       return structure.structureType === STRUCTURE_KEEPER_LAIR
     }).forEach(function (lair) {
       if (lair.ticksToSpawn < lowestrespawntime) {

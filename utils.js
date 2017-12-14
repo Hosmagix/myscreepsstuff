@@ -1,17 +1,17 @@
-var utils = {}
+let utils = {}
 utils.findClosestRoom = function (start, minlevel) {
-  var startroom = start.roomName
+  let startroom = start.roomName
 
-  var startcords = startroom.substr(1).replace('N', ',').replace('S', ',').split(',')
+  let startcords = startroom.substr(1).replace('N', ',').replace('S', ',').split(',')
   // console.log('cords: ' + JSON.stringify(startcords));
-  var center = (Number(startcords[0]) % 10 > 3 && Number(startcords[0]) % 10 < 7 && Number(startcords[1]) % 10 > 3 && Number(startcords[1]) % 10 < 7)
+  let center = (Number(startcords[0]) % 10 > 3 && Number(startcords[0]) % 10 < 7 && Number(startcords[1]) % 10 > 3 && Number(startcords[1]) % 10 < 7)
   console.log('center: ' + center)
 
-  var goals = []
-  for (var spawn in Game.spawns) {
+  let goals = []
+  for (let spawn in Game.spawns) {
     goals.push({ pos: Game.spawns[spawn].pos, range: 2 })
   }
-  var res = PathFinder.search(start, goals, {
+  let res = PathFinder.search(start, goals, {
     plainCost: 1,
     swampCost: 5,
     maxCost: 1000,
@@ -21,7 +21,7 @@ utils.findClosestRoom = function (start, minlevel) {
       let room = Game.rooms[roomName]
 
       // only ignore center rooms if start room isn't in the center
-      var cords = roomName.substr(1).replace('N', ',').replace('S', ',').split(',')
+      let cords = roomName.substr(1).replace('N', ',').replace('S', ',').split(',')
       console.log('cords: ' + JSON.stringify(cords))
       if (!center && Number(cords[0]) % 10 > 3 && Number(cords[0]) % 10 < 7 && Number(cords[1]) % 10 > 3 && Number(cords[1]) % 10 < 7) {
         // console.log('should be a central room -> return false');

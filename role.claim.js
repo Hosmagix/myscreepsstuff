@@ -1,4 +1,4 @@
-var roleClaim = {
+let roleClaim = {
 
   /** @param {Creep} creep **/
   run: function (creep) {
@@ -16,8 +16,8 @@ var roleClaim = {
         }
       }
     } else {
-      var roompos = new RoomPosition(25, 25, creep.memory.room)
-      var controllerroom = Game.rooms[creep.memory.room]
+      let roompos = new RoomPosition(25, 25, creep.memory.room)
+      let controllerroom = Game.rooms[creep.memory.room]
       if (controllerroom && controllerroom.controller) {
         roompos = controllerroom.controller.pos
       } else if (creep.memory.lasttarget && creep.memory.lasttarget.roomName === creep.memory.room) {

@@ -8,11 +8,11 @@ exports.overridePrototypes = function () {
       // console.log('maxcarry was already inizialized return');
       return
     }
-    var carry = this.getActiveBodyparts(CARRY)
+    let carry = this.getActiveBodyparts(CARRY)
     if (carry > 0) {
-      var maxweight = this.getActiveBodyparts(MOVE)
-      var remainingweight = maxweight - this.getActiveBodyparts(WORK)
-      var maxcarry = remainingweight * 50
+      let maxweight = this.getActiveBodyparts(MOVE)
+      let remainingweight = maxweight - this.getActiveBodyparts(WORK)
+      let maxcarry = remainingweight * 50
       // console.log(this.name + '/' + this.memory.role + 'has a maxcarry of' + maxcarry);
       this.memory.maxcarry = maxcarry
     } else {
@@ -49,14 +49,14 @@ exports.overridePrototypes = function () {
         }
       })
 
-      this.find(FIND_CONSTRUCTION_SITES).forEach(function(construcitonsite){
-        if (construcitonsite.structureType !== STRUCTURE_ROAD){
-          costs.set(construcitonsite.pos.x, construcitonsite.pos.y, 0xff);
+      this.find(FIND_CONSTRUCTION_SITES).forEach(function (construcitonsite) {
+        if (construcitonsite.structureType !== STRUCTURE_ROAD) {
+          costs.set(construcitonsite.pos.x, construcitonsite.pos.y, 0xff)
         }
       })
 
       this.matrix1 = costs
-      var storedmatrix = {}
+      let storedmatrix = {}
       storedmatrix.timevalid = Game.time + 10
       storedmatrix.matrix = costs.serialize()
       this.memory.storedmatrix = storedmatrix
@@ -66,7 +66,7 @@ exports.overridePrototypes = function () {
   }
 
   Creep.prototype.boost = function (mineraltype) {
-    var lab = this.pos.findClosestByRange(FIND_MY_STRUCTURES, {
+    let lab = this.pos.findClosestByRange(FIND_MY_STRUCTURES, {
       filter: function (lab) {
         return lab.mineralType === mineraltype && lab.mineralAmount > 100
       }
@@ -81,8 +81,8 @@ exports.overridePrototypes = function () {
 
   Creep.prototype.goTo = function (roompos) {
     // console.log('goto called');
-    var plaincost = 1
-    var swampcost = 5
+    let plaincost = 1
+    let swampcost = 5
 
     if (!roompos) {
       return false
@@ -90,12 +90,12 @@ exports.overridePrototypes = function () {
     if (this.pos.isNearTo(roompos)) {
       // check if its empty TODO
 
-      var terrain = roompos.lookFor(LOOK_TERRAIN)
+      let terrain = roompos.lookFor(LOOK_TERRAIN)
       if (terrain.length > 0 && terrain[0] === 'wall') {
         // this.log('terrain is wall: ' + JSON.stringify(terrain));
         return false
       }
-      var structure = roompos.lookFor(LOOK_STRUCTURES).filter(function (stru) {
+      let structure = roompos.lookFor(LOOK_STRUCTURES).filter(function (stru) {
         return stru.structureType !== STRUCTURE_ROAD && stru.structureType !== STRUCTURE_RAMPART
       })
       if (structure.length > 0) {
@@ -116,7 +116,7 @@ exports.overridePrototypes = function () {
       this.initmaxcarry()
     }
     if (this.memory.maxcarry && this.memory.maxcarry !== 1) {
-      var weight = _.sum(this.carry)
+      let weight = _.sum(this.carry)
       if (weight > this.memory.maxcarry) {
         // console.log(this.name + '/' + this.memory.role +' weight is larger than carry -> use 2 and 10');
         plaincost = 2
@@ -126,16 +126,16 @@ exports.overridePrototypes = function () {
 
     // console.log('plaincost: ' + plaincost + 'swampcost: ' + swampcost);
 
-    var lasttarget = this.memory.lasttarget
+    let lasttarget = this.memory.lasttarget
 
     if (lasttarget && this.memory.path && this.memory.path.length > 0 && lasttarget.x === roompos.x && lasttarget.y === roompos.y && lasttarget.roomName === roompos.roomName) {
       // console.log('old path found');
-      var temppos = this.memory.path.shift()
+      let temppos = this.memory.path.shift()
       if (!temppos) {
         console.log('wrong tempos' + JSON.stringify(temppos))
         return this.moveTo(roompos)
       }
-      var next = new RoomPosition(temppos.x, temppos.y, temppos.roomName)
+      let next = new RoomPosition(temppos.x, temppos.y, temppos.roomName)
 
       if (next && this.pos.isNearTo(next)) {
         var direction = this.pos.getDirectionTo(next)
@@ -148,14 +148,14 @@ exports.overridePrototypes = function () {
       }
     }
 
-    var creep = this
-    var range = 1
+    let creep = this
+    let range = 1
     if (this.pos.roomName !== roompos.roomName) {
       // this.log('walking to other room -> use dist 2');
       range = 2
     }
 
-    var res = PathFinder.search(this.pos, { pos: roompos, range: range }, {
+    let res = PathFinder.search(this.pos, { pos: roompos, range: range }, {
       plainCost: plaincost,
       swampCost: swampcost,
       maxCost: 400,
@@ -166,7 +166,7 @@ exports.overridePrototypes = function () {
 
         if (!room) return new PathFinder.CostMatrix()
 
-        var costs = room.getCostmatrix()
+        let costs = room.getCostmatrix()
 
         if (roomName === creep.pos.roomName) {
           // console.log('bla');
@@ -199,7 +199,7 @@ exports.overridePrototypes = function () {
     }
 
     // console.log('res.path: '+ JSON.stringify(res));
-    var nextsquare = this.memory.path.shift()
+    let nextsquare = this.memory.path.shift()
     var direction = this.pos.getDirectionTo(nextsquare)
     this.move(direction)
     var result = this.moveTo(nextsquare)

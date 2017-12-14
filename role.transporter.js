@@ -1,4 +1,4 @@
-var roleBuilder = {
+let roleBuilder = {
 
   harvest: function (creep) {
     // pickup
@@ -61,7 +61,7 @@ var roleBuilder = {
 
       // else go to room
       var roompos = null
-      var targetroom = Game.rooms[creep.memory.room]
+      let targetroom = Game.rooms[creep.memory.room]
       if (creep.memory.lasttarget && creep.memory.lasttarget.roomName === creep.memory.room) {
         roompos = new RoomPosition(creep.memory.lasttarget.x, creep.memory.lasttarget.y, creep.memory.lasttarget.roomName)
       } else if (creep.memory.sourcepos) {
@@ -82,18 +82,18 @@ var roleBuilder = {
 
     if (creep.memory.linkfrom && creep.memory.role === 'transporter') {
       var roompos = new RoomPosition(creep.memory.linkfrom.x, creep.memory.linkfrom.y, creep.memory.linkfrom.roomName)
-      var linkfrom = roompos.lookFor(LOOK_STRUCTURES).filter(function (linki) {
+      let linkfrom = roompos.lookFor(LOOK_STRUCTURES).filter(function (linki) {
         return linki.structureType === STRUCTURE_LINK
       })
 
       // console.log('linkfrom: ' + JSON.stringify(linkfrom));
       if (linkfrom && linkfrom[0].energy > 200) {
-        var link = linkfrom[0]
+        let link = linkfrom[0]
         // console.log('link: ' + JSON.stringify(link));
         var range = creep.pos.getRangeTo(link.pos)
         // console.log('range to link' + range);
         if (range <= 1) {
-          var result = creep.withdraw(link, RESOURCE_ENERGY)
+          let result = creep.withdraw(link, RESOURCE_ENERGY)
           // console.log('withdraw result:' + result);
           if (result === -6 && creep.memory.role !== 'transporter') {
             // -> Storage
@@ -116,7 +116,7 @@ var roleBuilder = {
       })
       if (container && container.length > 0) {
         // console.log(creep.name + ' sltrans founc container');
-        var con = roompos.findClosestByRange(container)
+        let con = roompos.findClosestByRange(container)
 
         if (creep.withdraw(con, RESOURCE_ENERGY) !== OK) {
           creep.moveTo(con)
@@ -163,8 +163,8 @@ var roleBuilder = {
     // this room
     if (creep.memory.source !== undefined) {
       // console.log('creep.name:' + creep.name);
-      var sources = creep.room.find(FIND_SOURCES)
-      var id = creep.memory.source
+      let sources = creep.room.find(FIND_SOURCES)
+      let id = creep.memory.source
       var source = sources[id]
 
       var harvestresult = creep.harvest(source)
@@ -185,9 +185,9 @@ var roleBuilder = {
     }
 
     // storage
-    var storage = creep.room.storage
+    let storage = creep.room.storage
     if (storage) {
-      var links = creep.room.find(FIND_MY_STRUCTURES).filter(function (structure) {
+      let links = creep.room.find(FIND_MY_STRUCTURES).filter(function (structure) {
         return structure.structureType === STRUCTURE_LINK && structure.energy >= 300
       })
       if (links.length >= 1) {
@@ -206,16 +206,16 @@ var roleBuilder = {
   },
 
   build_roads: function (creep) {
-    var structures = creep.pos.lookFor(LOOK_STRUCTURES).filter(function (structure) {
+    let structures = creep.pos.lookFor(LOOK_STRUCTURES).filter(function (structure) {
       return structure.structureType === STRUCTURE_ROAD
     })
     if (structures.length === 0 && creep.pos.lookFor(LOOK_CONSTRUCTION_SITES).length === 0 && creep.fatigue > 0) {
-      var flags = creep.pos.lookFor(LOOK_FLAGS)
+      let flags = creep.pos.lookFor(LOOK_FLAGS)
       if (flags.length > 0) {
-        var flag = flags[0]
-        var terrain = Game.map.getTerrainAt(flag.pos)
-        var visited = flag.memory.visited ? flag.memory.visited : 0
-        var effectivevisited = (terrain === 'swamp') ? visited / 4 : visited
+        let flag = flags[0]
+        let terrain = Game.map.getTerrainAt(flag.pos)
+        let visited = flag.memory.visited ? flag.memory.visited : 0
+        let effectivevisited = (terrain === 'swamp') ? visited / 4 : visited
 
         if (flag.memory.visited && effectivevisited >= 2) {
           if (creep.pos.createConstructionSite(STRUCTURE_ROAD) === OK) {
@@ -224,7 +224,7 @@ var roleBuilder = {
           }
         } else {
           // console.log('updating flag visited');
-          var extra = (creep.memory.role === 'harvester') ? 2 : 1
+          let extra = (creep.memory.role === 'harvester') ? 2 : 1
 
           flag.memory.visited = flag.memory.visited ? flag.memory.visited + extra : extra
         }
@@ -233,7 +233,7 @@ var roleBuilder = {
         // console.log('creating Flag at' +creep.pos);
       }
     } else if (structures.length >= 1) {
-      var road = structures[0]
+      let road = structures[0]
       if (road.hits < road.hitsMax / 2) {
         if (creep.getActiveBodyparts(WORK) > 0 && creep.carry.energy > 0) {
           creep.repair(road)
@@ -243,18 +243,18 @@ var roleBuilder = {
   },
 
   init: function (creep) {
-    var getHarvestID = function (room) {
-      var creeplist = room.find(FIND_MY_CREEPS)
-      var count1 = creeplist.filter(function (creep) { return creep.memory.source === 1 && (creep.ticksToLive > 100 || creep.spawning) && (creep.memory.role === 'builder' || creep.memory.role === 'upgrader' || creep.memory.role === 'harvester') }).length
-      var count0 = creeplist.filter(function (creep) { return creep.memory.source === 0 && (creep.ticksToLive > 100 || creep.spawning) && (creep.memory.role === 'builder' || creep.memory.role === 'upgrader' || creep.memory.role === 'harvester') }).length
+    let getHarvestID = function (room) {
+      let creeplist = room.find(FIND_MY_CREEPS)
+      let count1 = creeplist.filter(function (creep) { return creep.memory.source === 1 && (creep.ticksToLive > 100 || creep.spawning) && (creep.memory.role === 'builder' || creep.memory.role === 'upgrader' || creep.memory.role === 'harvester') }).length
+      let count0 = creeplist.filter(function (creep) { return creep.memory.source === 0 && (creep.ticksToLive > 100 || creep.spawning) && (creep.memory.role === 'builder' || creep.memory.role === 'upgrader' || creep.memory.role === 'harvester') }).length
       console.log('count 0: ' + count0 + ' count1: ' + count1)
-      var res = (count1 >= count0) ? 0 : 1
+      let res = (count1 >= count0) ? 0 : 1
       console.log('Target source for new creep:' + res)
 
       return res
     }
 
-    var room = creep.room
+    let room = creep.room
     if (creep.memory.role === 'harvester') {
       var links = room.find(FIND_STRUCTURES, {
         filter: (i) => i.structureType === STRUCTURE_LINK
@@ -262,7 +262,7 @@ var roleBuilder = {
 
       creep.memory.source = getHarvestID(room)
 
-      var sources = room.find(FIND_SOURCES)
+      let sources = room.find(FIND_SOURCES)
       var targetlink = sources[creep.memory.source].pos.findClosestByRange(links)
       creep.memory.link = targetlink.pos
     } else if ((creep.memory.role === 'transporter' || creep.memory.role === 'specialbuilder') && creep.room.memory.haslinks) {
@@ -283,7 +283,7 @@ var roleBuilder = {
 
   checkforEnemies: function (creep) {
     if (creep.memory.home && creep.room.name !== creep.memory.home) {
-      var targets = creep.room.find(FIND_HOSTILE_CREEPS).filter(function (hc) {
+      let targets = creep.room.find(FIND_HOSTILE_CREEPS).filter(function (hc) {
         return (hc.getActiveBodyparts(ATTACK) > 0) || (hc.getActiveBodyparts(RANGED_ATTACK) > 0) || (hc.getActiveBodyparts(HEAL) > 0)
       })
       // var targets = creep.room.find(FIND_HOSTILE_CREEPS);
@@ -294,11 +294,11 @@ var roleBuilder = {
         creep.memory.dangertill = Game.time + 50
         // going home
 
-        var homeroom = Game.rooms[creep.memory.home]
+        let homeroom = Game.rooms[creep.memory.home]
         // console.log('homeroom' +JSON.stringify(homeroom));
 
-        var exitDir = creep.room.findExitTo(homeroom)
-        var exit = creep.pos.findClosestByRange(exitDir)
+        let exitDir = creep.room.findExitTo(homeroom)
+        let exit = creep.pos.findClosestByRange(exitDir)
         creep.moveTo(exit)
         return true
       } else {
@@ -332,7 +332,7 @@ var roleBuilder = {
 
     var targets = creep.pos.findInRange(FIND_HOSTILE_CREEPS, 6)
 
-    var lairs = creep.pos.findInRange(FIND_HOSTILE_STRUCTURES, 6).filter(function (structure) {
+    let lairs = creep.pos.findInRange(FIND_HOSTILE_STRUCTURES, 6).filter(function (structure) {
       return structure.structureType === STRUCTURE_KEEPER_LAIR && (structure.ticksToSpawn <= 7)
     })
 
@@ -365,14 +365,14 @@ var roleBuilder = {
 
   /** @param {Creep} creep **/
   run: function (creep) {
-    var startcpu = Game.cpu.getUsed()
+    let startcpu = Game.cpu.getUsed()
     if (!creep.memory.init) {
       this.init(creep)
     }
 
     if (creep.memory.dangertill && creep.memory.dangertill > Game.time) {
       //  console.log(creep.name +' target room might still be in danger -> not returning -> gathering at controller');
-      var homeroom = Game.rooms[creep.memory.home]
+      let homeroom = Game.rooms[creep.memory.home]
       creep.goTo(homeroom.controller.pos)
       return
     }
@@ -386,11 +386,11 @@ var roleBuilder = {
         return
       }
     }
-    var cpuaftersafetycheck = Game.cpu.getUsed()
+    let cpuaftersafetycheck = Game.cpu.getUsed()
 
     this.build_roads(creep)
 
-    var cpuafterroads = Game.cpu.getUsed()
+    let cpuafterroads = Game.cpu.getUsed()
 
     if (creep.memory.building && creep.carry.energy === 0) {
       creep.memory.building = false
@@ -405,10 +405,10 @@ var roleBuilder = {
       this.harvest(creep)
     }
 
-    var cpufinished = Game.cpu.getUsed()
-    var safety = cpuaftersafetycheck - startcpu
-    var roadtime = cpuafterroads - cpuaftersafetycheck
-    var actiontime = cpufinished - cpuafterroads
+    let cpufinished = Game.cpu.getUsed()
+    let safety = cpuaftersafetycheck - startcpu
+    let roadtime = cpuafterroads - cpuaftersafetycheck
+    let actiontime = cpufinished - cpuafterroads
     // creep.log('cpu usage: safety: ' + safety + ' roads: ' + roadtime + ' action: ' + actiontime);
   },
 
@@ -438,7 +438,7 @@ var roleBuilder = {
         return structure.structureType === STRUCTURE_CONTAINER
       })
       if (container && container.length > 0) {
-        var con = container[0]
+        let con = container[0]
         var range = creep.pos.getRangeTo(con.pos)
 
         if (range <= 1) {
@@ -462,7 +462,7 @@ var roleBuilder = {
         if (creep.room.memory.upgradepos) {
           creep.moveTo(creep.room.memory.upgradepos.x, creep.room.memory.upgradepos.y)
         } else {
-          var move = creep.moveTo(creep.room.controller)
+          let move = creep.moveTo(creep.room.controller)
         }
       }
       return
@@ -472,12 +472,12 @@ var roleBuilder = {
 
     if (creep.memory.link) {
       var roompos = new RoomPosition(creep.memory.link.x, creep.memory.link.y, creep.memory.link.roomName)
-      var link = roompos.lookFor(LOOK_STRUCTURES).filter(function (linki) {
+      let link = roompos.lookFor(LOOK_STRUCTURES).filter(function (linki) {
         return linki.structureType === STRUCTURE_LINK
       })
 
       if (link) {
-        var linki = link[0]
+        let linki = link[0]
         // console.log('haslink ' + JSON.stringify(linki));
         var range = creep.pos.getRangeTo(linki.pos)
         // console.log('range to link' + range);
@@ -495,7 +495,7 @@ var roleBuilder = {
         console.error('creep has no link: ' + creep.name + ' link' + JSON.stringify(link))
       }
     }
-    var towerfilltill = 800
+    let towerfilltill = 800
     if (creep.room.memory.dangertill && creep.room.memory.dangertill > Game.time) {
       towerfilltill = 600 // such that they don't fill at 990
     }
@@ -557,8 +557,8 @@ var roleBuilder = {
     // bring energy to Storage
 
     if (creep.room.storage && (creep.memory.role === 'sltrans' || creep.memory.role === 'outsider' || creep.memory.role === 'gatherer' || creep.memory.role === 'looter' && creep.room.controller && creep.room.controller.my)) {
-      var storage = creep.room.storage
-      var links = creep.room.find(FIND_MY_STRUCTURES).filter(function (structure) {
+      let storage = creep.room.storage
+      let links = creep.room.find(FIND_MY_STRUCTURES).filter(function (structure) {
         return (structure.structureType === STRUCTURE_LINK) && structure.energy <= 600
       })
       // console.log('creep.name:' + creep.name);
@@ -575,11 +575,11 @@ var roleBuilder = {
       return
     }
 
-    var my = creep.room.controller && creep.room.controller && creep.room.controller.my
+    let my = creep.room.controller && creep.room.controller && creep.room.controller.my
 
     // repairing ramparts
     var test = null
-    var objecthits = 800000
+    let objecthits = 800000
     if (creep.room.memory.wallshp) {
       objecthits = creep.room.memory.wallshp
     } else if (creep.room.controller && creep.room.controller.level < 4) {
@@ -682,7 +682,7 @@ var roleBuilder = {
         return
       }
 
-      var homeroom = Game.rooms[creep.memory.home]
+      let homeroom = Game.rooms[creep.memory.home]
 
       var roompos = new RoomPosition(25, 25, creep.memory.home)
       if (homeroom.storage) {
@@ -691,7 +691,7 @@ var roleBuilder = {
       } else {
         roompos = homeroom.controller.pos
       }
-      var res = creep.goTo(roompos)
+      let res = creep.goTo(roompos)
       return
     }
     console.log(creep.name + 'tries to spend energy but cannnot')

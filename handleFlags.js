@@ -1,7 +1,7 @@
-var Utils = require('utils')
+let Utils = require('utils')
 
 exports.handleflags = function () {
-  var removeflags = (Game.cpu.bucket < 300)
+  let removeflags = (Game.cpu.bucket < 300)
 
   for (let flagN in Game.flags) {
     let flag = Game.flags[flagN]
@@ -17,10 +17,10 @@ exports.handleflags = function () {
       }
 
       if (Game.time % 200 === 0) {
-        var terrain = Game.map.getTerrainAt(flag.pos)
-        var visited = flag.memory.visited ? flag.memory.visited : 1
-        var timeout = flag.memory.timeout ? flag.memory.timeout : 0
-        var diff = visited - timeout
+        let terrain = Game.map.getTerrainAt(flag.pos)
+        let visited = flag.memory.visited ? flag.memory.visited : 1
+        let timeout = flag.memory.timeout ? flag.memory.timeout : 0
+        let diff = visited - timeout
         if (diff >= 1) {
           flag.memory.timeout = (terrain === 'swamp') ? timeout + 4 : timeout + 1
           // console.log('reducing visited count');
@@ -42,7 +42,7 @@ exports.handleflags = function () {
       var sourceroomname = Utils.findClosestRoom(flag.pos)
       // console.log(sourceroomname);
       if (sourceroomname) {
-        var slaverooms = Game.rooms[sourceroomname].memory.slaverooms || []
+        let slaverooms = Game.rooms[sourceroomname].memory.slaverooms || []
         slaverooms.push(flag.pos)
         Game.rooms[sourceroomname].memory.slaverooms = slaverooms
         flag.memory.remove = true
@@ -80,13 +80,13 @@ exports.handleflags = function () {
     } else if (flag.color === COLOR_CYAN && !flag.memory.remove) {
       var sourceroomname = Utils.findClosestRoom(flag.pos)
 
-      var cords = flag.pos.roomName.substr(1).replace('N', ',').replace('S', ',').split(',')
+      let cords = flag.pos.roomName.substr(1).replace('N', ',').replace('S', ',').split(',')
       if (Number(cords[0]) % 10 === 5 && Number(cords[1]) % 10 === 5) {
         centralroom = true
         console.log('add central room to list')
         Game.rooms[sourceroomname].memory.centralroom = flag.pos.roomName
       } else {
-        var keeperrooms = Game.rooms[sourceroomname].memory.keeperrooms || []
+        let keeperrooms = Game.rooms[sourceroomname].memory.keeperrooms || []
         keeperrooms.push(flag.pos.roomName)
         Game.rooms[sourceroomname].memory.keeperrooms = keeperrooms
       }

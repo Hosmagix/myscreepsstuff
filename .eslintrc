@@ -13,6 +13,10 @@
     "node": true
   },
 
+  "rules": {
+    "no-var":"error"
+  },
+
     "extends": "standard"
 
 }

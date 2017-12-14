@@ -1,14 +1,14 @@
-var roleDismantler = {
+let roleDismantler = {
 
   act: function (creep) {
     // console.log('roleAttacker act called');
 
-    var priorityTargets = []
+    let priorityTargets = []
 
-    for (var flagN in Game.flags) {
-      var flag = Game.flags[flagN]
+    for (let flagN in Game.flags) {
+      let flag = Game.flags[flagN]
       if (flag.color === COLOR_PURPLE && creep.room.name === flag.pos.roomName) {
-        var targets = flag.pos.lookFor(LOOK_STRUCTURES, {
+        let targets = flag.pos.lookFor(LOOK_STRUCTURES, {
           filter: {function (s) { return s.structureType !== STRUCTURE_ROAD }}
         })
         if (targets.length > 0) {
@@ -28,7 +28,7 @@ var roleDismantler = {
     }
 
     // nearbybuildings
-    var nearbybuildings = creep.room.find(FIND_HOSTILE_STRUCTURES, {
+    let nearbybuildings = creep.room.find(FIND_HOSTILE_STRUCTURES, {
       filter: (structure) => {
         return (structure.structureType !== STRUCTURE_CONTROLLER && structure.structureType !== STRUCTURE_RAMPART && structure.structureType !== STRUCTURE_KEEPER_LAIR && creep.pos.inRangeTo(structure, 1) && structure.structureType !== STRUCTURE_STORAGE && structure.structureType !== STRUCTURE_TERMINAL)
       }
@@ -44,7 +44,7 @@ var roleDismantler = {
       return true
     }
 
-    var towers = creep.room.find(FIND_HOSTILE_STRUCTURES, {
+    let towers = creep.room.find(FIND_HOSTILE_STRUCTURES, {
       filter: (structure) => {
         return (structure.structureType === STRUCTURE_TOWER)
       }
@@ -60,7 +60,7 @@ var roleDismantler = {
       return true
     }
 
-    var structures = creep.room.find(FIND_HOSTILE_STRUCTURES, {
+    let structures = creep.room.find(FIND_HOSTILE_STRUCTURES, {
       filter: (structure) => {
         return (structure.structureType !== STRUCTURE_CONTROLLER && structure.structureType !== STRUCTURE_RAMPART && structure.structureType !== STRUCTURE_KEEPER_LAIR && structure.structureType !== STRUCTURE_STORAGE && structure.structureType !== STRUCTURE_TERMINAL)
       }
@@ -112,9 +112,9 @@ var roleDismantler = {
 
       if (creep.memory.home && creep.memory.home !== creep.room.name) {
         // console.log('creep is outside -> go home');
-        var homeroom = Game.rooms[creep.memory.home]
-        var exitDir = creep.room.findExitTo(homeroom)
-        var exit = creep.pos.findClosestByRange(exitDir)
+        let homeroom = Game.rooms[creep.memory.home]
+        let exitDir = creep.room.findExitTo(homeroom)
+        let exit = creep.pos.findClosestByRange(exitDir)
         creep.moveTo(exit)
         return
       } else {
@@ -139,8 +139,8 @@ var roleDismantler = {
     }
 
     if (creep.memory.boost) {
-      for (var i in creep.body) {
-        var part = creep.body[i]
+      for (let i in creep.body) {
+        let part = creep.body[i]
         if (!part.boost && part.type === WORK) {
           var succ = creep.boost(RESOURCE_ZYNTHIUM_ACID)
           if (!succ) {
@@ -161,7 +161,7 @@ var roleDismantler = {
     }
 
     if (!creep.room.controller || (creep.room.controller && !creep.room.controller.safeMode)) {
-      var actiondone = this.act(creep)
+      let actiondone = this.act(creep)
       if (actiondone) {
         return
       }
@@ -170,7 +170,7 @@ var roleDismantler = {
     }
 
     if (creep.memory.gatheringpoint) {
-      var pos = new RoomPosition(creep.memory.gatheringpoint.x, creep.memory.gatheringpoint.y, creep.memory.gatheringpoint.roomName)
+      let pos = new RoomPosition(creep.memory.gatheringpoint.x, creep.memory.gatheringpoint.y, creep.memory.gatheringpoint.roomName)
       // var res = creep.moveTo(pos, {ignoreCreeps: true});
       creep.goTo(pos)
       return
@@ -183,7 +183,7 @@ var roleDismantler = {
       }
     } else {
       // console.log('no gatheringpoint other room -> move');
-      var roompos = new RoomPosition(25, 25, creep.memory.room)
+      let roompos = new RoomPosition(25, 25, creep.memory.room)
       if (creep.memory.lasttarget && creep.memory.lasttarget.roomName === creep.memory.room) {
         roompos = new RoomPosition(creep.memory.lasttarget.x, creep.memory.lasttarget.y, creep.memory.lasttarget.roomName)
       }

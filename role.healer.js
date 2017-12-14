@@ -1,10 +1,10 @@
-var roleHealer = {
+let roleHealer = {
 
   /** @param {Creep} creep **/
   run: function (creep) {
     if (creep.memory.boost) {
-      for (var i in creep.body) {
-        var part = creep.body[i]
+      for (let i in creep.body) {
+        let part = creep.body[i]
         if (!part.boost && part.type === HEAL) {
           this.boost(creep, RESOURCE_LEMERGIUM_OXIDE)
           return
@@ -14,7 +14,7 @@ var roleHealer = {
       creep.memory.boost = false
     }
 
-    var actiondone = this.act(creep)
+    let actiondone = this.act(creep)
     if (actiondone) {
       return
     }
@@ -28,14 +28,14 @@ var roleHealer = {
     }
 
     if (creep.memory.gatheringpoint) {
-      var pos = new RoomPosition(creep.memory.gatheringpoint.x, creep.memory.gatheringpoint.y, creep.memory.gatheringpoint.roomName)
+      let pos = new RoomPosition(creep.memory.gatheringpoint.x, creep.memory.gatheringpoint.y, creep.memory.gatheringpoint.roomName)
       creep.goTo(pos)
       // var res = creep.moveTo(pos, {ignoreCreeps: true});
       return
     }
 
     if (creep.memory.room !== creep.room.name) {
-      var roompos = new RoomPosition(25, 25, creep.memory.room)
+      let roompos = new RoomPosition(25, 25, creep.memory.room)
       if (creep.memory.lasttarget && creep.memory.lasttarget.roomName === creep.memory.room) {
         roompos = new RoomPosition(creep.memory.lasttarget.x, creep.memory.lasttarget.y, creep.memory.lasttarget.roomName)
       }
@@ -48,7 +48,7 @@ var roleHealer = {
   },
 
   act: function (creep) {
-    var healpower = creep.getActiveBodyparts(HEAL) * 12
+    let healpower = creep.getActiveBodyparts(HEAL) * 12
     // console.log('healpower');
     // heal prio
     var target = creep.pos.findClosestByRange(FIND_MY_CREEPS, {
@@ -84,7 +84,7 @@ var roleHealer = {
   },
 
   afteract: function (creep) {
-    var healpower = creep.getActiveBodyparts(HEAL) * 12
+    let healpower = creep.getActiveBodyparts(HEAL) * 12
     // heal prio
     var target = creep.pos.findClosestByRange(FIND_MY_CREEPS, {
       filter: function (mc) { return mc.hits + healpower <= mc.hitsMax }
@@ -114,7 +114,7 @@ var roleHealer = {
   },
 
   boost: function (creep, mineraltype) {
-    var lab = creep.pos.findClosestByRange(FIND_MY_STRUCTURES, {
+    let lab = creep.pos.findClosestByRange(FIND_MY_STRUCTURES, {
       filter: function (lab) {
         return lab.mineralType === mineraltype && lab.mineralAmount > 100
       }
