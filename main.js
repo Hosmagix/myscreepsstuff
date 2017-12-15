@@ -9,12 +9,12 @@ module.exports.loop = function () {
 
   overridePrototypes.overridePrototypes()
 
-  for (var name in Memory.creeps) {
+  for (let name in Memory.creeps) {
     if (!Game.creeps[name]) {
       delete Memory.creeps[name]
     }
   }
-  for (var name in Memory.flags) {
+  for (let name in Memory.flags) {
     if (!Game.flags[name]) {
       delete Memory.flags[name]
     }
@@ -50,7 +50,7 @@ module.exports.loop = function () {
     let mincontrollerlevel = 8
     let progress = 0
     var roomname = ''
-    for (var room_id in Game.rooms) {
+    for (let room_id in Game.rooms) {
       let room = Game.rooms[room_id]
       if (room.controller && room.controller.my && room.controller.level < 8 && room.controller.level < mincontrollerlevel && room.terminal) {
         roomname = room.name
@@ -73,7 +73,7 @@ module.exports.loop = function () {
   let creepscpu = Game.cpu.getUsed()
 
   let targets
-  for (var room_id in Game.rooms) {
+  for (let room_id in Game.rooms) {
     let room = Game.rooms[room_id]
 
     if (!room.controller || !room.controller.my) {
@@ -90,8 +90,8 @@ module.exports.loop = function () {
 
     // activate safemode
 
-    var danger = false
-    targets = room.find(FIND_HOSTILE_CREEPS)
+    let danger = false
+    targets = room.findHostileCreeps()
     let numinvaders = targets.length
 
     let towers = room.find(FIND_MY_STRUCTURES, {
@@ -101,26 +101,25 @@ module.exports.loop = function () {
     })
 
     if (targets.length >= 1) {
-      var danger = true
+      danger = true
       room.memory.dangertill = Game.time + 50
       console.log('setting dangertill')
 
+      // TODO add condition that this code part isn't reached every single tick.
       if (towers.length === 0) {
-        var result = room.controller.activateSafeMode()
+        let result = room.controller.activateSafeMode()
         console.log('activated safe mode because no towers were there:' + result)
-      }
-
-      if (targets.length > 3 && room.controller.level < 8) {
-        var result = room.controller.activateSafeMode()
+      } else if (targets.length > 3 && room.controller.level < 8) {
+        let result = room.controller.activateSafeMode()
         console.log('activated safe mode because 4 opponents are scary:' + result)
-      }
-      if (targets.length > 5) {
-        var result = room.controller.activateSafeMode()
-        console.log('activated safe mode because 4 opponents are scary:' + result)
+      } else if (targets.length > 5) {
+        let result = room.controller.activateSafeMode()
+        console.log('activated safe mode because 6 opponents are scary:' + result)
       }
 
       towers.forEach(function (tower) {
-        let closest = tower.pos.findClosestByRange(FIND_HOSTILE_CREEPS)
+        let hostileCreeps = room.findHostileCreeps()
+        let closest = tower.pos.findClosestByRange(hostileCreeps)
         console.log('attacking closest enemy')
         tower.attack(closest)
       })
@@ -432,7 +431,7 @@ module.exports.loop = function () {
       // console.log('reserving: ' + JSON.stringify(reserving));
 
       for (var y in room.memory.slaverooms) {
-        var name = room.memory.slaverooms[y].roomName
+        let name = room.memory.slaverooms[y].roomName
         let claimroom = Game.rooms[name]
 
         if (claimroom && claimroom.controller) {
@@ -709,7 +708,7 @@ module.exports.loop = function () {
             }
 
             if (numfree >= 4) {
-              var result = pos.createConstructionSite(STRUCTURE_EXTENSION)
+              let result = pos.createConstructionSite(STRUCTURE_EXTENSION)
               console.log('Found pos to build at' + pos + ' construction started with: ' + result)
 
               if (result !== ERR_RCL_NOT_ENOUGH) {

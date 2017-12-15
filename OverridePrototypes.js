@@ -65,6 +65,14 @@ exports.overridePrototypes = function () {
     }
   }
 
+  Room.prototype.findHostileCreeps = function () {
+    if (this._hostileCreeps) {
+      return this._hostileCreeps
+    }
+    this._hostileCreeps = this.find(FIND_HOSTILE_CREEPS)
+    return this._hostileCreeps
+  }
+
   Creep.prototype.boost = function (mineraltype) {
     let lab = this.pos.findClosestByRange(FIND_MY_STRUCTURES, {
       filter: function (lab) {
