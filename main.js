@@ -522,7 +522,7 @@ module.exports.loop = function () {
         var parts = [CARRY, CARRY, MOVE, MOVE, WORK, WORK, WORK, WORK, WORK, WORK, WORK]
         var newName = spawns[firstfreespawn].createCreep(parts, undefined, {role: 'harvester', home: room.name})
         room.log('Spawning new harvester: ' + newName)
-      } else if (danger && defenders < numinvaders || (defenders < 1 && slaveroomindanger)) {
+      } else if (danger && ((defenders < 2 && defenders < numinvaders) || (defenders < 1 && slaveroomindanger))) {
         var newName = spawns[firstfreespawn].createCreep(createRangedCreep(spawn), undefined, {role: 'defender', room: room.name, home: room.name, ignoreneutrals: true, wait: false})
         room.log('Spawning new defender: ' + newName)
       } else if (keeperid && keeperid !== '') {

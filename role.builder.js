@@ -591,7 +591,7 @@ let roleBuilder = {
 
     if (my) {
       test = creep.pos.findClosestByRange(FIND_STRUCTURES, {
-        filter: object => object.hits < 100000 && object.structureType === STRUCTURE_RAMPART
+        filter: object => object.hits < 20000 && object.structureType === STRUCTURE_RAMPART
       })
 
       if (test) {

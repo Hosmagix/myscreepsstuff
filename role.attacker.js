@@ -180,11 +180,11 @@ let roleAttacker = {
         creep.memory.safepoint = creep.pos
       }
     }
-
     var targets = creep.pos.findInRange(FIND_HOSTILE_CREEPS, 2).filter(function (hc) {
       return hc.getActiveBodyparts(ATTACK) > 0
     })
-    if (targets.length > 0 && creep.memory.role !== 'attacker') {
+    if (targets.length > 0 && creep.memory.role !== 'attacker') { // defender???
+      creep.log('I am a defender')
       var dmg = 0
       targets.forEach(function (hc) {
         let distance = creep.pos.getRangeTo(hc)
@@ -198,12 +198,7 @@ let roleAttacker = {
           console.log('Warning: distance is: ' + distance + 'but should be smaller than 3')
         }
       })
-      /* if (dmg >= 10){
-                console.log('dmg ist: ' + dmg);
-                creep.rangedMassAttack();
-            } else {
-                creep.rangedAttack(target);
-            } */
+      var target = creep.pos.findClosestByRange()
 
       if ((creep.pos.x === 49 || creep.pos.y === 49 || creep.pos.x === 0 || creep.pos.y === 0) && creep.hits > creep.hitsMax * 0.7) {
         console.log('creep is at border -> move out')
@@ -215,6 +210,7 @@ let roleAttacker = {
         } else {
           creep.rangedAttack(target)
         }
+        return true
       } else {
         var roompos = new RoomPosition(creep.memory.safepoint.x, creep.memory.safepoint.y, creep.room.name)
         creep.moveTo(roompos, {reusePath: 0})
@@ -225,7 +221,7 @@ let roleAttacker = {
           creep.rangedAttack(target)
         }
       }
-
+      creep.log('returned true here')
       return true
     }
     var targets = creep.pos.findInRange(FIND_HOSTILE_CREEPS, 3)
@@ -273,6 +269,7 @@ let roleAttacker = {
     }
 
     if (targets.length > 0) {
+      let closestTarget = -1
       let healers = targets.filter(function (hc) {
         return hc.getActiveBodyparts(HEAL) > 0
       })
@@ -284,6 +281,7 @@ let roleAttacker = {
         var dmg = 0
         targets.forEach(function (hc) {
           let distance = creep.pos.getRangeTo(hc)
+          closestTarget = Math.max(distance, closestTarget)
           if (distance === 1) {
             dmg += 10
           } else if (distance === 2) {
@@ -305,9 +303,11 @@ let roleAttacker = {
         console.log('creep is at border -> move out')
         var center = new RoomPosition(25, 25, creep.room.name)
         creep.moveTo(center)
-      } else if (creep.hits > creep.hitsMax * 0.8) {
+      } else if (creep.hits > creep.hitsMax * 0.8 && closestTarget >= 3) {
         console.log('creep has stil enough health -> fight')
         creep.moveTo(target, {reusePath: 0})
+      } else if (creep.hits > creep.hitsMax * 0.8 && closestTarget === 2) {
+        console.log('range 2 -> wait')
       } else {
         var roompos = new RoomPosition(creep.memory.safepoint.x, creep.memory.safepoint.y, creep.room.name)
         creep.moveTo(roompos, {reusePath: 0})
@@ -326,7 +326,6 @@ let roleAttacker = {
         let exitDir = creep.room.findExitTo(homeroom)
         let exit = creep.pos.findClosestByRange(exitDir)
         creep.moveTo(exit)
-        return
       } else {
         // console.log('creep is at home');
         creep.moveTo(creep.room.controller)
@@ -465,7 +464,7 @@ let roleAttacker = {
       creep.memory.endangeredroom = null
     }
 
-    if (creep.memory.endangeredroom) {
+    if (creep.memory.endangeredroom && creep.hits === creep.hitsMax) {
       console.log('creep has endangeredroom -> goTo ' + creep.memory.endangeredroom)
       var roompos = new RoomPosition(25, 25, (creep.memory.endangeredroom))
       creep.goTo(roompos)
