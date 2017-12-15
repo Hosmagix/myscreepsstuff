@@ -10,8 +10,11 @@
 
   "env": {
     "es6": true,
-    "node": true
+    "node": true,
+    "screeps/screeps": true
   },
+
+  "plugins": ["screeps"],
 
   "rules": {
     "no-var":"error"
