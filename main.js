@@ -255,7 +255,7 @@ module.exports.loop = function () {
     var slaveroomindanger = false
     var endangeredslaveroom = ''
     if (room.memory.slaverooms && room.memory.slaverooms.length > 0) {
-      room.memory.slaverooms.forEach(function (slaveroom) {
+      room.memory.slaverooms.forEach(function (slaveroom, index) {
         if (!slaveroom) {
           return
         }
@@ -267,6 +267,12 @@ module.exports.loop = function () {
           slaveroomindanger = true
           // console.log(room.name + ': slaveroom ' + slaveroom.roomName + ' is in danger');
           endangeredslaveroom = slaveroom.roomName
+        }
+        let stupportTill = room.controller.level >= 5 ? 3 : 2
+        if (room2.controller.level > stupportTill) {
+          // room is self sustainable -> remove help
+          room.memory.slaverooms.splice(index, 1)
+          room.log('freeing slaveroom because it needs no help: ' + endangeredslaveroom)
         }
       })
     }
