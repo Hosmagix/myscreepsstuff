@@ -208,13 +208,10 @@ module.exports.loop = function () {
     }
 
     if (firstfreespawn >= 0) {
-      // TODO: refactor redesign -> find this out while iterating the creeps
-      let roomcreeps = _.filter(Game.creeps, (creep) => creep.memory.home === room.name && (creep.ticksToLive > 100 || creep.spawning))
-
       let builders = room.myCreeps.builder.length
       let upgraders = room.myCreeps.upgrader.length
       let harvesters = room.myCreeps.harvester.length
-      var transporters = room.myCreeps.transporter.length, reserver = room.myCreeps.reserver.length,
+      let transporters = room.myCreeps.transporter.length, reserver = room.myCreeps.reserver.length,
         defenders = room.myCreeps.defender.length, attackers = room.myCreeps.attacker.length,
         healers = room.myCreeps.healer.length, specialbuilders = room.myCreeps.specialbuilder.length,
         mineral = room.myCreeps.mineral.length, mineraltransporters = room.myCreeps.mineraltransporter.length,
@@ -250,43 +247,48 @@ module.exports.loop = function () {
         })
       }
 
-      roomcreeps.forEach(function (creep) {
-        if (creep.memory.role === 'outsider') {
-          var roomName = JSON.stringify(creep.memory.sourcepos)
-          // console.log('roomname: ' + roomName);
-          if (slaves[roomName]) {
-            slaves[roomName] = slaves[roomName] + 1
+      room.myCreeps.outsider.forEach((creep) => {
+        let roomName = JSON.stringify(creep.memory.sourcepos)
+        // console.log('roomname: ' + roomName);
+        if (slaves[roomName]) {
+          slaves[roomName] = slaves[roomName] + 1
+        } else {
+          slaves[roomName] = 1
+        }
+      })
+
+      room.myCreeps.sltrans.forEach((creep) => {
+        let roomName = JSON.stringify(creep.memory.containerpos)
+        if (slavetransporter[roomName]) {
+          slavetransporter[roomName] = slavetransporter[roomName] + 1
+        } else {
+          slavetransporter[roomName] = 1
+        }
+      })
+
+      room.myCreeps.reserver.forEach((creep) => {
+        let roomName = creep.memory.room
+        reserving[roomName] = true
+      })
+
+      room.myCreeps.keeper.forEach((creep) => {
+        if (creep.ticksToLive > 200 || creep.spawning) {
+          let roomName = creep.memory.room
+          if (keepers[roomName]) {
+            keepers[roomName]++
           } else {
-            slaves[roomName] = 1
+            keepers[roomName] = 1
           }
-        } else if (creep.memory.role === 'sltrans') {
-          var roomName = JSON.stringify(creep.memory.containerpos)
-          if (slavetransporter[roomName]) {
-            slavetransporter[roomName] = slavetransporter[roomName] + 1
+        }
+      })
+
+      room.myCreeps.gatherer.forEach((creep) => {
+        if (creep.ticksToLive > 200 || creep.spawning) {
+          let roomName = creep.memory.room
+          if (gatherers[roomName]) {
+            gatherers[roomName]++
           } else {
-            slavetransporter[roomName] = 1
-          }
-        } else if (creep.memory.role === 'reserver') {
-          reserver++
-          var roomName = creep.memory.room
-          reserving[roomName] = true
-        } else if (creep.memory.role === 'keeper') {
-          if (creep.ticksToLive > 200 || creep.spawning) {
-            var roomName = creep.memory.room
-            if (keepers[roomName]) {
-              keepers[roomName]++
-            } else {
-              keepers[roomName] = 1
-            }
-          }
-        } else if (creep.memory.role === 'gatherer') {
-          if (creep.ticksToLive > 200 || creep.spawning) {
-            var roomName = creep.memory.room
-            if (gatherers[roomName]) {
-              gatherers[roomName]++
-            } else {
-              gatherers[roomName] = 1
-            }
+            gatherers[roomName] = 1
           }
         }
       })
@@ -382,18 +384,17 @@ module.exports.loop = function () {
         }
       }
 
-      let normalcreeps = roomcreeps.filter(function (creep) {
-        return creep.memory.role !== 'outsider' && creep.memory.role !== 'defender' && creep.memory.role !== 'attacker' && creep.memory.role !== 'sltrans'
-      })
-      if (normalcreeps.length > 0) {
-        // console.log('normalcreeprole: ' +normalcreeps[0].memory.role);
-      }
+      // let roles = ['builder', 'upgrader', 'outsider', 'sltrans', 'harvester', 'transporter', 'reserver', 'defender',
+      //   'attacker', 'healer', 'specialbuilder', 'mineral', 'mineraltransporter', 'dismantler', 'keeper', 'gatherer', 'Specialdefender', 'looter' ]
+
+      let basicProductionCreepsLength = room.myCreeps.builder.length + room.myCreeps.transporter.length + room.myCreeps.specialbuilder.length
 
       var parts
       var newName
       var components
+      var creationpossible
 
-      if (normalcreeps.length === 0) {
+      if (basicProductionCreepsLength === 0) {
         let capa = spawn.room.energyAvailable
         if (capa < 300) {
           capa = 300
@@ -468,7 +469,7 @@ module.exports.loop = function () {
         room.log('Spawning new upgrader: ' + newName)
       } else if (attackers < 1 && room.memory.attackinprogress) {
         let body = createRangedCreep(spawn)
-        var creationpossible = spawns[firstfreespawn].canCreateCreep(body)
+        creationpossible = spawns[firstfreespawn].canCreateCreep(body)
         if (creationpossible === OK) {
           var newName = spawns[firstfreespawn].createCreep(body, undefined, {role: 'attacker', room: room.memory.warroom, home: room.name})
           room.log('Spawning new ranged attacker: ' + newName)
