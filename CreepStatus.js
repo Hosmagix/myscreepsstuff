@@ -1,5 +1,5 @@
 let roles = ['builder', 'upgrader', 'outsider', 'sltrans', 'harvester', 'transporter', 'reserver', 'defender',
-  'attacker', 'healer', 'specialbuilder', 'mineral', 'mineraltransporter', 'dismantler', 'keeper', 'gatherer', 'Specialdefender', 'looter' ]
+  'attacker', 'healer', 'specialbuilder', 'mineral', 'mineraltransporter', 'dismantler', 'keeper', 'gatherer', 'Specialdefender', 'looter', 'claim' ]
 
 function addRolesToRoom (room) {
   room.myCreeps = {}
@@ -18,12 +18,13 @@ exports.AddCreepStatusToRoomInfo = function () {
   }
 
   for (let key in Game.creeps) {
-    if (Game.rooms.hasOwnProperty(key)) {
+    if (Game.creeps.hasOwnProperty(key)) {
       let creep = Game.creeps[key]
       if (creep.ticksToLive > 100) {
         let home = creep.memory.home
         let room = Game.rooms[home]
         room.myCreeps[creep.memory.role].push(creep) // TODO add array in other for loop
+        // console.log(JSON.stringify(room.myCreeps));
       }
     }
   }

@@ -212,7 +212,7 @@ exports.overridePrototypes = function () {
       this.log(JSON.stringify(res))
     }
     if (res.incomplete) {
-      this.log('res was incomplete: ' + JSON.stringify(res))
+      // this.log('res was incomplete: ' + JSON.stringify(res))
     }
 
     // console.log('res.path: '+ JSON.stringify(res));
