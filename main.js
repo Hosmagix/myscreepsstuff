@@ -530,7 +530,7 @@ module.exports.loop = function () {
         let dump = !!roompos.container
         sourcepos.container = roompos.container
 
-        var newName = spawns[firstfreespawn].createCreep(components, undefined, {role: 'outsider', room: roompos.roomName, home: room.name, sourcepos: sourcepos, dump: dump, nofear: centralroom })
+        var newName = spawns[firstfreespawn].createCreep(components, undefined, {role: 'outsider', room: roompos.roomName, home: room.name, sourcepos: sourcepos, dump: dump, nofear: true })
         room.log('Spawning new outsider: ' + newName)
       } else if (slavetransid && slavetransid !== '') {
         var roompos = JSON.parse(slavetransid)

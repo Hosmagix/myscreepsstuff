@@ -10,7 +10,7 @@ exports.AddCreepStatusToRoomInfo = function () {
   for (let key in Game.rooms) {
     if (Game.rooms.hasOwnProperty(key)) {
       let room = Game.rooms[key]
-      if (room.controller.my) {
+      if (room.controller && room.controller.my) {
         // I can only have creeps I own myself;
         addRolesToRoom(room)
       }

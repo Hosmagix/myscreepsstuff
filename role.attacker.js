@@ -183,8 +183,7 @@ let roleAttacker = {
     var targets = creep.pos.findInRange(FIND_HOSTILE_CREEPS, 2).filter(function (hc) {
       return hc.getActiveBodyparts(ATTACK) > 0
     })
-    if (targets.length > 0 && creep.memory.role !== 'attacker') { // defender???
-      creep.log('I am a defender')
+    if (targets.length > 0) { // defender??? // TODO refactor: temprarily use defender code anyway // TODO:  idea check for healsupport
       var dmg = 0
       targets.forEach(function (hc) {
         let distance = creep.pos.getRangeTo(hc)
