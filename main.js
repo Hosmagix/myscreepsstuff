@@ -164,8 +164,8 @@ module.exports.loop = function () {
     }
 
     // slaveroomlogic
-    var slaveroomindanger = false
-    var endangeredslaveroom = ''
+    var slaveRoomInDanger = false
+    var endangeredSlaveRoom = ''
     if (room.memory.slaverooms && room.memory.slaverooms.length > 0) {
       room.memory.slaverooms.forEach(function (slaveroom, index) {
         if (!slaveroom) {
@@ -174,27 +174,26 @@ module.exports.loop = function () {
         // TODO: calculate distance
 
         let room2 = Game.rooms[slaveroom.roomName]
-        // console.log('room2.memory.dangertill' + room2.memory.dangertill);
 
         if (room2 && room2.memory.dangertill && (room2.memory.dangertill > Game.time)) {
-          slaveroomindanger = true
-          // console.log(room.name + ': slaveroom ' + slaveroom.roomName + ' is in danger');
-          endangeredslaveroom = slaveroom.roomName
+          slaveRoomInDanger = true
+          endangeredSlaveRoom = slaveroom.roomName
         }
-        let stupportTill = room.controller.level >= 5 ? 3 : 2
-        if (room2 && room2.controller && room2.controller.level > stupportTill) {
+        let supportTill = room.controller.level >= 5 ? 3 : 2
+        if (room2 && room2.controller && room2.controller.level > supportTill) {
           // room is self sustainable -> remove help
           room.memory.slaverooms.splice(index, 1)
-          room.log('freeing slaveroom because it needs no help: ' + endangeredslaveroom)
+          room.log('freeing slaveroom because it needs no help: ' + endangeredSlaveRoom)
         }
       })
     }
-    if (endangeredslaveroom) {
-      room.log('endangered slaveroom is: ' + endangeredslaveroom)
+    if (endangeredSlaveRoom) {
+      room.log('endangered slaveroom is: ' + endangeredSlaveRoom)
 
+      // TODO refactor: All creeps are iterated -> create Defender group while doing actions
       var defenders = _.filter(Game.creeps, (creep) => creep.memory.home === room.name && creep.memory.role === 'defender')
       defenders.forEach(function (creep) {
-        creep.memory.room = endangeredslaveroom
+        creep.memory.room = endangeredSlaveRoom // TODO bad design maybe do this at another location alltogether
       })
     }
 
@@ -209,8 +208,9 @@ module.exports.loop = function () {
     }
 
     if (firstfreespawn >= 0) {
+      // TODO: refactor redesign -> find this out while iterating the creeps
       let roomcreeps = _.filter(Game.creeps, (creep) => creep.memory.home === room.name && (creep.ticksToLive > 100 || creep.spawning))
-      // console.log(JSON.stringify(roomcreeps));
+
       var builders = 0, upgraders = 0, harvesters = 0, transporters = 0, reserver = 0, defenders = 0, attackers = 0, healers = 0,
         specialbuilders = 0, mineral = 0, mineraltransporters = 0, dismantlers = 0, specialdefenders = 0, looters = 0
       var slaves = {}
@@ -441,7 +441,7 @@ module.exports.loop = function () {
         var parts = [CARRY, CARRY, MOVE, MOVE, WORK, WORK, WORK, WORK, WORK, WORK, WORK]
         var newName = spawns[firstfreespawn].createCreep(parts, undefined, {role: 'harvester', home: room.name})
         room.log('Spawning new harvester: ' + newName)
-      } else if (danger && ((defenders < 2 && defenders < numinvaders) || (defenders < 1 && slaveroomindanger))) {
+      } else if (danger && ((defenders < 2 && defenders < numinvaders) || (defenders < 1 && slaveRoomInDanger))) {
         var newName = spawns[firstfreespawn].createCreep(createRangedCreep(spawn), undefined, {role: 'defender', room: room.name, home: room.name, ignoreneutrals: true, wait: false})
         room.log('Spawning new defender: ' + newName)
       } else if (keeperid && keeperid !== '') {
