@@ -262,13 +262,14 @@ module.exports.loop = function () {
 
         let room2 = Game.rooms[slaveroom.roomName]
         // console.log('room2.memory.dangertill' + room2.memory.dangertill);
+
         if (room2 && room2.memory.dangertill && (room2.memory.dangertill > Game.time)) {
           slaveroomindanger = true
           // console.log(room.name + ': slaveroom ' + slaveroom.roomName + ' is in danger');
           endangeredslaveroom = slaveroom.roomName
         }
         let stupportTill = room.controller.level >= 5 ? 3 : 2
-        if (room2.controller.level > stupportTill) {
+        if (room2 && room2.controller && room2.controller.level > stupportTill) {
           // room is self sustainable -> remove help
           room.memory.slaverooms.splice(index, 1)
           room.log('freeing slaveroom because it needs no help: ' + endangeredslaveroom)
