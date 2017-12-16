@@ -81,4 +81,33 @@ exports.sellResources = function () {
       console.log('selling zynthium: ' + amount + ' result: ' + result)
     }
   }
+
+  /* if (room.name === "W15N67" && Game.time %50 === 9){
+        var oxygen = room.terminal.store[RESOURCE_LEMERGIUM];
+        room.log('lem: ' + JSON.stringify(oxygen));
+        if ( (!oxygen || oxygen < 10000) && room.terminal.store.energy >= 30000){
+            var orders = Game.market.getAllOrders().filter(function(order){
+                 return order.resourceType === RESOURCE_LEMERGIUM && order.type === ORDER_SELL && Game.market.calcTransactionCost(1000, room.name, order.roomName) < 2000;
+            });
+            // console.log('orders:' + JSON.stringify(orders));
+
+            var price = 1;
+            var orderid = null;
+            var maxamount = 0;
+            orders.forEach(function(order){
+                if (order.price < price){
+                    price = order.price;
+                    orderid = order.id;
+                    maxamount = order.amount;
+                }
+            });
+            if (orderid){
+
+                var amount = Math.min(maxamount, 15000);
+                room.log('orderid: '  +orderid + 'amountl' +  amount + 'price'+ price);
+                var result = Game.market.deal(orderid, amount, room.name);
+                room.log('buying L: ' + amount + ' result: ' + result);
+            }
+        }
+    } */
 }
