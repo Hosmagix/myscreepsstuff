@@ -4,6 +4,7 @@ let moveCreeps = require('moveCreeps')
 let sellResources = require('sellResources')
 let overridePrototypes = require('OverridePrototypes')
 let handleTerminals = require('handleTerminals')
+let creepStatus = require('CreepStatus')
 
 module.exports.loop = function () {
   let startcpu = Game.cpu.getUsed()
@@ -20,6 +21,8 @@ module.exports.loop = function () {
       delete Memory.flags[name]
     }
   }
+
+  creepStatus.AddCreepStatusToRoomInfo();
 
   let gatheringpoint = Memory.gatheringpoint
   let warroom = null
