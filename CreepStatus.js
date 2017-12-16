@@ -7,18 +7,24 @@ function addRolesToRoom (room) {
 }
 
 exports.AddCreepStatusToRoomInfo = function () {
-  Game.rooms.forEach((room) => {
-    if (room.controller.my) {
-      // I can only have creeps I own myself;
-      addRolesToRoom(room)
+  for (let key in Game.rooms) {
+    if (Game.rooms.hasOwnProperty(key)) {
+      let room = Game.rooms[key]
+      if (room.controller.my) {
+        // I can only have creeps I own myself;
+        addRolesToRoom(room)
+      }
     }
-  })
+  }
 
-  Game.creeps.forEach((creep) => {
-    if (creep.ticksToLive > 100) {
-      let home = creep.memory.home
-      let room = Game.rooms[home]
-      room.myCreeps[creep.memory.role].push(creep) // TODO add array in other for loop
+  for (let key in Game.creeps) {
+    if (Game.rooms.hasOwnProperty(key)) {
+      let creep = Game.creeps[key]
+      if (creep.ticksToLive > 100) {
+        let home = creep.memory.home
+        let room = Game.rooms[home]
+        room.myCreeps[creep.memory.role].push(creep) // TODO add array in other for loop
+      }
     }
-  })
+  }
 }

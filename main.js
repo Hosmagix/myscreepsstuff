@@ -22,7 +22,7 @@ module.exports.loop = function () {
     }
   }
 
-  creepStatus.AddCreepStatusToRoomInfo();
+  creepStatus.AddCreepStatusToRoomInfo()
 
   let gatheringpoint = Memory.gatheringpoint
   let warroom = null
@@ -90,7 +90,7 @@ module.exports.loop = function () {
       room.memory.wallshp = 100000
     }
 
-    let roomname = room.name
+    var roomname = room.name
 
     // activate safemode
 
@@ -128,7 +128,7 @@ module.exports.loop = function () {
         tower.attack(closest)
       })
     } else {
-      let damagedCreeps = room.findFriendlyDamagedCreeps();
+      let damagedCreeps = room.findFriendlyDamagedCreeps()
 
       if (damagedCreeps.length > 0) {
         towers.forEach(function (tower) {
@@ -148,7 +148,7 @@ module.exports.loop = function () {
 
     // terminal
 
-    handleTerminals.handleTerminals(room);
+    handleTerminals.handleTerminals(room)
 
     // sell ressources
     if (Game.time % 50 === 1) {
@@ -510,7 +510,7 @@ module.exports.loop = function () {
         var roompos = JSON.parse(slaveid)
         var sourcepos = new RoomPosition(roompos.x, roompos.y, roompos.roomName)
 
-        var roomname = roompos.roomName
+        let roomname = roompos.roomName
         var cords = roomname.substr(1).replace('N', ',').replace('S', ',').split(',')
         console.log('cords: ' + JSON.stringify(cords))
         var centralroom = false
