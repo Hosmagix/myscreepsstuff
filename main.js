@@ -211,12 +211,12 @@ module.exports.loop = function () {
       // TODO: refactor redesign -> find this out while iterating the creeps
       let roomcreeps = _.filter(Game.creeps, (creep) => creep.memory.home === room.name && (creep.ticksToLive > 100 || creep.spawning))
 
-      var builders = room.myCreeps.builder.length;
-      var upgraders = room.myCreeps.upgrader.length;
-      var harvesters = room.myCreeps.harvester.length;
+      let builders = room.myCreeps.builder.length
+      let upgraders = room.myCreeps.upgrader.length
+      let harvesters = room.myCreeps.harvester.length
       var transporters = room.myCreeps.transporter.length, reserver = room.myCreeps.reserver.length,
         defenders = room.myCreeps.defender.length, attackers = room.myCreeps.attacker.length,
-        healers = room.myCreeps.healer.length,  specialbuilders = room.myCreeps.specialbuilder.length,
+        healers = room.myCreeps.healer.length, specialbuilders = room.myCreeps.specialbuilder.length,
         mineral = room.myCreeps.mineral.length, mineraltransporters = room.myCreeps.mineraltransporter.length,
         dismantlers = room.myCreeps.dismantler.length, specialdefenders = room.myCreeps.Specialdefender.length,
         looters = room.myCreeps.looter.length
@@ -408,8 +408,7 @@ module.exports.loop = function () {
           newName = spawns[firstfreespawn].createCreep(createWorkFocussedCreep(spawn, capa), undefined, {role: 'builder', source: getHarvestID(room), home: room.name})
           room.log('Spawning new General Purpuse Creep: ' + newName)
         }
-      }
-      else
+      } else
       if (room.myCreeps.transporter.length < 2 && room.storage && (room.storage.store.energy > 20000 || room.memory.haslinks)) {
         parts = [MOVE, MOVE, MOVE, MOVE, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY]
         if (room.controller.level === 8) {
@@ -423,7 +422,7 @@ module.exports.loop = function () {
       if (room.myCreeps.harvester.length < 2 && room.memory.haslinks) {
         parts = [CARRY, CARRY, MOVE, MOVE, WORK, WORK, WORK, WORK, WORK, WORK, WORK]
         newName = spawns[firstfreespawn].createCreep(parts, undefined, {role: 'harvester', home: room.name})
-      } else if (danger && ((room.myCreeps.defender.length < Math.min(2, numinvaders)  || (room.myCreeps.defender.length < 1 && slaveRoomInDanger))) {
+      } else if (danger && ((room.myCreeps.defender.length < Math.min(2, numinvaders)) || (room.myCreeps.defender.length < 1 && slaveRoomInDanger))) {
         newName = spawns[firstfreespawn].createCreep(createRangedCreep(spawn), undefined, {role: 'defender', room: room.name, home: room.name, ignoreneutrals: true, wait: false})
         room.log('Spawning new defender: ' + newName)
       } else if (keeperid && keeperid !== '') {
