@@ -66,11 +66,20 @@ exports.overridePrototypes = function () {
   }
 
   Room.prototype.findHostileCreeps = function () {
-    if (this._hostileCreeps) {
-      return this._hostileCreeps
+    if (this._hostileCreeps !== undefined) {
+      this._hostileCreeps = this.find(FIND_HOSTILE_CREEPS)
     }
-    this._hostileCreeps = this.find(FIND_HOSTILE_CREEPS)
+
     return this._hostileCreeps
+  }
+
+  Room.prototype.findFriendlyDamagedCreeps = function () {
+    if (this._friendlyDamagedCreeps !== undefined) {
+      this._friendlyDamagedCreeps = this.find(FIND_MY_CREEPS, {
+        filter: function (mc) { return mc.hits < mc.hitsMax }
+      })
+    }
+    return this._friendlyDamagedCreeps
   }
 
   Creep.prototype.boost = function (mineraltype) {

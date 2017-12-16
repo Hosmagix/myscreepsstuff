@@ -49,7 +49,7 @@ module.exports.loop = function () {
   if (Game.time % 100 === 3 || !Memory.energytarget) {
     let mincontrollerlevel = 8
     let progress = 0
-    var roomname = ''
+    let roomname = ''
     for (let room_id in Game.rooms) {
       let room = Game.rooms[room_id]
       if (room.controller && room.controller.my && room.controller.level < 8 && room.controller.level < mincontrollerlevel && room.terminal) {
@@ -86,7 +86,7 @@ module.exports.loop = function () {
       room.memory.wallshp = 100000
     }
 
-    var roomname = room.name
+    let roomname = room.name
 
     // activate safemode
 
@@ -124,9 +124,7 @@ module.exports.loop = function () {
         tower.attack(closest)
       })
     } else {
-      var damagedCreeps = room.find(FIND_MY_CREEPS, {
-        filter: function (mc) { return mc.hits < mc.hitsMax }
-      })
+      let damagedCreeps = room.findFriendlyDamagedCreeps();
 
       if (damagedCreeps.length > 0) {
         towers.forEach(function (tower) {
