@@ -248,34 +248,6 @@ let roleMineral = {
     }
   },
 
-  checkforEnemies: function (creep) {
-    if (creep.memory.home && creep.room.name !== creep.memory.home) {
-      let targets = creep.room.find(FIND_HOSTILE_CREEPS).filter(function (hc) {
-        return (hc.getActiveBodyparts(ATTACK) > 0) || (hc.getActiveBodyparts(RANGED_ATTACK) > 0) || (hc.getActiveBodyparts(HEAL) > 0)
-      })
-      // var targets = creep.room.find(FIND_HOSTILE_CREEPS);
-      if (targets.length > 0) {
-        console.log('creep: ' + creep.name + ' is in Danger -> returning home')
-        // Game.rooms[creep.memory.room].memory.danger = true;
-        Game.rooms[creep.room.name].memory.dangertill = Game.time + 50
-        creep.memory.dangertill = Game.time + 50
-        // going home
-
-        let homeroom = Game.rooms[creep.memory.home]
-        // console.log('homeroom' +JSON.stringify(homeroom));
-
-        let exitDir = creep.room.findExitTo(homeroom)
-        let exit = creep.pos.findClosestByRange(exitDir)
-        creep.moveTo(exit)
-        return true
-      } else {
-        Game.rooms[creep.room.name].memory.dangertill = Game.time - 1
-        // Game.rooms[creep.room.name].memory.danger = false;
-        // console.log('creep.memory.room' + creep.memory.room);
-        return false
-      }
-    }
-  },
 
   run: function (creep) {
     that = this
@@ -291,7 +263,7 @@ let roleMineral = {
       return
     }
 
-    if (this.checkforEnemies(creep)) {
+    if (creep.checkForEnemies()) {
       return
     }
 

@@ -325,88 +325,6 @@ let roleBuilder = {
     creep.memory.init = true
   },
 
-  checkforEnemies: function (creep) {
-    if (creep.memory.home && creep.room.name !== creep.memory.home) {
-      let targets = creep.room.find(FIND_HOSTILE_CREEPS).filter(function (hc) {
-        return (hc.getActiveBodyparts(ATTACK) > 0) || (hc.getActiveBodyparts(RANGED_ATTACK) > 0) || (hc.getActiveBodyparts(HEAL) > 0)
-      })
-      // var targets = creep.room.find(FIND_HOSTILE_CREEPS);
-      if (targets.length > 0) {
-        console.log('creep: ' + creep.name + ' is in Danger -> returning home')
-        // Game.rooms[creep.memory.room].memory.danger = true;
-        Game.rooms[creep.room.name].memory.dangertill = Game.time + 50
-        creep.memory.dangertill = Game.time + 50
-        // going home
-
-        let homeroom = Game.rooms[creep.memory.home]
-        // console.log('homeroom' +JSON.stringify(homeroom));
-
-        let exitDir = creep.room.findExitTo(homeroom)
-        let exit = creep.pos.findClosestByRange(exitDir)
-        creep.moveTo(exit)
-        return true
-      } else {
-        Game.rooms[creep.room.name].memory.dangertill = Game.time - 1
-        // Game.rooms[creep.room.name].memory.danger = false;
-        // console.log('creep.memory.room' + creep.memory.room);
-        return false
-      }
-    }
-  },
-
-  checkforKeepers: function (creep) {
-    if (creep.memory.home && creep.room.name !== creep.memory.home) {
-      var targets = creep.room.find(FIND_HOSTILE_CREEPS).filter(function (hc) {
-        return (hc.getActiveBodyparts(ATTACK) > 0 || hc.getActiveBodyparts(RANGED_ATTACK) > 0 || hc.getActiveBodyparts(HEAL) > 0) && hc.owner.username !== 'Source Keeper'
-      })
-
-      // var targets = creep.room.find(FIND_HOSTILE_CREEPS);
-      //
-      if (targets.length >= 1) {
-        Game.rooms[creep.room.name].memory.dangertill = Game.time + 50
-        creep.memory.dangertill = Game.time + 50
-        var homeroom = Game.rooms[creep.memory.home]
-        creep.goTo(homeroom.controller.pos)
-        // console.log('targets:' + JSON.stringify(targets));
-        return true
-      } else {
-        Game.rooms[creep.room.name].memory.dangertill = Game.time - 1
-      }
-    }
-
-    var targets = creep.pos.findInRange(FIND_HOSTILE_CREEPS, 6)
-
-    let lairs = creep.pos.findInRange(FIND_HOSTILE_STRUCTURES, 6).filter(function (structure) {
-      return structure.structureType === STRUCTURE_KEEPER_LAIR && (structure.ticksToSpawn <= 7)
-    })
-
-    // console.log('creep.hits ' + creep.hits+'/'+creep.hitsMax);
-    if (targets.length > 0 || lairs.length > 0 || creep.hits < creep.hitsMax) {
-      // console.log('creeps in 6: ' + targets.length + 'pos: ' + JSON.stringify(creep.pos ));
-      targets = targets.filter(function (target) {
-        return creep.pos.inRangeTo(target, 5)
-      })
-      lairs = lairs.filter(function (target) {
-        return creep.pos.inRangeTo(target, 5)
-      })
-      // console.log('creeps in 5: ' + targets.length);
-
-      if (targets.length > 0 || lairs.length > 0 || creep.hits < creep.hitsMax) {
-        var homeroom = Game.rooms[creep.memory.home]
-
-        if (homeroom.storage) {
-          creep.moveTo(homeroom.storage)
-        } else {
-          creep.moveTo(homeroom.controller)
-        }
-      }
-
-      return true
-    }
-
-    return false
-  },
-
   /** @param {Creep} creep **/
   run: function (creep) {
     let startcpu = Game.cpu.getUsed()
@@ -422,11 +340,11 @@ let roleBuilder = {
     }
 
     if (!creep.memory.nofear) {
-      if (this.checkforEnemies(creep)) {
+      if (creep.checkForEnemies()) {
         return
       }
     } else {
-      if (this.checkforKeepers(creep)) {
+      if (creep.checkForKeepers()) {
         return
       }
     }

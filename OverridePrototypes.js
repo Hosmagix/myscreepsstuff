@@ -229,4 +229,86 @@ exports.overridePrototypes = function () {
 
     return result
   }
+
+  Creep.prototype.checkForEnemies= function () {
+    if (this.memory.home && this.room.name !== this.memory.home) {
+      let targets = this.room.find(FIND_HOSTILE_CREEPS).filter(function (hc) {
+        return (hc.getActiveBodyparts(ATTACK) > 0) || (hc.getActiveBodyparts(RANGED_ATTACK) > 0) || (hc.getActiveBodyparts(HEAL) > 0)
+      })
+      // var targets = this.room.find(FIND_HOSTILE_CREEPS);
+      if (targets.length > 0) {
+        console.log('creep: ' + this.name + ' is in Danger -> returning home')
+        // Game.rooms[this.memory.room].memory.danger = true;
+        Game.rooms[this.room.name].memory.dangertill = Game.time + 50
+        this.memory.dangertill = Game.time + 50
+        // going home
+
+        let homeroom = Game.rooms[this.memory.home]
+        // console.log('homeroom' +JSON.stringify(homeroom));
+
+        let exitDir = this.room.findExitTo(homeroom)
+        let exit = this.pos.findClosestByRange(exitDir)
+        this.moveTo(exit)
+        return true
+      } else {
+        Game.rooms[this.room.name].memory.dangertill = Game.time - 1
+        // Game.rooms[this.room.name].memory.danger = false;
+        // console.log('this.memory.room' + this.memory.room);
+        return false
+      }
+    }
+  }
+
+  Creep.prototype.checkForKeepers= function () {
+    if (this.memory.home && this.room.name !== this.memory.home) {
+      var targets = this.room.find(FIND_HOSTILE_CREEPS).filter(function (hc) {
+        return (hc.getActiveBodyparts(ATTACK) > 0 || hc.getActiveBodyparts(RANGED_ATTACK) > 0 || hc.getActiveBodyparts(HEAL) > 0) && hc.owner.username !== 'Source Keeper'
+      })
+
+      // var targets = this.room.find(FIND_HOSTILE_CREEPS);
+      //
+      if (targets.length >= 1) {
+        Game.rooms[this.room.name].memory.dangertill = Game.time + 50
+        this.memory.dangertill = Game.time + 50
+        var homeroom = Game.rooms[this.memory.home]
+        this.goTo(homeroom.controller.pos)
+        // console.log('targets:' + JSON.stringify(targets));
+        return true
+      } else {
+        Game.rooms[this.room.name].memory.dangertill = Game.time - 1
+      }
+    }
+
+    var targets = this.pos.findInRange(FIND_HOSTILE_CREEPS, 6)
+
+    let lairs = this.pos.findInRange(FIND_HOSTILE_STRUCTURES, 6).filter(function (structure) {
+      return structure.structureType === STRUCTURE_KEEPER_LAIR && (structure.ticksToSpawn <= 7)
+    })
+
+    // console.log('this.hits ' + this.hits+'/'+this.hitsMax);
+    if (targets.length > 0 || lairs.length > 0 || this.hits < this.hitsMax) {
+      // console.log('thiss in 6: ' + targets.length + 'pos: ' + JSON.stringify(this.pos ));
+      targets = targets.filter(function (target) {
+        return this.pos.inRangeTo(target, 5)
+      })
+      lairs = lairs.filter(function (target) {
+        return this.pos.inRangeTo(target, 5)
+      })
+      // console.log('creeps in 5: ' + targets.length);
+
+      if (targets.length > 0 || lairs.length > 0 || this.hits < this.hitsMax) {
+        var homeroom = Game.rooms[this.memory.home]
+
+        if (homeroom.storage) {
+          this.moveTo(homeroom.storage)
+        } else {
+          this.moveTo(homeroom.controller)
+        }
+      }
+
+      return true
+    }
+
+    return false
+  }
 }
