@@ -311,4 +311,41 @@ exports.overridePrototypes = function () {
 
     return false
   }
+
+  Creep.prototype.buildRoads = function () {
+    let structures = this.pos.lookFor(LOOK_STRUCTURES).filter(function (structure) {
+      return structure.structureType === STRUCTURE_ROAD
+    })
+    if (structures.length === 0 && this.pos.lookFor(LOOK_CONSTRUCTION_SITES).length === 0 && this.fatigue > 0) {
+      let flags = this.pos.lookFor(LOOK_FLAGS)
+      if (flags.length > 0) {
+        let flag = flags[0]
+        let terrain = Game.map.getTerrainAt(flag.pos)
+        let visited = flag.memory.visited ? flag.memory.visited : 0
+        let effectivevisited = (terrain === 'swamp') ? visited / 4 : visited
+
+        if (flag.memory.visited && effectivevisited >= 2) {
+          if (this.pos.createConstructionSite(STRUCTURE_ROAD) === OK) {
+            flag.remove()
+            console.log('flag was visited enough -> creating Road')
+          }
+        } else {
+          // console.log('updating flag visited');
+          let extra = (this.memory.role === 'harvester') ? 2 : 1
+
+          flag.memory.visited = flag.memory.visited ? flag.memory.visited + extra : extra
+        }
+      } else {
+        this.pos.createFlag()
+        // console.log('creating Flag at' +this.pos);
+      }
+    } else if (structures.length >= 1) {
+      let road = structures[0]
+      if (road.hits < road.hitsMax / 2) {
+        if (this.getActiveBodyparts(WORK) > 0 && this.carry.energy > 0) {
+          this.repair(road)
+        }
+      }
+    }
+  }
 }

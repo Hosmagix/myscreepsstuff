@@ -195,43 +195,6 @@ let roleMineral = {
     // console.log(creep.memory.role + ' ' + creep.name + ' tries to harvest but finds nothing');
   },
 
-  build_roads: function (creep) {
-    let structures = creep.pos.lookFor(LOOK_STRUCTURES).filter(function (structure) {
-      return structure.structureType === STRUCTURE_ROAD
-    })
-    if (structures.length === 0 && creep.pos.lookFor(LOOK_CONSTRUCTION_SITES).length === 0) {
-      let flags = creep.pos.lookFor(LOOK_FLAGS)
-      if (flags.length > 0) {
-        let flag = flags[0]
-        let terrain = Game.map.getTerrainAt(flag.pos)
-        let visited = flag.memory.visited ? flag.memory.visited : 0
-        let effectivevisited = (terrain === 'swamp') ? visited / 3 : visited
-
-        if (flag.memory.visited && effectivevisited >= 4) {
-          if (creep.pos.createConstructionSite(STRUCTURE_ROAD) === OK) {
-            flag.remove()
-            console.log('flag was visited enough -> creating Road')
-          }
-        } else {
-          // console.log('updating flag visited');
-          let extra = (creep.memory.role === 'harvester') ? 2 : 1
-
-          flag.memory.visited = flag.memory.visited ? flag.memory.visited + extra : extra
-        }
-      } else {
-        creep.pos.createFlag()
-        // console.log('creating Flag at' +creep.pos);
-      }
-    } else if (structures.length >= 1) {
-      let road = structures[0]
-      if (road.hits < road.hitsMax / 2) {
-        if (creep.getActiveBodyparts(WORK) > 0 && creep.carry.energy > 0) {
-          creep.repair(road)
-        }
-      }
-    }
-  },
-
   init: function (creep) {
     if (creep.memory.role !== 'mineraltransporter') {
       // TODO: fixme -> other room compatible
@@ -267,7 +230,7 @@ let roleMineral = {
       return
     }
 
-    this.build_roads(creep)
+    creep.buildRoads()
 
     let totalcarrying = _.sum(creep.carry)
 
