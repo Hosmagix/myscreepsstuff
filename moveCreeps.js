@@ -1,6 +1,4 @@
-let roleUpgrader = require('role.upgrader')
 let roleBuilder = require('role.builder')
-let roleTransporter = require('role.transporter')
 let roleAttacker = require('role.attacker')
 let roleClaim = require('role.claim')
 let roleHealer = require('role.healer')

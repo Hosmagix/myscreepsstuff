@@ -394,6 +394,7 @@ module.exports.loop = function () {
       var components
       var creationpossible
 
+
       if (basicProductionCreepsLength === 0) {
         let capa = spawn.room.energyAvailable
         if (capa < 300) {
@@ -1049,17 +1050,17 @@ var positionFree = function (roomposition) {
   console.log('roomposition:' + roomposition)
   let terrain = roomposition.lookFor(LOOK_TERRAIN)
   if (terrain.length > 0 && terrain[0] === 'wall') {
-    console.log('terrain is wall: ' + JSON.stringify(terrain))
+   //  console.log('terrain is wall: ' + JSON.stringify(terrain))
     return false
   }
   let structure = roomposition.lookFor(LOOK_STRUCTURES)
   if (structure.length > 0 && structure[0].structureType !== STRUCTURE_ROAD) {
-    console.log('structure on it: ' + JSON.stringify(structure))
+   //  console.log('structure on it: ' + JSON.stringify(structure))
     return false
   }
   let constsite = roomposition.lookFor(LOOK_CONSTRUCTION_SITES)
   if (constsite.length > 0) {
-    console.log('constsite on it: ' + JSON.stringify(constsite))
+   //  console.log('constsite on it: ' + JSON.stringify(constsite))
     return false
   }
 
