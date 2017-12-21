@@ -1,177 +1,221 @@
+function gathererDroppedEnergy(){
+  var resources = creep.room.find(FIND_DROPPED_RESOURCES).filter(function (res) {
+    return res.resourceType === RESOURCE_ENERGY && res.energy > 300
+  })
+
+  var target = creep.pos.findClosestByRange(resources)
+
+  // console.log('resource:' + JSON.stringify(target));
+  if (target) {
+    if (creep.pickup(target) !== OK) {
+      creep.goTo(target.pos)
+    }
+    return true
+  }
+
+  resources = creep.room.find(FIND_DROPPED_RESOURCES).filter(function (res) {
+    return res.resourceType === RESOURCE_ENERGY
+  })
+
+  target = creep.pos.findClosestByRange(resources)
+
+  // console.log('resource:' + JSON.stringify(target));
+  if (target) {
+    if (creep.pickup(target) !== OK) {
+      creep.goTo(target.pos)
+    }
+    return true
+  }
+}
+
+function generalDroppedEnergy () {
+  var resources = creep.room.find(FIND_DROPPED_RESOURCES).filter(function (res) {
+    return res.resourceType === RESOURCE_ENERGY
+  })
+
+  var target = creep.pos.findClosestByRange(resources)
+  if (target) {
+    var range = creep.pos.getRangeTo(target)
+    if (range <= 1) {
+      creep.pickup(target)
+      // creep.moveTo(target);
+      return true
+    } else if (range <= 5) {
+      creep.goTo(target.pos)
+      return true
+    }
+  }
+}
+
+function goToOtherRoom (){
+  if (creep.fatigue) {
+    // console.log('fatigue');
+    return true
+  }
+
+  // else go to room
+  var roompos = null
+  let targetroom = Game.rooms[creep.memory.room]
+  if (creep.memory.lasttarget && creep.memory.lasttarget.roomName === creep.memory.room) {
+    roompos = new RoomPosition(creep.memory.lasttarget.x, creep.memory.lasttarget.y, creep.memory.lasttarget.roomName)
+  } else if (creep.memory.sourcepos) {
+    roompos = new RoomPosition(creep.memory.sourcepos.x, creep.memory.sourcepos.y, creep.memory.room)
+  } else if (creep.memory.containerpos) {
+    roompos = new RoomPosition(creep.memory.containerpos.x, creep.memory.containerpos.y, creep.memory.room)
+  } else if (targetroom && targetroom.controller) {
+    roompos = targetroom.controller.pos
+  } else {
+    roompos = new RoomPosition(25, 25, creep.memory.room)
+  }
+  creep.goTo(roompos)
+  return true
+}
+
+function getEnergyFromLink () {
+  var roompos = new RoomPosition(creep.memory.linkfrom.x, creep.memory.linkfrom.y, creep.memory.linkfrom.roomName)
+  let linkfrom = roompos.lookFor(LOOK_STRUCTURES).filter(function (linki) {
+    return linki.structureType === STRUCTURE_LINK
+  })
+
+  // console.log('linkfrom: ' + JSON.stringify(linkfrom));
+  if (linkfrom && linkfrom[0].energy > 200) {
+    let link = linkfrom[0]
+    // console.log('link: ' + JSON.stringify(link));
+    var range = creep.pos.getRangeTo(link.pos)
+    // console.log('range to link' + range);
+    if (range <= 1) {
+      let result = creep.withdraw(link, RESOURCE_ENERGY)
+      // console.log('withdraw result:' + result);
+      if (result === -6 && creep.memory.role !== 'transporter') {
+        // -> Storage
+      } else {
+        return true
+      }
+    } else {
+      creep.moveTo(link.pos)
+      return true
+    }
+  }
+}
+
+function getEnergyFromContainer () {
+  // console.log('creep.name: ' +creep.name);
+  var roompos = new RoomPosition(creep.memory.containerpos.x, creep.memory.containerpos.y, creep.memory.room)
+  // var source = roompos.lookFor(LOOK_SOURCES)[0];
+  var container = roompos.findInRange(FIND_STRUCTURES, 3).filter(function (structure) {
+    return structure.structureType === STRUCTURE_CONTAINER
+  })
+  if (container && container.length > 0) {
+    // console.log(creep.name + ' sltrans founc container');
+    let con = roompos.findClosestByRange(container)
+
+    if (creep.withdraw(con, RESOURCE_ENERGY) !== OK) {
+      creep.moveTo(con)
+    }
+    return true
+  } else {
+    console.log('warning: no container found near pos: ' + JSON.stringify(roompos))
+  }
+}
+
+function getEnergyFromSource (){
+  var roompos = new RoomPosition(creep.memory.sourcepos.x, creep.memory.sourcepos.y, creep.memory.room)
+  // var source = roompos.lookFor(LOOK_SOURCES)[0];
+  var source = roompos.findClosestByRange(FIND_SOURCES)
+
+  var harvestresult = creep.harvest(source)
+  if (harvestresult === ERR_NOT_IN_RANGE || harvestresult === ERR_NOT_ENOUGH_RESOURCES || harvestresult === ERR_INVALID_TARGET) {
+    var status = creep.moveTo(source)
+    if (status !== OK) {
+      // console.log(creep.name + 'cannot move to target ' + source.pos +' because: ' + status);
+      creep.moveTo(creep.room.controller)
+    }
+  }
+  if (creep.memory.role === 'outsider' && !creep.memory.drop) {
+    // console.log('checking for finished container');
+    var container = roompos.findInRange(FIND_STRUCTURES, 2).filter(function (structure) {
+      // console.log('structure: ' + JSON.stringify(structure));
+      return structure.structureType === STRUCTURE_CONTAINER
+    })
+    if (container && container.length > 0) {
+      // console.log('finished container found');
+      // console.log( Game.rooms[creep.memory.home].memory.slaverooms.length);
+      Game.rooms[creep.memory.home].memory.slaverooms.forEach(function (slaveroom) {
+        if (slaveroom && slaveroom.x === roompos.x && slaveroom.y === roompos.y && slaveroom.roomName === roompos.roomName) {
+          // console.log('setting flag for container');
+          slaveroom.container = true
+        }
+      })
+    }
+  }
+  return true
+}
+
+function getEnergyFromSourceId () {
+  // console.log('creep.name:' + creep.name);
+  let sources = creep.room.find(FIND_SOURCES)
+  let id = creep.memory.source
+  var source = sources[id]
+
+  var harvestresult = creep.harvest(source)
+  if (harvestresult === ERR_NOT_IN_RANGE) {
+    var status = creep.goTo(source.pos)
+  }
+  return true
+}
+
 let roleBuilder = {
 
   harvest: function (creep) {
-    // pickup
-    // console.log('creep.name ' + creep.name);
 
     if (creep.memory.role === 'gatherer') {
-      var resources = creep.room.find(FIND_DROPPED_RESOURCES).filter(function (res) {
-        return res.resourceType === RESOURCE_ENERGY && res.energy > 300
-      })
-
-      var target = creep.pos.findClosestByRange(resources)
-
-      // console.log('resource:' + JSON.stringify(target));
-      if (target) {
-        if (creep.pickup(target) !== OK) {
-          creep.goTo(target.pos)
-        }
-        return
+      let result =gathererDroppedEnergy()
+      if (result){
+        return true;
       }
+    }
 
-      resources = creep.room.find(FIND_DROPPED_RESOURCES).filter(function (res) {
-        return res.resourceType === RESOURCE_ENERGY
-      })
-
-      target = creep.pos.findClosestByRange(resources)
-
-      // console.log('resource:' + JSON.stringify(target));
-      if (target) {
-        if (creep.pickup(target) !== OK) {
-          creep.goTo(target.pos)
-        }
-        return
+    // other room
+    if (creep.memory.room && creep.room.name !== creep.memory.room) {
+      let result =goToOtherRoom()
+      if (result){
+        return true;
       }
     }
 
     if (!creep.memory.dump) {
-      var resources = creep.room.find(FIND_DROPPED_RESOURCES).filter(function (res) {
-        return res.resourceType === RESOURCE_ENERGY
-      })
-
-      var target = creep.pos.findClosestByRange(resources)
-      if (target) {
-        var range = creep.pos.getRangeTo(target)
-        if (range <= 1) {
-          creep.pickup(target)
-          // creep.moveTo(target);
-          return
-        } else if (range <= 5) {
-          creep.goTo(target.pos)
-          return
-        }
+      let result =generalDroppedEnergy()
+      if (result){
+        return true;
       }
     }
-    // other room
-    if (creep.memory.room && creep.room.name !== creep.memory.room) {
-      if (creep.fatigue) {
-        // console.log('fatigue');
-        return
-      }
-
-      // else go to room
-      var roompos = null
-      let targetroom = Game.rooms[creep.memory.room]
-      if (creep.memory.lasttarget && creep.memory.lasttarget.roomName === creep.memory.room) {
-        roompos = new RoomPosition(creep.memory.lasttarget.x, creep.memory.lasttarget.y, creep.memory.lasttarget.roomName)
-      } else if (creep.memory.sourcepos) {
-        roompos = new RoomPosition(creep.memory.sourcepos.x, creep.memory.sourcepos.y, creep.memory.room)
-      } else if (creep.memory.containerpos) {
-        roompos = new RoomPosition(creep.memory.containerpos.x, creep.memory.containerpos.y, creep.memory.room)
-      } else if (targetroom && targetroom.controller) {
-        roompos = targetroom.controller.pos
-      } else {
-        roompos = new RoomPosition(25, 25, creep.memory.room)
-      }
-      creep.goTo(roompos)
-
-      return
-    }
-
-    // get energy from link
 
     if (creep.memory.linkfrom && creep.memory.role === 'transporter') {
-      var roompos = new RoomPosition(creep.memory.linkfrom.x, creep.memory.linkfrom.y, creep.memory.linkfrom.roomName)
-      let linkfrom = roompos.lookFor(LOOK_STRUCTURES).filter(function (linki) {
-        return linki.structureType === STRUCTURE_LINK
-      })
-
-      // console.log('linkfrom: ' + JSON.stringify(linkfrom));
-      if (linkfrom && linkfrom[0].energy > 200) {
-        let link = linkfrom[0]
-        // console.log('link: ' + JSON.stringify(link));
-        var range = creep.pos.getRangeTo(link.pos)
-        // console.log('range to link' + range);
-        if (range <= 1) {
-          let result = creep.withdraw(link, RESOURCE_ENERGY)
-          // console.log('withdraw result:' + result);
-          if (result === -6 && creep.memory.role !== 'transporter') {
-            // -> Storage
-          } else {
-            return
-          }
-        } else {
-          creep.moveTo(link.pos)
-          return
-        }
+      let result = getEnergyFromLink()
+      if (result){
+        return true;
       }
     }
 
     if (creep.memory.containerpos && creep.memory.role === 'sltrans') {
-      // console.log('creep.name: ' +creep.name);
-      var roompos = new RoomPosition(creep.memory.containerpos.x, creep.memory.containerpos.y, creep.memory.room)
-      // var source = roompos.lookFor(LOOK_SOURCES)[0];
-      var container = roompos.findInRange(FIND_STRUCTURES, 3).filter(function (structure) {
-        return structure.structureType === STRUCTURE_CONTAINER
-      })
-      if (container && container.length > 0) {
-        // console.log(creep.name + ' sltrans founc container');
-        let con = roompos.findClosestByRange(container)
-
-        if (creep.withdraw(con, RESOURCE_ENERGY) !== OK) {
-          creep.moveTo(con)
-        }
-        return
-      } else {
-        console.log('warning: no container found near pos: ' + JSON.stringify(roompos))
+      let result = getEnergyFromContainer()
+      if (result){
+        return true;
       }
     }
 
     if (creep.memory.sourcepos) {
-      var roompos = new RoomPosition(creep.memory.sourcepos.x, creep.memory.sourcepos.y, creep.memory.room)
-      // var source = roompos.lookFor(LOOK_SOURCES)[0];
-      var source = roompos.findClosestByRange(FIND_SOURCES)
-
-      var harvestresult = creep.harvest(source)
-      if (harvestresult === ERR_NOT_IN_RANGE || harvestresult === ERR_NOT_ENOUGH_RESOURCES || harvestresult === ERR_INVALID_TARGET) {
-        var status = creep.moveTo(source)
-        if (status !== OK) {
-          // console.log(creep.name + 'cannot move to target ' + source.pos +' because: ' + status);
-          creep.moveTo(creep.room.controller)
-        }
+      let result = getEnergyFromSource()
+      if (result){
+        return true;
       }
-      if (creep.memory.role === 'outsider' && !creep.memory.drop) {
-        // console.log('checking for finished container');
-        var container = roompos.findInRange(FIND_STRUCTURES, 2).filter(function (structure) {
-          // console.log('structure: ' + JSON.stringify(structure));
-          return structure.structureType === STRUCTURE_CONTAINER
-        })
-        if (container && container.length > 0) {
-          // console.log('finished container found');
-          // console.log( Game.rooms[creep.memory.home].memory.slaverooms.length);
-          Game.rooms[creep.memory.home].memory.slaverooms.forEach(function (slaveroom) {
-            if (slaveroom && slaveroom.x === roompos.x && slaveroom.y === roompos.y && slaveroom.roomName === roompos.roomName) {
-              // console.log('setting flag for container');
-              slaveroom.container = true
-            }
-          })
-        }
-      }
-      return
     }
 
-    // this room
     if (creep.memory.source !== undefined) {
-      // console.log('creep.name:' + creep.name);
-      let sources = creep.room.find(FIND_SOURCES)
-      let id = creep.memory.source
-      var source = sources[id]
-
-      var harvestresult = creep.harvest(source)
-      if (harvestresult === ERR_NOT_IN_RANGE) {
-        var status = creep.goTo(source.pos)
+      let result = getEnergyFromSourceId()
+      if (result){
+        return true;
       }
-      return
     }
 
     // terminal
@@ -181,7 +225,7 @@ let roleBuilder = {
       if (creep.withdraw(target, RESOURCE_ENERGY) !== OK) {
         creep.moveTo(target)
       }
-      return
+      return true
     }
 
     // storage
