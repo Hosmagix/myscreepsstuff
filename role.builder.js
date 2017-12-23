@@ -1,9 +1,9 @@
-function gathererDroppedEnergy(){
-  var resources = creep.room.find(FIND_DROPPED_RESOURCES).filter(function (res) {
+function gathererDroppedEnergy (creep) {
+  let resources = creep.room.find(FIND_DROPPED_RESOURCES).filter(function (res) {
     return res.resourceType === RESOURCE_ENERGY && res.energy > 300
   })
 
-  var target = creep.pos.findClosestByRange(resources)
+  let target = creep.pos.findClosestByRange(resources)
 
   // console.log('resource:' + JSON.stringify(target));
   if (target) {
@@ -28,14 +28,14 @@ function gathererDroppedEnergy(){
   }
 }
 
-function generalDroppedEnergy () {
-  var resources = creep.room.find(FIND_DROPPED_RESOURCES).filter(function (res) {
+function generalDroppedEnergy (creep) {
+  let resources = creep.room.find(FIND_DROPPED_RESOURCES).filter(function (res) {
     return res.resourceType === RESOURCE_ENERGY
   })
 
-  var target = creep.pos.findClosestByRange(resources)
+  let target = creep.pos.findClosestByRange(resources)
   if (target) {
-    var range = creep.pos.getRangeTo(target)
+    let range = creep.pos.getRangeTo(target)
     if (range <= 1) {
       creep.pickup(target)
       // creep.moveTo(target);
@@ -47,14 +47,14 @@ function generalDroppedEnergy () {
   }
 }
 
-function goToOtherRoom (){
+function goToOtherRoom (creep) {
   if (creep.fatigue) {
     // console.log('fatigue');
     return true
   }
 
   // else go to room
-  var roompos = null
+  let roompos = null
   let targetroom = Game.rooms[creep.memory.room]
   if (creep.memory.lasttarget && creep.memory.lasttarget.roomName === creep.memory.room) {
     roompos = new RoomPosition(creep.memory.lasttarget.x, creep.memory.lasttarget.y, creep.memory.lasttarget.roomName)
@@ -71,8 +71,8 @@ function goToOtherRoom (){
   return true
 }
 
-function getEnergyFromLink () {
-  var roompos = new RoomPosition(creep.memory.linkfrom.x, creep.memory.linkfrom.y, creep.memory.linkfrom.roomName)
+function getEnergyFromLink (creep) {
+  let roompos = new RoomPosition(creep.memory.linkfrom.x, creep.memory.linkfrom.y, creep.memory.linkfrom.roomName)
   let linkfrom = roompos.lookFor(LOOK_STRUCTURES).filter(function (linki) {
     return linki.structureType === STRUCTURE_LINK
   })
@@ -81,7 +81,7 @@ function getEnergyFromLink () {
   if (linkfrom && linkfrom[0].energy > 200) {
     let link = linkfrom[0]
     // console.log('link: ' + JSON.stringify(link));
-    var range = creep.pos.getRangeTo(link.pos)
+    let range = creep.pos.getRangeTo(link.pos)
     // console.log('range to link' + range);
     if (range <= 1) {
       let result = creep.withdraw(link, RESOURCE_ENERGY)
@@ -98,11 +98,11 @@ function getEnergyFromLink () {
   }
 }
 
-function getEnergyFromContainer () {
+function getEnergyFromContainer (creep) {
   // console.log('creep.name: ' +creep.name);
-  var roompos = new RoomPosition(creep.memory.containerpos.x, creep.memory.containerpos.y, creep.memory.room)
+  let roompos = new RoomPosition(creep.memory.containerpos.x, creep.memory.containerpos.y, creep.memory.room)
   // var source = roompos.lookFor(LOOK_SOURCES)[0];
-  var container = roompos.findInRange(FIND_STRUCTURES, 3).filter(function (structure) {
+  let container = roompos.findInRange(FIND_STRUCTURES, 3).filter(function (structure) {
     return structure.structureType === STRUCTURE_CONTAINER
   })
   if (container && container.length > 0) {
@@ -118,14 +118,14 @@ function getEnergyFromContainer () {
   }
 }
 
-function getEnergyFromSource (){
-  var roompos = new RoomPosition(creep.memory.sourcepos.x, creep.memory.sourcepos.y, creep.memory.room)
+function getEnergyFromSource (creep) {
+  let roompos = new RoomPosition(creep.memory.sourcepos.x, creep.memory.sourcepos.y, creep.memory.room)
   // var source = roompos.lookFor(LOOK_SOURCES)[0];
-  var source = roompos.findClosestByRange(FIND_SOURCES)
+  let source = roompos.findClosestByRange(FIND_SOURCES)
 
-  var harvestresult = creep.harvest(source)
+  let harvestresult = creep.harvest(source)
   if (harvestresult === ERR_NOT_IN_RANGE || harvestresult === ERR_NOT_ENOUGH_RESOURCES || harvestresult === ERR_INVALID_TARGET) {
-    var status = creep.moveTo(source)
+    let status = creep.moveTo(source)
     if (status !== OK) {
       // console.log(creep.name + 'cannot move to target ' + source.pos +' because: ' + status);
       creep.moveTo(creep.room.controller)
@@ -133,7 +133,7 @@ function getEnergyFromSource (){
   }
   if (creep.memory.role === 'outsider' && !creep.memory.drop) {
     // console.log('checking for finished container');
-    var container = roompos.findInRange(FIND_STRUCTURES, 2).filter(function (structure) {
+    let container = roompos.findInRange(FIND_STRUCTURES, 2).filter(function (structure) {
       // console.log('structure: ' + JSON.stringify(structure));
       return structure.structureType === STRUCTURE_CONTAINER
     })
@@ -151,34 +151,34 @@ function getEnergyFromSource (){
   return true
 }
 
-function getEnergyFromSourceId () {
+function getEnergyFromSourceId (creep) { // TODO: remove and use sourcepos instead
   // console.log('creep.name:' + creep.name);
   let sources = creep.room.find(FIND_SOURCES)
   let id = creep.memory.source
-  var source = sources[id]
+  let source = sources[id]
 
-  var harvestresult = creep.harvest(source)
+  let harvestresult = creep.harvest(source)
   if (harvestresult === ERR_NOT_IN_RANGE) {
-    var status = creep.goTo(source.pos)
+    creep.goTo(source.pos)
   }
   return true
 }
 
 /// spend energy
 
-function repairContainer () {
+function repairContainer (creep) {
   // role: sltrans
   // console.log('outsider ready to dump');
-  var roompos = new RoomPosition(creep.memory.sourcepos.x, creep.memory.sourcepos.y, creep.memory.room)
-  var container = roompos.findInRange(FIND_STRUCTURES, 2).filter(function (structure) {
+  let roompos = new RoomPosition(creep.memory.sourcepos.x, creep.memory.sourcepos.y, creep.memory.room)
+  let container = roompos.findInRange(FIND_STRUCTURES, 2).filter(function (structure) {
     return structure.structureType === STRUCTURE_CONTAINER
   })
   if (container && container.length > 0) {
     let con = container[0]
-    var range = creep.pos.getRangeTo(con.pos)
+    let range = creep.pos.getRangeTo(con.pos)
 
     if (range <= 1) {
-      var result = creep.transfer(con, RESOURCE_ENERGY)
+      let result = creep.transfer(con, RESOURCE_ENERGY)
       if (result !== OK) {
         creep.drop(RESOURCE_ENERGY, creep.carry.RESOURCE_ENERGY)
       }
@@ -190,86 +190,77 @@ function repairContainer () {
   }
 }
 
+function getEnergyFromTerminal (creep) {
+  let target = creep.room.terminal
+  if (creep.withdraw(target, RESOURCE_ENERGY) !== OK) {
+    creep.moveTo(target) // TODO: check
+  }
+  return true
+}
+
+function getEnergyFromClosestLinkOrStorage (creep) {
+  let links = creep.room.find(FIND_MY_STRUCTURES).filter(function (structure) {
+    return structure.structureType === STRUCTURE_LINK && structure.energy >= 300 // TODO: cache link part
+  })
+  if (links.length >= 1) {
+    // console.log('found links');
+  }
+  links.push(creep.room.storage)
+  let target = creep.pos.findClosestByRange(links)
+
+  if (creep.withdraw(target, RESOURCE_ENERGY) !== OK) {
+    creep.moveTo(target)
+  }
+  return true
+}
+
 let roleBuilder = {
 
   harvest: function (creep) {
+    let harvestQueue = []
 
     if (creep.memory.role === 'gatherer') {
-      let result =gathererDroppedEnergy()
-      if (result){
-        return true;
-      }
+      harvestQueue.push(gathererDroppedEnergy)
     }
 
     // other room
     if (creep.memory.room && creep.room.name !== creep.memory.room) {
-      let result =goToOtherRoom()
-      if (result){
-        return true;
-      }
+      harvestQueue.push(goToOtherRoom)
     }
 
     if (!creep.memory.dump) {
-      let result =generalDroppedEnergy()
-      if (result){
-        return true;
-      }
+      harvestQueue.push(generalDroppedEnergy)
     }
 
     if (creep.memory.linkfrom && creep.memory.role === 'transporter') {
-      let result = getEnergyFromLink()
-      if (result){
-        return true;
-      }
+      harvestQueue.push(getEnergyFromLink)
     }
 
     if (creep.memory.containerpos && creep.memory.role === 'sltrans') {
-      let result = getEnergyFromContainer()
-      if (result){
-        return true;
-      }
+      harvestQueue.push(getEnergyFromContainer)
     }
 
     if (creep.memory.sourcepos) {
-      let result = getEnergyFromSource()
-      if (result){
-        return true;
-      }
+      harvestQueue.push(getEnergyFromSource)
     }
 
     if (creep.memory.source !== undefined) {
-      let result = getEnergyFromSourceId()
-      if (result){
-        return true;
-      }
+      harvestQueue.push(getEnergyFromSourceId)
     }
-
-    // terminal
-
+    // TODO: fix condition
     if (creep.room.terminal && creep.room.terminal.store.energy > 70000 && creep.room.controller.level < 8 || creep.room.terminal && creep.room.terminal.store.energy > 0 && creep.memory.role === 'looter') {
-      var target = creep.room.terminal
-      if (creep.withdraw(target, RESOURCE_ENERGY) !== OK) {
-        creep.moveTo(target)
-      }
-      return true
+      harvestQueue.push(getEnergyFromTerminal)
     }
 
-    // storage
-    let storage = creep.room.storage
-    if (storage) {
-      let links = creep.room.find(FIND_MY_STRUCTURES).filter(function (structure) {
-        return structure.structureType === STRUCTURE_LINK && structure.energy >= 300
-      })
-      if (links.length >= 1) {
-        // console.log('found links');
-      }
-      links.push(storage)
-      var target = creep.pos.findClosestByRange(links)
+    if (creep.room.storage) {
+      harvestQueue.push(getEnergyFromClosestLinkOrStorage)
+    }
 
-      if (creep.withdraw(target, RESOURCE_ENERGY) !== OK) {
-        creep.moveTo(target)
+    for (let i = 0; i < harvestQueue.length; i++) {
+      let task = harvestQueue[i]
+      if (task(creep)) {
+        break
       }
-      return
     }
 
     console.log(creep.name + '/' + creep.memory.role + ':' + creep.room.name + ' tries to harvest but finds nothing')
@@ -367,8 +358,8 @@ let roleBuilder = {
     // repair containers
 
     if (creep.memory.role !== 'sltrans' && creep.memory.role !== 'gatherer' && creep.memory.role !== 'looter') {
-      let result = repairContainer(); // TODO: bug everywhere: each function needs to be called with creep -> maybe refactor ???
-      if (result) return;
+      let result = repairContainer() // TODO: bug everywhere: each function needs to be called with creep -> maybe refactor ???
+      if (result) return
     }
 
     // outsiderdump
@@ -377,7 +368,7 @@ let roleBuilder = {
       // role: sltrans
       // console.log('outsider ready to dump');
       var roompos = new RoomPosition(creep.memory.sourcepos.x, creep.memory.sourcepos.y, creep.memory.room)
-      var container = roompos.findInRange(FIND_STRUCTURES, 2).filter(function (structure) {
+      let container = roompos.findInRange(FIND_STRUCTURES, 2).filter(function (structure) {
         return structure.structureType === STRUCTURE_CONTAINER
       })
       if (container && container.length > 0) {
@@ -400,7 +391,7 @@ let roleBuilder = {
     // upgrader
 
     if (creep.memory.role === 'upgrader') {
-      if (creep.upgradeController(creep.room.controller) === ERR_NOT_IN_RANGE) {  // TODO: distance check instead of penalty
+      if (creep.upgradeController(creep.room.controller) === ERR_NOT_IN_RANGE) { // TODO: distance check instead of penalty
         if (creep.room.memory.upgradepos) {
           creep.moveTo(creep.room.memory.upgradepos.x, creep.room.memory.upgradepos.y)
         } else {
@@ -412,7 +403,7 @@ let roleBuilder = {
 
     // harvester to link
 
-    if (creep.memory.link) {  // TODO: if only harvester -> make check dependant on role
+    if (creep.memory.link) { // TODO: if only harvester -> make check dependant on role
       var roompos = new RoomPosition(creep.memory.link.x, creep.memory.link.y, creep.memory.link.roomName)
       let link = roompos.lookFor(LOOK_STRUCTURES).filter(function (linki) { // TODO: cache filtered links
         return linki.structureType === STRUCTURE_LINK
@@ -443,7 +434,7 @@ let roleBuilder = {
     }
 
     // bring energy to tower
-    var targets = creep.room.find(FIND_STRUCTURES, {    // TODO: cache filtered towers
+    var targets = creep.room.find(FIND_STRUCTURES, { // TODO: cache filtered towers
       filter: (structure) => {
         return (structure.structureType === STRUCTURE_TOWER && structure.energy < towerfilltill)
       }
@@ -500,7 +491,7 @@ let roleBuilder = {
 
     if (creep.room.storage && (creep.memory.role === 'sltrans' || creep.memory.role === 'outsider' || creep.memory.role === 'gatherer' || creep.memory.role === 'looter' && creep.room.controller && creep.room.controller.my)) {
       let storage = creep.room.storage
-      let links = creep.room.find(FIND_MY_STRUCTURES).filter(function (structure) {   // TODO: cache
+      let links = creep.room.find(FIND_MY_STRUCTURES).filter(function (structure) { // TODO: cache
         return (structure.structureType === STRUCTURE_LINK) && structure.energy <= 600
       })
       // console.log('creep.name:' + creep.name);
