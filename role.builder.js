@@ -214,6 +214,239 @@ function repairContainer (creep) {
   }
 }
 
+function dropOnContainerOrFloor (creep) {
+  let roompos = new RoomPosition(creep.memory.sourcepos.x, creep.memory.sourcepos.y, creep.memory.room);
+  let container = roompos.findInRange(FIND_STRUCTURES, 2).filter(function (structure) {
+    return structure.structureType === STRUCTURE_CONTAINER;
+  });
+  if (container && container.length > 0) {
+    let con = container[0];
+    let range = creep.pos.getRangeTo(con.pos);
+
+    if (range <= 1) {
+      let result = creep.transfer(con, RESOURCE_ENERGY);
+      if (result !== OK) {
+        creep.drop(RESOURCE_ENERGY, creep.carry.RESOURCE_ENERGY);
+      }
+      return true;
+    } else {
+      creep.moveTo(con);
+      return true;
+    }
+  }
+}
+
+function upgradeController (creep) {
+  if (creep.upgradeController(creep.room.controller) === ERR_NOT_IN_RANGE) { // TODO: distance check instead of penalty
+    if (creep.room.memory.upgradepos) {
+      creep.moveTo(creep.room.memory.upgradepos.x, creep.room.memory.upgradepos.y);
+    } else {
+      creep.moveTo(creep.room.controller); // TODO: creep.goTo
+    }
+  }
+  return true;
+}
+
+function harvesterToLinkIndex (creep) {
+  let roompos = new RoomPosition(creep.memory.link.x, creep.memory.link.y, creep.memory.link.roomName);
+  let link = roompos.lookFor(LOOK_STRUCTURES).filter(function (linki) { // TODO: cache filtered links
+    return linki.structureType === STRUCTURE_LINK;
+  });
+
+  if (link) {
+    let linki = link[0];
+    // console.log('haslink ' + JSON.stringify(linki));
+    let range = creep.pos.getRangeTo(linki.pos);
+    // console.log('range to link' + range);
+    if (range <= 1) {
+      if (creep.transfer(linki, RESOURCE_ENERGY) === OK) {
+        return true;
+      }
+      // console.log('creep ' + creep.name + ' cant transfer enery to the link');
+      return true;
+    } else {
+      creep.moveTo(linki);
+      return true;
+    }
+  } else {
+    console.error('creep has no link: ' + creep.name + ' link' + JSON.stringify(link));
+  }
+}
+
+function fillTowers (creep) {
+  let towerFillTill = 800;
+  if (creep.room.memory.dangertill && creep.room.memory.dangertill > Game.time) {
+    towerFillTill = 600; // such that they don't fill at 990
+  }
+
+  // bring energy to tower
+  let targets = creep.room.find(FIND_STRUCTURES, { // TODO: cache filtered towers
+    filter: (structure) => {
+      return (structure.structureType === STRUCTURE_TOWER && structure.energy < towerFillTill);
+    }
+  });
+  if (targets.length > 0) {
+    let target = creep.pos.findClosestByRange(targets);
+    if (creep.transfer(target, RESOURCE_ENERGY) === ERR_NOT_IN_RANGE) { // TODO: move closer check first
+      creep.moveTo(target);
+    }
+    return true;
+  }
+}
+
+function distributeEnergy (creep) {
+  let targets = creep.room.find(FIND_STRUCTURES, { // TODO: cache
+    filter: (structure) => {
+      return (structure.structureType === STRUCTURE_EXTENSION || structure.structureType === STRUCTURE_SPAWN || structure.structureType === STRUCTURE_LAB) && structure.energy < structure.energyCapacity;
+    }
+  });
+  if (targets.length > 0) {
+    let target = creep.pos.findClosestByRange(targets);
+    if (creep.transfer(target, RESOURCE_ENERGY) === ERR_NOT_IN_RANGE) { // TODO: check for range
+      creep.moveTo(target);
+    }
+    return true;
+  }
+}
+
+function bringEnergyToTerminal (creep) {
+  let terminal = creep.room.terminal;
+  if (creep.transfer(terminal, RESOURCE_ENERGY) === ERR_NOT_IN_RANGE) { // TODO: check for range
+    creep.moveTo(terminal);
+  }
+  return true;
+}
+
+function bringEnergyToStorage (creep) {
+  if (creep.transfer(creep.room.storage, RESOURCE_ENERGY) !== OK) { // TODO: check for range
+    creep.moveTo(creep.room.storage);
+  }
+  return true;
+}
+
+function bringEnergyToStorageOrClosestLink (creep) {
+  let storage = creep.room.storage;
+  let links = creep.room.find(FIND_MY_STRUCTURES).filter(function (structure) { // TODO: cache
+    return (structure.structureType === STRUCTURE_LINK) && structure.energy <= 600;
+  });
+  // console.log('creep.name:' + creep.name);
+  if (links.length >= 1) {
+    //  console.log('found links' + JSON.stringify(links));
+  }
+  links.push(storage);
+  let target = creep.pos.findClosestByRange(links);
+  // console.log('links: ' + JSON.stringify(links) + ' become ' + JSON.stringify(target));
+
+  if (creep.transfer(target, RESOURCE_ENERGY) !== OK) { // TODO: check for range
+    creep.moveTo(target);
+  }
+  return true;
+}
+
+function buildStuff (creep) {
+  let my = creep.room.controller && creep.room.controller && creep.room.controller.my;
+
+  // repairing ramparts
+  let test = null;
+  let objecthits = 800000;
+  if (creep.room.memory.wallshp) {
+    objecthits = creep.room.memory.wallshp;
+  } else if (creep.room.controller && creep.room.controller.level < 4) {
+    objecthits = 0;
+  }
+  if (!creep.memory.repairing) {
+    objecthits *= 0.8;
+  }
+
+  if (my) {
+    test = creep.pos.findClosestByRange(FIND_STRUCTURES, {
+      filter: object => object.hits < 20000 && object.structureType === STRUCTURE_RAMPART
+    });
+
+    if (test) {
+      // console.log('repairing target:' + JSON.stringify(test));
+      if (creep.repair(test) === ERR_NOT_IN_RANGE) {
+        creep.moveTo(test);
+      }
+      return true;
+    }
+  }
+
+  // build
+  let targets = creep.room.find(FIND_CONSTRUCTION_SITES).filter(function (constrsite) {
+    return constrsite.my;
+  });
+  if (targets.length > 0) {
+    let target = creep.pos.findClosestByRange(targets);
+    // console.log(JSON.stringify(target));
+    if (creep.build(target) === ERR_NOT_IN_RANGE) {
+      let result = creep.moveTo(target);
+      if (result !== OK && result !== ERR_TIRED) {
+        console.log(creep.name + 'wants to move to construction site at ' + target.pos + 'but cannot because' + result);
+      }
+    }
+    return true;
+  }
+
+  if (my) {
+    test = creep.pos.findClosestByRange(FIND_STRUCTURES, {
+      filter: object => object.hits < objecthits * 2 && object.structureType === STRUCTURE_RAMPART
+    });
+
+    // console.log('ramparts: ' + JSON.stringify(test));
+
+    if (test) {
+      // console.log('repairing target:' + JSON.stringify(test));
+      if (creep.repair(test) === ERR_NOT_IN_RANGE) {
+        creep.moveTo(test);
+      }
+      creep.memory.repairing = true;
+      return true;
+    }
+
+    creep.memory.reparing = false;
+
+    test = creep.pos.findClosestByRange(FIND_STRUCTURES, {
+      filter: object => object.hits < (object.hitsMax / 2) && object.structureType !== STRUCTURE_ROAD && object.hits < objecthits
+    });
+
+    if (test) {
+      // console.log('repairing target:' + JSON.stringify(test));
+      if (creep.repair(test) === ERR_NOT_IN_RANGE) {
+        creep.moveTo(test);
+      }
+      return true;
+    }
+  }
+}
+
+function increaseWallHp (creep) {
+  console.log(creep.room.name + ' increasing wallshp');
+  creep.room.memory.wallshp += 300000;
+  buildStuff(creep);
+}
+
+function returnHome (creep) {
+  // console.log(creep.name + ' not in homeroom');
+
+  if (creep.fatigue) {
+    // console.log('fatigue');
+    return true;
+  }
+
+  let homeroom = Game.rooms[creep.memory.home];
+
+  let roomPos = new RoomPosition(25, 25, creep.memory.home);
+  if (homeroom.storage) {
+    roomPos = homeroom.storage.pos;
+    // console.log('check1');
+  } else {
+    roomPos = homeroom.controller.pos;
+  }
+  creep.goTo(roomPos);
+  return true;
+}
+
 let roleBuilder = {
 
   harvest: function (creep) {
@@ -259,7 +492,7 @@ let roleBuilder = {
     for (let i = 0; i < harvestQueue.length; i++) {
       let task = harvestQueue[i];
       if (task(creep)) {
-        break;
+        return;
       }
     }
 
@@ -347,286 +580,76 @@ let roleBuilder = {
       this.harvest(creep);
     }
 
-    let cpufinished = Game.cpu.getUsed();
+    /* let cpufinished = Game.cpu.getUsed();
     let safety = cpuaftersafetycheck - startcpu;
     let roadtime = cpuafterroads - cpuaftersafetycheck;
     let actiontime = cpufinished - cpuafterroads;
     // creep.log('cpu usage: safety: ' + safety + ' roads: ' + roadtime + ' action: ' + actiontime);
+    */
   },
 
   spendEnergy: function (creep) {
     // repair containers
 
-    if (creep.memory.role !== 'sltrans' && creep.memory.role !== 'gatherer' && creep.memory.role !== 'looter') {
-      let result = repairContainer(creep);
-      if (result) return true;
-    }
+    let spendEnergyQueue = [];
 
-    // outsiderdump
+    if (creep.memory.role !== 'sltrans' && creep.memory.role !== 'gatherer' && creep.memory.role !== 'looter') {
+      spendEnergyQueue.push(repairContainer);
+    }
 
     if (creep.memory.role === 'outsider' && creep.memory.dump && creep.memory.sourcepos && creep.memory.room === creep.room.name) { // make new role
-      // role: sltrans
-      // console.log('outsider ready to dump');
-      var roompos = new RoomPosition(creep.memory.sourcepos.x, creep.memory.sourcepos.y, creep.memory.room);
-      let container = roompos.findInRange(FIND_STRUCTURES, 2).filter(function (structure) {
-        return structure.structureType === STRUCTURE_CONTAINER;
-      });
-      if (container && container.length > 0) {
-        let con = container[0];
-        var range = creep.pos.getRangeTo(con.pos);
-
-        if (range <= 1) {
-          var result = creep.transfer(con, RESOURCE_ENERGY);
-          if (result !== OK) {
-            creep.drop(RESOURCE_ENERGY, creep.carry.RESOURCE_ENERGY);
-          }
-          return true;
-        } else {
-          creep.moveTo(con);
-          return true;
-        }
-      }
+      spendEnergyQueue.push(dropOnContainerOrFloor);
     }
-
-    // upgrader
 
     if (creep.memory.role === 'upgrader') {
-      if (creep.upgradeController(creep.room.controller) === ERR_NOT_IN_RANGE) { // TODO: distance check instead of penalty
-        if (creep.room.memory.upgradepos) {
-          creep.moveTo(creep.room.memory.upgradepos.x, creep.room.memory.upgradepos.y);
-        } else {
-          let move = creep.moveTo(creep.room.controller);
-        }
-      }
-      return true;
+      spendEnergyQueue.push(upgradeController);
     }
-
-    // harvester to link
 
     if (creep.memory.link) { // TODO: if only harvester -> make check dependant on role
-      var roompos = new RoomPosition(creep.memory.link.x, creep.memory.link.y, creep.memory.link.roomName);
-      let link = roompos.lookFor(LOOK_STRUCTURES).filter(function (linki) { // TODO: cache filtered links
-        return linki.structureType === STRUCTURE_LINK;
-      });
-
-      if (link) {
-        let linki = link[0];
-        // console.log('haslink ' + JSON.stringify(linki));
-        var range = creep.pos.getRangeTo(linki.pos);
-        // console.log('range to link' + range);
-        if (range <= 1) {
-          if (creep.transfer(linki, RESOURCE_ENERGY) === OK) {
-            return true;
-          }
-          // console.log('creep ' + creep.name + ' cant transfer enery to the link');
-          return true;
-        } else {
-          creep.moveTo(linki);
-          return true;
-        }
-      } else {
-        console.error('creep has no link: ' + creep.name + ' link' + JSON.stringify(link));
-      }
-    }
-    let towerfilltill = 800;
-    if (creep.room.memory.dangertill && creep.room.memory.dangertill > Game.time) {
-      towerfilltill = 600; // such that they don't fill at 990
+      spendEnergyQueue.push(harvesterToLinkIndex);
     }
 
-    // bring energy to tower
-    var targets = creep.room.find(FIND_STRUCTURES, { // TODO: cache filtered towers
-      filter: (structure) => {
-        return (structure.structureType === STRUCTURE_TOWER && structure.energy < towerfilltill);
-      }
-    });
-    if (targets.length > 0) {
-      var target = creep.pos.findClosestByRange(targets);
-      if (creep.transfer(target, RESOURCE_ENERGY) === ERR_NOT_IN_RANGE) { // TODO: move closer check first
-        creep.moveTo(target);
-      }
-      return true;
-    }
+    spendEnergyQueue.push(fillTowers);
 
-    // TODO: warning builders won't transport energy to extensions
-    // bring energy to spawn
     if (creep.memory.role === 'transporter' || (creep.memory.role === 'builder' && !(creep.room.storage && creep.room.storage.store.energy < 5000))) {
-      var targets = creep.room.find(FIND_STRUCTURES, { // TODO: cache
-        filter: (structure) => {
-          return (structure.structureType === STRUCTURE_EXTENSION || structure.structureType === STRUCTURE_SPAWN || structure.structureType === STRUCTURE_LAB) && structure.energy < structure.energyCapacity;
-        }
-      });
-      if (targets.length > 0) {
-        var target = creep.pos.findClosestByRange(targets);
-        if (creep.transfer(target, RESOURCE_ENERGY) === ERR_NOT_IN_RANGE) { // TODO: check for range
-          creep.moveTo(target);
-        }
-        return true;
-      }
+      spendEnergyQueue.push(distributeEnergy);
     }
 
-    if (creep.memory.role === 'transporter' && creep.room.terminal && creep.room.terminal.store.energy < 30000) {
-      var terminal = creep.room.terminal;
-      if (creep.transfer(terminal, RESOURCE_ENERGY) === ERR_NOT_IN_RANGE) { // TODO: check for range
-        creep.moveTo(terminal);
-      }
-      return true;
-    }
-
-    if (creep.memory.role === 'transporter' && creep.room.terminal && creep.room.controller.level === 8 && creep.room.terminal.store.energy < 100000 && creep.room.storage && creep.room.storage.store.energy > 200000) {
-      var terminal = creep.room.terminal;
-      if (creep.transfer(terminal, RESOURCE_ENERGY) === ERR_NOT_IN_RANGE) { // TODO: check for range
-        creep.moveTo(terminal);
-      }
-      return true;
+    if (creep.memory.role === 'transporter' && creep.room.terminal &&
+      (creep.room.terminal.store.energy < 30000 ||
+        (creep.room.controller.level === 8 && creep.room.terminal.store.energy < 100000 && creep.room.storage && creep.room.storage.store.energy > 200000))) {
+      spendEnergyQueue.push(bringEnergyToTerminal);
     }
 
     if ((creep.memory.role === 'transporter' || creep.memory.role === 'builder') && creep.room.storage) {
-      if (creep.transfer(creep.room.storage, RESOURCE_ENERGY) !== OK) {
-        creep.moveTo(creep.room.storage);
-      }
-      return true;
+      spendEnergyQueue.push(bringEnergyToStorage);
     }
 
-    // bring energy to Storage
-
-    if (creep.room.storage && (creep.memory.role === 'sltrans' || creep.memory.role === 'outsider' || creep.memory.role === 'gatherer' || creep.memory.role === 'looter' && creep.room.controller && creep.room.controller.my)) {
-      let storage = creep.room.storage;
-      let links = creep.room.find(FIND_MY_STRUCTURES).filter(function (structure) { // TODO: cache
-        return (structure.structureType === STRUCTURE_LINK) && structure.energy <= 600;
-      });
-      // console.log('creep.name:' + creep.name);
-      if (links.length >= 1) {
-        //  console.log('found links' + JSON.stringify(links));
-      }
-      links.push(storage);
-      var target = creep.pos.findClosestByRange(links);
-      // console.log('links: ' + JSON.stringify(links) + ' become ' + JSON.stringify(target));
-
-      if (creep.transfer(target, RESOURCE_ENERGY) !== OK) {
-        creep.moveTo(target);
-      }
-      return true;
+    if (creep.room.storage && (creep.memory.role === 'sltrans' || creep.memory.role === 'outsider' || creep.memory.role === 'gatherer' || creep.memory.role === 'looter') && creep.room.controller && creep.room.controller.my) {
+      spendEnergyQueue.push(bringEnergyToStorageOrClosestLink);
     }
 
-    let my = creep.room.controller && creep.room.controller && creep.room.controller.my;
-
-    // repairing ramparts
-    var test = null;
-    let objecthits = 800000;
-    if (creep.room.memory.wallshp) {
-      objecthits = creep.room.memory.wallshp;
-    } else if (creep.room.controller && creep.room.controller.level < 4) {
-      objecthits = 0;
-    }
-    if (!creep.memory.repairing) {
-      objecthits *= 0.8;
-    }
-
-    if (my) {
-      test = creep.pos.findClosestByRange(FIND_STRUCTURES, {
-        filter: object => object.hits < 20000 && object.structureType === STRUCTURE_RAMPART
-      });
-
-      if (test) {
-        // console.log('repairing target:' + JSON.stringify(test));
-        if (creep.repair(test) === ERR_NOT_IN_RANGE) {
-          creep.moveTo(test);
-        }
-        return true;
-      }
-    }
-
-    // build
-    var targets = creep.room.find(FIND_CONSTRUCTION_SITES).filter(function (constrsite) {
-      return constrsite.my;
-    });
-    if (targets.length > 0) {
-      var target = creep.pos.findClosestByRange(targets);
-      // console.log(JSON.stringify(target));
-      if (creep.build(target) === ERR_NOT_IN_RANGE) {
-        var result = creep.moveTo(target);
-        if (result !== OK && result !== ERR_TIRED) {
-          console.log(creep.name + 'wants to move to construction site at ' + target.pos + 'but cannot because' + result);
-        }
-      }
-      return true;
-    }
-
-    if (my) {
-      test = creep.pos.findClosestByRange(FIND_STRUCTURES, {
-        filter: object => object.hits < objecthits * 2 && object.structureType === STRUCTURE_RAMPART
-      });
-
-      // console.log('ramparts: ' + JSON.stringify(test));
-
-      if (test) {
-        // console.log('repairing target:' + JSON.stringify(test));
-        if (creep.repair(test) === ERR_NOT_IN_RANGE) {
-          creep.moveTo(test);
-        }
-        creep.memory.repairing = true;
-        return true;
-      }
-
-      creep.memory.reparing = false;
-
-      // repairing
-      var test = null;
-
-      test = creep.pos.findClosestByRange(FIND_STRUCTURES, {
-        filter: object => object.hits < (object.hitsMax / 2) && object.structureType !== STRUCTURE_ROAD && object.hits < objecthits
-      });
-
-      if (test) {
-        // console.log('repairing target:' + JSON.stringify(test));
-        if (creep.repair(test) === ERR_NOT_IN_RANGE) {
-          creep.moveTo(test);
-        }
-        return true;
-      }
-    }
-
-    // increase wallshp when specialbuilder and nothing else to do
+    spendEnergyQueue.push(buildStuff);
 
     if (creep.memory.role === 'specialbuilder' && creep.room.controller && creep.room.controller.level === 8) {
-      console.log(creep.room.name + ' increasing wallshp');
-      creep.room.memory.wallshp += 300000;
+      spendEnergyQueue.push(increaseWallHp);
     }
-
-    // upgrade controller
-
     if (creep.room.controller && creep.room.controller.my && (!creep.room.memory.noupgrade || creep.room.controller.ticksToDowngrade < 5000)) {
-      if (creep.upgradeController(creep.room.controller) === ERR_NOT_IN_RANGE) {
-        if (creep.room.memory.upgradepos) {
-          creep.moveTo(creep.room.memory.upgradepos.x, creep.room.memory.upgradepos.y);
-        } else {
-          creep.moveTo(creep.room.controller);
-        }
-      }
-      return true;
+      spendEnergyQueue.push(upgradeController);
     }
 
     // outside
     if (creep.memory.home && creep.memory.home !== creep.room.name) {
-      // console.log(creep.name + ' not in homeroom');
-
-      if (creep.fatigue) {
-        // console.log('fatigue');
-        return true;
-      }
-
-      let homeroom = Game.rooms[creep.memory.home];
-
-      var roompos = new RoomPosition(25, 25, creep.memory.home);
-      if (homeroom.storage) {
-        roompos = homeroom.storage.pos;
-        // console.log('check1');
-      } else {
-        roompos = homeroom.controller.pos;
-      }
-      let res = creep.goTo(roompos);
-      return true;
+      spendEnergyQueue.push(returnHome);
     }
+
+    for (let i = 0; i < spendEnergyQueue.length; i++) {
+      let task = spendEnergyQueue[i];
+      if (task(creep)) {
+        break;
+      }
+    }
+
     console.log(creep.name + 'tries to spend energy but cannnot');
   }
 };
