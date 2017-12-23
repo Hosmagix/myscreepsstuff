@@ -7,7 +7,7 @@ function gathererDroppedEnergy(){
 
   // console.log('resource:' + JSON.stringify(target));
   if (target) {
-    if (creep.pickup(target) !== OK) {
+    if (creep.pickup(target) !== OK) { // TODO: check range
       creep.goTo(target.pos)
     }
     return true
@@ -21,7 +21,7 @@ function gathererDroppedEnergy(){
 
   // console.log('resource:' + JSON.stringify(target));
   if (target) {
-    if (creep.pickup(target) !== OK) {
+    if (creep.pickup(target) !== OK) { // TODO: check range
       creep.goTo(target.pos)
     }
     return true
@@ -162,6 +162,32 @@ function getEnergyFromSourceId () {
     var status = creep.goTo(source.pos)
   }
   return true
+}
+
+/// spend energy
+
+function repairContainer () {
+  // role: sltrans
+  // console.log('outsider ready to dump');
+  var roompos = new RoomPosition(creep.memory.sourcepos.x, creep.memory.sourcepos.y, creep.memory.room)
+  var container = roompos.findInRange(FIND_STRUCTURES, 2).filter(function (structure) {
+    return structure.structureType === STRUCTURE_CONTAINER
+  })
+  if (container && container.length > 0) {
+    let con = container[0]
+    var range = creep.pos.getRangeTo(con.pos)
+
+    if (range <= 1) {
+      var result = creep.transfer(con, RESOURCE_ENERGY)
+      if (result !== OK) {
+        creep.drop(RESOURCE_ENERGY, creep.carry.RESOURCE_ENERGY)
+      }
+      return true
+    } else {
+      creep.moveTo(con)
+      return true
+    }
+  }
 }
 
 let roleBuilder = {
@@ -313,7 +339,7 @@ let roleBuilder = {
     }
     let cpuaftersafetycheck = Game.cpu.getUsed()
 
-    creep.buildRoads()
+    creep.buildRoads() // TODO: check for return here.
 
     let cpuafterroads = Game.cpu.getUsed()
 
@@ -341,21 +367,13 @@ let roleBuilder = {
     // repair containers
 
     if (creep.memory.role !== 'sltrans' && creep.memory.role !== 'gatherer' && creep.memory.role !== 'looter') {
-      // creep.log('bla');
-      var roompos = creep.pos
-      var container = roompos.findInRange(FIND_STRUCTURES, 2).filter(function (structure) {
-        return structure.structureType === STRUCTURE_CONTAINER && structure.hits < structure.hitsMax
-      })
-      if (container && container.length > 0) {
-        // console.log('repairing containers')
-        creep.repair(container[0])
-        return
-      }
+      let result = repairContainer(); // TODO: bug everywhere: each function needs to be called with creep -> maybe refactor ???
+      if (result) return;
     }
 
     // outsiderdump
 
-    if (creep.memory.role === 'outsider' && creep.memory.dump && creep.memory.sourcepos && creep.memory.room === creep.room.name) {
+    if (creep.memory.role === 'outsider' && creep.memory.dump && creep.memory.sourcepos && creep.memory.room === creep.room.name) { // make new role
       // role: sltrans
       // console.log('outsider ready to dump');
       var roompos = new RoomPosition(creep.memory.sourcepos.x, creep.memory.sourcepos.y, creep.memory.room)
@@ -377,13 +395,12 @@ let roleBuilder = {
           return
         }
       }
-      // console.log('waring: no container found');
     }
 
     // upgrader
 
     if (creep.memory.role === 'upgrader') {
-      if (creep.upgradeController(creep.room.controller) === ERR_NOT_IN_RANGE) {
+      if (creep.upgradeController(creep.room.controller) === ERR_NOT_IN_RANGE) {  // TODO: distance check instead of penalty
         if (creep.room.memory.upgradepos) {
           creep.moveTo(creep.room.memory.upgradepos.x, creep.room.memory.upgradepos.y)
         } else {
@@ -395,9 +412,9 @@ let roleBuilder = {
 
     // harvester to link
 
-    if (creep.memory.link) {
+    if (creep.memory.link) {  // TODO: if only harvester -> make check dependant on role
       var roompos = new RoomPosition(creep.memory.link.x, creep.memory.link.y, creep.memory.link.roomName)
-      let link = roompos.lookFor(LOOK_STRUCTURES).filter(function (linki) {
+      let link = roompos.lookFor(LOOK_STRUCTURES).filter(function (linki) { // TODO: cache filtered links
         return linki.structureType === STRUCTURE_LINK
       })
 
@@ -426,14 +443,14 @@ let roleBuilder = {
     }
 
     // bring energy to tower
-    var targets = creep.room.find(FIND_STRUCTURES, {
+    var targets = creep.room.find(FIND_STRUCTURES, {    // TODO: cache filtered towers
       filter: (structure) => {
         return (structure.structureType === STRUCTURE_TOWER && structure.energy < towerfilltill)
       }
     })
     if (targets.length > 0) {
       var target = creep.pos.findClosestByRange(targets)
-      if (creep.transfer(target, RESOURCE_ENERGY) === ERR_NOT_IN_RANGE) {
+      if (creep.transfer(target, RESOURCE_ENERGY) === ERR_NOT_IN_RANGE) { // TODO: move closer check first
         creep.moveTo(target)
       }
       return
@@ -442,14 +459,14 @@ let roleBuilder = {
     // TODO: warning builders won't transport energy to extensions
     // bring energy to spawn
     if (creep.memory.role === 'transporter' || (creep.memory.role === 'builder' && !(creep.room.storage && creep.room.storage.store.energy < 5000))) {
-      var targets = creep.room.find(FIND_STRUCTURES, {
+      var targets = creep.room.find(FIND_STRUCTURES, { // TODO: cache
         filter: (structure) => {
           return (structure.structureType === STRUCTURE_EXTENSION || structure.structureType === STRUCTURE_SPAWN || structure.structureType === STRUCTURE_LAB) && structure.energy < structure.energyCapacity
         }
       })
       if (targets.length > 0) {
         var target = creep.pos.findClosestByRange(targets)
-        if (creep.transfer(target, RESOURCE_ENERGY) === ERR_NOT_IN_RANGE) {
+        if (creep.transfer(target, RESOURCE_ENERGY) === ERR_NOT_IN_RANGE) { // TODO: check for range
           creep.moveTo(target)
         }
         return
@@ -458,7 +475,7 @@ let roleBuilder = {
 
     if (creep.memory.role === 'transporter' && creep.room.terminal && creep.room.terminal.store.energy < 30000) {
       var terminal = creep.room.terminal
-      if (creep.transfer(terminal, RESOURCE_ENERGY) === ERR_NOT_IN_RANGE) {
+      if (creep.transfer(terminal, RESOURCE_ENERGY) === ERR_NOT_IN_RANGE) { // TODO: check for range
         creep.moveTo(terminal)
       }
       return
@@ -466,7 +483,7 @@ let roleBuilder = {
 
     if (creep.memory.role === 'transporter' && creep.room.terminal && creep.room.controller.level === 8 && creep.room.terminal.store.energy < 100000 && creep.room.storage && creep.room.storage.store.energy > 200000) {
       var terminal = creep.room.terminal
-      if (creep.transfer(terminal, RESOURCE_ENERGY) === ERR_NOT_IN_RANGE) {
+      if (creep.transfer(terminal, RESOURCE_ENERGY) === ERR_NOT_IN_RANGE) { // TODO: check for range
         creep.moveTo(terminal)
       }
       return
@@ -483,7 +500,7 @@ let roleBuilder = {
 
     if (creep.room.storage && (creep.memory.role === 'sltrans' || creep.memory.role === 'outsider' || creep.memory.role === 'gatherer' || creep.memory.role === 'looter' && creep.room.controller && creep.room.controller.my)) {
       let storage = creep.room.storage
-      let links = creep.room.find(FIND_MY_STRUCTURES).filter(function (structure) {
+      let links = creep.room.find(FIND_MY_STRUCTURES).filter(function (structure) {   // TODO: cache
         return (structure.structureType === STRUCTURE_LINK) && structure.energy <= 600
       })
       // console.log('creep.name:' + creep.name);
