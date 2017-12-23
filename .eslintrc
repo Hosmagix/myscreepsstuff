@@ -20,6 +20,6 @@
     "no-var":"error"
   },
 
-    "extends": "standard"
+    "extends": "semistandard"
 
 }
