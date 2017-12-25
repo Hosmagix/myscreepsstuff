@@ -78,7 +78,7 @@ function getEnergyFromLink (creep) {
   });
 
   // console.log('linkfrom: ' + JSON.stringify(linkfrom));
-  if (linkfrom && linkfrom[0].energy > 200) {
+  if (linkfrom && linkfrom.length > 0 && linkfrom[0].energy > 200) {
     let link = linkfrom[0];
     // console.log('link: ' + JSON.stringify(link));
     let range = creep.pos.getRangeTo(link.pos);
@@ -593,7 +593,7 @@ let roleBuilder = {
 
     let spendEnergyQueue = [];
 
-    if (creep.memory.role !== 'sltrans' && creep.memory.role !== 'gatherer' && creep.memory.role !== 'looter') {
+    if (creep.memory.role === 'sltrans' || (creep.memory.role === 'outsider' && creep.memory.dump)) { // TODO: why
       spendEnergyQueue.push(repairContainer);
     }
 
@@ -646,11 +646,11 @@ let roleBuilder = {
     for (let i = 0; i < spendEnergyQueue.length; i++) {
       let task = spendEnergyQueue[i];
       if (task(creep)) {
-        break;
+        return;
       }
     }
 
-    console.log(creep.name + 'tries to spend energy but cannnot');
+    creep.log(creep.name + 'tries to spend energy but cannnot' + JSON.stringify(spendEnergyQueue));
   }
 };
 
