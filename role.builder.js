@@ -191,26 +191,14 @@ function getEnergyFromClosestLinkOrStorage (creep) {
 /// spend energy
 
 function repairContainer (creep) {
-  // role: sltrans
-  // console.log('outsider ready to dump');
-  let roompos = new RoomPosition(creep.memory.sourcepos.x, creep.memory.sourcepos.y, creep.memory.room);
+  // creep.log('bla');
+  let roompos = creep.pos;
   let container = roompos.findInRange(FIND_STRUCTURES, 2).filter(function (structure) {
-    return structure.structureType === STRUCTURE_CONTAINER;
+    return structure.structureType === STRUCTURE_CONTAINER && structure.hits < structure.hitsMax;
   });
   if (container && container.length > 0) {
-    let con = container[0];
-    let range = creep.pos.getRangeTo(con.pos);
-
-    if (range <= 1) {
-      let result = creep.transfer(con, RESOURCE_ENERGY);
-      if (result !== OK) {
-        creep.drop(RESOURCE_ENERGY, creep.carry.RESOURCE_ENERGY);
-      }
-      return true;
-    } else {
-      creep.moveTo(con);
-      return true;
-    }
+    // console.log('repairing containers')
+    creep.repair(container[0]);
   }
 }
 
