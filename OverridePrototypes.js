@@ -283,7 +283,7 @@ exports.overridePrototypes = function () {
     var targets = this.pos.findInRange(FIND_HOSTILE_CREEPS, 6);
 
     let lairs = this.pos.findInRange(FIND_HOSTILE_STRUCTURES, 6).filter(function (structure) {
-      return structure.structureType === STRUCTURE_KEEPER_LAIR && (structure.ticksToSpawn <= 7);
+      return structure.structureType === STRUCTURE_KEEPER_LAIR && (structure.ticksToSpawn <= 10);
     });
 
     if (this.hits < this.hitsMax - 300) {
