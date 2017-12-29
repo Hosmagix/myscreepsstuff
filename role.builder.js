@@ -222,6 +222,23 @@ function dropOnContainerOrFloor (creep) {
       return true;
     }
   } else {
+    creep.log('no container found -> check for construction sites');
+    let containerConsts = roompos.findInRange(FIND_CONSTRUCTION_SITES, 2).filter(function (structure) { // TODO: do some cacheing
+      return structure.structureType === STRUCTURE_CONTAINER;
+    });
+    if (containerConsts.length > 0) {
+      creep.log('there is a container to be build');
+      let con = container[0];
+      let range = creep.pos.getRangeTo(con.pos);
+
+      if (range <= 1) {
+        creep.build(con);
+      } else {
+        creep.moveTo(con);
+      }
+      return true;
+    }
+
     creep.log('no container found -> check if next to source and then build one!');
     if (creep.pos.findInRange(FIND_SOURCES, 1)) {
       creep.log('creep is next to source -> build container');
