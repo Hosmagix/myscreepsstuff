@@ -92,7 +92,7 @@ function getEnergyFromLink (creep) {
         return true;
       }
     } else {
-      creep.creep.goTo(link.pos);
+      creep.goTo(link.pos);
       return true;
     }
   }
@@ -110,7 +110,7 @@ function getEnergyFromContainer (creep) {
     let con = roompos.findClosestByRange(container);
 
     if (creep.withdraw(con, RESOURCE_ENERGY) !== OK) {
-      creep.creep.goTo(con.pos);
+      creep.goTo(con.pos);
     }
     return true;
   } else {
@@ -218,7 +218,7 @@ function dropOnContainerOrFloor (creep) {
       }
       return true;
     } else {
-      creep.creep.goTo(con.pos);
+      creep.goTo(con.pos);
       return true;
     }
   } else {
@@ -234,7 +234,7 @@ function dropOnContainerOrFloor (creep) {
       if (range <= 1) {
         creep.build(con);
       } else {
-        creep.creep.goTo(con.pos);
+        creep.goTo(con.pos);
       }
       return true;
     }
@@ -280,7 +280,7 @@ function harvesterToLinkIndex (creep) {
       // console.log('creep ' + creep.name + ' cant transfer enery to the link');
       return true;
     } else {
-      creep.creep.goTo(linki.pos);
+      creep.goTo(linki.pos);
       return true;
     }
   } else {
@@ -303,7 +303,7 @@ function fillTowers (creep) {
   if (targets.length > 0) {
     let target = creep.pos.findClosestByRange(targets);
     if (creep.transfer(target, RESOURCE_ENERGY) === ERR_NOT_IN_RANGE) { // TODO: move closer check first
-      creep.creep.goTo(target.pos);
+      creep.goTo(target.pos);
     }
     return true;
   }
@@ -318,7 +318,7 @@ function distributeEnergy (creep) {
   if (targets.length > 0) {
     let target = creep.pos.findClosestByRange(targets);
     if (creep.transfer(target, RESOURCE_ENERGY) === ERR_NOT_IN_RANGE) { // TODO: check for range
-      creep.creep.goTo(target.pos);
+      creep.goTo(target.pos);
     }
     return true;
   }
@@ -327,14 +327,14 @@ function distributeEnergy (creep) {
 function bringEnergyToTerminal (creep) {
   let terminal = creep.room.terminal;
   if (creep.transfer(terminal, RESOURCE_ENERGY) === ERR_NOT_IN_RANGE) { // TODO: check for range
-    creep.creep.goTo(terminal.pos);
+    creep.goTo(terminal.pos);
   }
   return true;
 }
 
 function bringEnergyToStorage (creep) {
   if (creep.transfer(creep.room.storage, RESOURCE_ENERGY) !== OK) { // TODO: check for range
-    creep.creep.goTo(creep.room.storage.pos);
+    creep.goTo(creep.room.storage.pos);
   }
   return true;
 }
@@ -353,7 +353,7 @@ function bringEnergyToStorageOrClosestLink (creep) {
   // console.log('links: ' + JSON.stringify(links) + ' become ' + JSON.stringify(target));
 
   if (creep.transfer(target, RESOURCE_ENERGY) !== OK) { // TODO: check for range
-    creep.creep.goTo(target.pos);
+    creep.goTo(target.pos);
   }
   return true;
 }
@@ -381,7 +381,7 @@ function buildStuff (creep) {
     if (test) {
       // console.log('repairing target:' + JSON.stringify(test));
       if (creep.repair(test) === ERR_NOT_IN_RANGE) {
-        creep.creep.goTo(test.pos);
+        creep.goTo(test.pos);
       }
       return true;
     }
@@ -395,7 +395,7 @@ function buildStuff (creep) {
     let target = creep.pos.findClosestByRange(targets);
     // console.log(JSON.stringify(target));
     if (creep.build(target) === ERR_NOT_IN_RANGE) {
-      let result = creep.creep.goTo(target.pos);
+      let result = creep.goTo(target.pos);
       if (result !== OK && result !== ERR_TIRED) {
         console.log(creep.name + 'wants to move to construction site at ' + target.pos + 'but cannot because' + result);
       }
@@ -413,7 +413,7 @@ function buildStuff (creep) {
     if (test) {
       // console.log('repairing target:' + JSON.stringify(test));
       if (creep.repair(test) === ERR_NOT_IN_RANGE) {
-        creep.creep.goTo(test.pos);
+        creep.goTo(test.pos);
       }
       creep.memory.repairing = true;
       return true;
@@ -428,7 +428,7 @@ function buildStuff (creep) {
     if (test) {
       // console.log('repairing target:' + JSON.stringify(test));
       if (creep.repair(test) === ERR_NOT_IN_RANGE) {
-        creep.creep.goTo(test.pos);
+        creep.goTo(test.pos);
       }
       return true;
     }
