@@ -608,7 +608,7 @@ let roleBuilder = {
 
     let spendEnergyQueue = [];
 
-    if (creep.memory.role === 'sltrans' || creep.memory.role === 'dumper' || creep.memory.role === 'keepTrans') {
+    if (creep.memory.role === 'sltrans' || creep.memory.role === 'dumper') {
       spendEnergyQueue.push(repairContainer);
     }
 
