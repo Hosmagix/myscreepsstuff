@@ -92,7 +92,7 @@ function getEnergyFromLink (creep) {
         return true;
       }
     } else {
-      creep.moveTo(link.pos);
+      creep.creep.goTo(link.pos);
       return true;
     }
   }
@@ -110,7 +110,7 @@ function getEnergyFromContainer (creep) {
     let con = roompos.findClosestByRange(container);
 
     if (creep.withdraw(con, RESOURCE_ENERGY) !== OK) {
-      creep.goTo(con);
+      creep.creep.goTo(con.pos);
     }
     return true;
   } else {
@@ -125,10 +125,10 @@ function getEnergyFromSource (creep) {
 
   let harvestresult = creep.harvest(source);
   if (harvestresult === ERR_NOT_IN_RANGE || harvestresult === ERR_NOT_ENOUGH_RESOURCES || harvestresult === ERR_INVALID_TARGET) {
-    let status = creep.goTo(source);
+    let status = creep.goTo(source.pos);
     if (status !== OK) {
       // console.log(creep.name + 'cannot move to target ' + source.pos +' because: ' + status);
-      creep.goTo(creep.room.controller);
+      creep.goTo(creep.room.controller.pos);
     }
   }
   if (creep.memory.role === 'outsider' && !creep.memory.drop) {
@@ -167,7 +167,7 @@ function getEnergyFromSourceId (creep) { // TODO: remove and use sourcepos inste
 function getEnergyFromTerminal (creep) {
   let target = creep.room.terminal;
   if (creep.withdraw(target, RESOURCE_ENERGY) !== OK) {
-    creep.goTo(target); // TODO: check
+    creep.goTo(target.pos); // TODO: check
   }
   return true;
 }
@@ -183,7 +183,7 @@ function getEnergyFromClosestLinkOrStorage (creep) {
   let target = creep.pos.findClosestByRange(links);
 
   if (creep.withdraw(target, RESOURCE_ENERGY) !== OK) {
-    creep.goTo(target);
+    creep.goTo(target.pos);
   }
   return true;
 }
@@ -218,7 +218,7 @@ function dropOnContainerOrFloor (creep) {
       }
       return true;
     } else {
-      creep.goTo(con);
+      creep.creep.goTo(con.pos);
       return true;
     }
   } else {
@@ -234,7 +234,7 @@ function dropOnContainerOrFloor (creep) {
       if (range <= 1) {
         creep.build(con);
       } else {
-        creep.goTo(con);
+        creep.creep.goTo(con.pos);
       }
       return true;
     }
@@ -254,9 +254,9 @@ function dropOnContainerOrFloor (creep) {
 function upgradeController (creep) {
   if (creep.upgradeController(creep.room.controller) === ERR_NOT_IN_RANGE) { // TODO: distance check instead of penalty
     if (creep.room.memory.upgradepos) {
-      creep.goTo(creep.room.memory.upgradepos.x, creep.room.memory.upgradepos.y);
+      creep.moveTo(creep.room.memory.upgradepos.x, creep.room.memory.upgradepos.y); // TODO: goTO
     } else {
-      creep.goTo(creep.room.controller); // TODO: creep.goTo
+      creep.goTo(creep.room.controller.pos); // TODO: creep.goTo
     }
   }
   return true;
@@ -280,7 +280,7 @@ function harvesterToLinkIndex (creep) {
       // console.log('creep ' + creep.name + ' cant transfer enery to the link');
       return true;
     } else {
-      creep.goTo(linki);
+      creep.creep.goTo(linki.pos);
       return true;
     }
   } else {
@@ -303,7 +303,7 @@ function fillTowers (creep) {
   if (targets.length > 0) {
     let target = creep.pos.findClosestByRange(targets);
     if (creep.transfer(target, RESOURCE_ENERGY) === ERR_NOT_IN_RANGE) { // TODO: move closer check first
-      creep.goTo(target);
+      creep.creep.goTo(target.pos);
     }
     return true;
   }
@@ -318,7 +318,7 @@ function distributeEnergy (creep) {
   if (targets.length > 0) {
     let target = creep.pos.findClosestByRange(targets);
     if (creep.transfer(target, RESOURCE_ENERGY) === ERR_NOT_IN_RANGE) { // TODO: check for range
-      creep.goTo(target);
+      creep.creep.goTo(target.pos);
     }
     return true;
   }
@@ -327,14 +327,14 @@ function distributeEnergy (creep) {
 function bringEnergyToTerminal (creep) {
   let terminal = creep.room.terminal;
   if (creep.transfer(terminal, RESOURCE_ENERGY) === ERR_NOT_IN_RANGE) { // TODO: check for range
-    creep.goTo(terminal);
+    creep.creep.goTo(terminal.pos);
   }
   return true;
 }
 
 function bringEnergyToStorage (creep) {
   if (creep.transfer(creep.room.storage, RESOURCE_ENERGY) !== OK) { // TODO: check for range
-    creep.goTo(creep.room.storage);
+    creep.creep.goTo(creep.room.storage.pos);
   }
   return true;
 }
@@ -353,7 +353,7 @@ function bringEnergyToStorageOrClosestLink (creep) {
   // console.log('links: ' + JSON.stringify(links) + ' become ' + JSON.stringify(target));
 
   if (creep.transfer(target, RESOURCE_ENERGY) !== OK) { // TODO: check for range
-    creep.goTo(target);
+    creep.creep.goTo(target.pos);
   }
   return true;
 }
@@ -381,7 +381,7 @@ function buildStuff (creep) {
     if (test) {
       // console.log('repairing target:' + JSON.stringify(test));
       if (creep.repair(test) === ERR_NOT_IN_RANGE) {
-        creep.goTo(test);
+        creep.creep.goTo(test.pos);
       }
       return true;
     }
@@ -395,7 +395,7 @@ function buildStuff (creep) {
     let target = creep.pos.findClosestByRange(targets);
     // console.log(JSON.stringify(target));
     if (creep.build(target) === ERR_NOT_IN_RANGE) {
-      let result = creep.goTo(target);
+      let result = creep.creep.goTo(target.pos);
       if (result !== OK && result !== ERR_TIRED) {
         console.log(creep.name + 'wants to move to construction site at ' + target.pos + 'but cannot because' + result);
       }
@@ -413,7 +413,7 @@ function buildStuff (creep) {
     if (test) {
       // console.log('repairing target:' + JSON.stringify(test));
       if (creep.repair(test) === ERR_NOT_IN_RANGE) {
-        creep.goTo(test);
+        creep.creep.goTo(test.pos);
       }
       creep.memory.repairing = true;
       return true;
@@ -428,7 +428,7 @@ function buildStuff (creep) {
     if (test) {
       // console.log('repairing target:' + JSON.stringify(test));
       if (creep.repair(test) === ERR_NOT_IN_RANGE) {
-        creep.goTo(test);
+        creep.creep.goTo(test.pos);
       }
       return true;
     }
