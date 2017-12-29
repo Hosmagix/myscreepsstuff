@@ -228,7 +228,7 @@ function dropOnContainerOrFloor (creep) {
     });
     if (containerConsts.length > 0) {
       creep.log('there is a container to be build');
-      let con = container[0];
+      let con = containerConsts[0];
       let range = creep.pos.getRangeTo(con.pos);
 
       if (range <= 1) {
