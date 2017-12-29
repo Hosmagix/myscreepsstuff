@@ -461,7 +461,7 @@ let roleBuilder = {
       harvestQueue.push(goToOtherRoom);
     }
 
-    if (!creep.memory.dump) {
+    if (creep.memory.role !== 'dumper') {
       harvestQueue.push(generalDroppedEnergy);
     }
 
@@ -469,7 +469,7 @@ let roleBuilder = {
       harvestQueue.push(getEnergyFromLink);
     }
 
-    if (creep.memory.containerpos && creep.memory.role === 'sltrans') {
+    if (creep.memory.containerpos && (creep.memory.role === 'sltrans' || creep.memory.role === 'keepTrans')) {
       harvestQueue.push(getEnergyFromContainer);
     }
 
@@ -593,11 +593,11 @@ let roleBuilder = {
 
     let spendEnergyQueue = [];
 
-    if (creep.memory.role === 'sltrans' || (creep.memory.role === 'outsider' && creep.memory.dump)) { // TODO: why
+    if (creep.memory.role === 'sltrans' || creep.memory.role === 'dumper' || creep.memory.role === 'keepTrans') {
       spendEnergyQueue.push(repairContainer);
     }
 
-    if (creep.memory.role === 'outsider' && creep.memory.dump && creep.memory.sourcepos && creep.memory.room === creep.room.name) { // make new role
+    if (creep.memory.role === 'dumper' && creep.memory.room === creep.room.name) {
       spendEnergyQueue.push(dropOnContainerOrFloor);
     }
 
@@ -625,7 +625,7 @@ let roleBuilder = {
       spendEnergyQueue.push(bringEnergyToStorage);
     }
 
-    if (creep.room.storage && (creep.memory.role === 'sltrans' || creep.memory.role === 'outsider' || creep.memory.role === 'gatherer' || creep.memory.role === 'looter') && creep.room.controller && creep.room.controller.my) {
+    if (creep.room.storage && (creep.memory.role === 'sltrans' || creep.memory.role === 'keepTrans' || creep.memory.role === 'outsider' || creep.memory.role === 'gatherer' || creep.memory.role === 'looter') && creep.room.controller && creep.room.controller.my) {
       spendEnergyQueue.push(bringEnergyToStorageOrClosestLink);
     }
 

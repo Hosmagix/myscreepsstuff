@@ -508,18 +508,18 @@ module.exports.loop = function () {
         let body = createRangedCreep(spawn);
         creationpossible = spawns[firstfreespawn].canCreateCreep(body);
         if (creationpossible === OK) {
-          var newName = spawns[firstfreespawn].createCreep(body, undefined, {role: 'attacker', room: room.memory.warroom, home: room.name});
+          newName = spawns[firstfreespawn].createCreep(body, undefined, {role: 'attacker', room: room.memory.warroom, home: room.name});
           room.log('Spawning new ranged attacker: ' + newName);
           // room.memory.attackinprogress = false;
         } else {
           room.log('Would like to create roomwarcreep but cannot: ' + creationpossible);
         }
       } else if (specialdefenders < 1 && room.memory.centralroom) {
-        var newName = spawns[firstfreespawn].createCreep(createRangedCreep(spawn, true), undefined, {role: 'Specialdefender', room: room.memory.centralroom, home: room.name, ignoreneutrals: true, wait: false});
+        newName = spawns[firstfreespawn].createCreep(createRangedCreep(spawn, true), undefined, {role: 'Specialdefender', room: room.memory.centralroom, home: room.name, ignoreneutrals: true, wait: false});
         room.log('spawning new specialdefender');
       } else if (slaveid && slaveid !== '') {
-        var roompos = JSON.parse(slaveid);
-        var sourcepos = new RoomPosition(roompos.x, roompos.y, roompos.roomName);
+        let roompos = JSON.parse(slaveid);
+        let sourcepos = new RoomPosition(roompos.x, roompos.y, roompos.roomName);
 
         let roomname = roompos.roomName;
         var cords = roomname.substr(1).replace('N', ',').replace('S', ',').split(',');
@@ -530,7 +530,7 @@ module.exports.loop = function () {
           console.log('central room');
         }
 
-        var components = [];
+        components = [];
         if (roompos.container && !centralroom) {
           components = [CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK];
         } else if (roompos.container && centralroom) {
@@ -541,11 +541,11 @@ module.exports.loop = function () {
         let dump = !!roompos.container;
         sourcepos.container = roompos.container;
 
-        var newName = spawns[firstfreespawn].createCreep(components, undefined, {role: 'outsider', room: roompos.roomName, home: room.name, sourcepos: sourcepos, dump: dump, nofear: true });
+        newName = spawns[firstfreespawn].createCreep(components, undefined, {role: 'outsider', room: roompos.roomName, home: room.name, sourcepos: sourcepos, dump: dump, nofear: true });
         room.log('Spawning new outsider: ' + newName);
-      } else if (slavetransid && slavetransid !== '') {
-        var roompos = JSON.parse(slavetransid);
-        var sourcepos = new RoomPosition(roompos.x, roompos.y, roompos.roomName);
+      } else if (slavetransid && slavetransid !== '') { // TODO: remove unnecessary stuff
+        let roompos = JSON.parse(slavetransid);
+        let sourcepos = new RoomPosition(roompos.x, roompos.y, roompos.roomName);
         sourcepos.container = roompos.container;
 
         var roomname = roompos.roomName;
@@ -556,31 +556,45 @@ module.exports.loop = function () {
           room.log('central room');
         }
 
-        var components = centralroom ? [WORK, WORK, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE]
+        components = centralroom ? [WORK, WORK, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE]
           : [WORK, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
 
-        var newName = spawns[firstfreespawn].createCreep(components, undefined, {role: 'sltrans', room: roompos.roomName, home: room.name, containerpos: sourcepos, nofear: centralroom});
+        newName = spawns[firstfreespawn].createCreep(components, undefined, {role: 'sltrans', room: roompos.roomName, home: room.name, containerpos: sourcepos, nofear: centralroom});
         room.log('Spawning new slavetransporter: ' + newName);
+      } else if (dumperId && dumperId !== '') { // TODO check why the useage of ''
+        let roompos = JSON.parse(dumperId);
+        let sourcepos = new RoomPosition(roompos.x, roompos.y, roompos.roomName);
+        components = [CARRY, CARRY, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
+
+        newName = spawns[firstfreespawn].createCreep(components, undefined, {role: 'dumper', room: roompos.roomName, home: room.name, sourcepos: sourcepos, nofear: true });
+        room.log('Spawning new dumper: ' + newName);
+      } else if (keeperTransporterId && keeperTransporterId !== '') {
+        let roompos = JSON.parse(keeperTransporterId);
+        let sourcepos = new RoomPosition(roompos.x, roompos.y, roompos.roomName);
+
+        components = [WORK, WORK, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
+        newName = spawns[firstfreespawn].createCreep(components, undefined, {role: 'keepTrans', room: roompos.roomName, home: room.name, sourcepos: sourcepos, nofear: true});
+        room.log('Spawning new keeperTransporterId: ' + newName);
       } else if (gathererid && gathererid !== '') {
-        var components = [WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
-        var newName = spawns[firstfreespawn].createCreep(components, undefined, {role: 'gatherer', room: gathererid, home: room.name, nofear: true});
+        components = [WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
+        newName = spawns[firstfreespawn].createCreep(components, undefined, {role: 'gatherer', room: gathererid, home: room.name, nofear: true});
         // console.log('keeperid: ' + JSON.stringify(keeperid));
         room.log('Spawning new gatherer: ' + newName);
       } else if (roomtoreserve && reserver <= 1) {
-        var newName = spawns[firstfreespawn].createCreep(createClaimCreep(spawn), undefined, {role: 'reserver', room: roomtoreserve, home: room.name });
+        newName = spawns[firstfreespawn].createCreep(createClaimCreep(spawn), undefined, {role: 'reserver', room: roomtoreserve, home: room.name });
         room.log('Spawning new reserver: ' + newName);
       } else if (mineral < 1 && room.terminal && (room.memory.mineralregentime < Game.time)) {
-        var newName = spawns[firstfreespawn].createCreep(createCreepComponents(spawn), undefined, {role: 'mineral', home: room.name, room: room.name});
+        newName = spawns[firstfreespawn].createCreep(createCreepComponents(spawn), undefined, {role: 'mineral', home: room.name, room: room.name});
         room.log('Spawning new Mineral Creep: ' + newName);
       } else if (room.memory.haslabs && mineraltransporters < 1) {
-        var newName = spawns[firstfreespawn].createCreep([CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE], undefined, {role: 'mineraltransporter', home: room.name, room: room.name});
+        newName = spawns[firstfreespawn].createCreep([CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE], undefined, {role: 'mineraltransporter', home: room.name, room: room.name});
         room.log('Spawning new Mineral Transporter: ' + newName);
       } else if (singleroomreserve && reserver <= 1) {
-        var newName = spawns[firstfreespawn].createCreep(createClaimCreep(spawn), undefined, {role: 'reserver', room: singleroomreserve, home: room.name });
+        newName = spawns[firstfreespawn].createCreep(createClaimCreep(spawn), undefined, {role: 'reserver', room: singleroomreserve, home: room.name });
         room.log('Spawning new reserver: ' + newName);
       } else if (looters < 2 && room.memory.lootroom) {
-        var components = [WORK, WORK, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
-        var newName = spawns[firstfreespawn].createCreep(components, undefined, {role: 'looter', room: room.memory.lootroom, home: room.name });
+        components = [WORK, WORK, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
+        newName = spawns[firstfreespawn].createCreep(components, undefined, {role: 'looter', room: room.memory.lootroom, home: room.name });
         room.log('Spawning new loota: ' + newName);
       }
     }
