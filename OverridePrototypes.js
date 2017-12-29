@@ -116,7 +116,7 @@ exports.overridePrototypes = function () {
         return stru.structureType !== STRUCTURE_ROAD && stru.structureType !== STRUCTURE_RAMPART;
       });
       if (structure.length > 0) {
-        this.log('structure on it: ' + JSON.stringify(structure));
+        // this.log('structure on it: ' + JSON.stringify(structure));
         return false;
       }
 
