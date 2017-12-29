@@ -572,14 +572,14 @@ module.exports.loop = function () {
 
         newName = spawns[firstfreespawn].createCreep(components, undefined, {role: 'sltrans', room: roompos.roomName, home: room.name, containerpos: sourcepos, nofear: centralroom});
         room.log('Spawning new slavetransporter: ' + newName);
-      } else if (false && dumperId && dumperId !== '') { // TODO check why the useage of ''
+      } else if (dumperId && dumperId !== '') { // TODO check why the useage of ''
         let roompos = JSON.parse(dumperId);
         let sourcepos = new RoomPosition(roompos.x, roompos.y, roompos.roomName);
         components = [CARRY, CARRY, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
 
         newName = spawns[firstfreespawn].createCreep(components, undefined, {role: 'dumper', room: roompos.roomName, home: room.name, sourcepos: sourcepos, nofear: true });
         room.log('Spawning new dumper: ' + newName);
-      } else if (false && keeperTransporterId && keeperTransporterId !== '') {
+      } else if (keeperTransporterId && keeperTransporterId !== '') {
         let roompos = JSON.parse(keeperTransporterId);
         let sourcepos = new RoomPosition(roompos.x, roompos.y, roompos.roomName);
 
