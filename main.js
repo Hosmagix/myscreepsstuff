@@ -1,4 +1,3 @@
-
 let handleFlags = require('handleFlags');
 let moveCreeps = require('moveCreeps');
 let sellResources = require('sellResources');
@@ -254,6 +253,7 @@ module.exports.loop = function () {
           if (keeperRoom.memory.sources) {
             keeperRoom.memory.sources.forEach((source) => {
               let sourceString = JSON.stringify(source);
+              console.log('sourceString before stringify: ' + sourceString);
               keeperTransporters[sourceString] = 0;
               dumpers[sourceString] = 0;
             });
@@ -261,8 +261,15 @@ module.exports.loop = function () {
         });
 
         room.myCreeps.dumper.forEach((creep) => {
-          let sourceString = JSON.stringify(creep.memory.source); // TODO: create corresponding creep
-          dumpers[sourceString] = dumpers[sourceString] + 1;
+          let sourceString = JSON.stringify(creep.memory.sourcepos);
+          if (!dumpers[sourceString]) {
+            room.log('this sourceString is not found in dumpers: ' + sourceString + ' dumpers: ' + JSON.stringify(dumpers));
+          }
+          if (sourceString) {
+            dumpers[sourceString] = dumpers[sourceString] + 1;
+          } else {
+            dumpers[sourceString] = 1; // some JSON.stringify shenanigans ...
+          }
         });
 
         for (let x in dumpers) {
@@ -272,8 +279,12 @@ module.exports.loop = function () {
         }
 
         room.myCreeps.keepTrans.forEach((creep) => {
-          let sourceString = JSON.stringify(creep.memory.source);
-          keeperTransporters[sourceString] = keeperTransporters[sourceString] + 1;
+          let sourceString = JSON.stringify(creep.memory.sourcepos);
+          if (sourceString) {
+            keeperTransporters[sourceString] = keeperTransporters[sourceString] + 1;
+          } else {
+            keeperTransporters[sourceString] = 1;
+          }
         });
 
         for (let x in keeperTransporters) {
@@ -561,14 +572,14 @@ module.exports.loop = function () {
 
         newName = spawns[firstfreespawn].createCreep(components, undefined, {role: 'sltrans', room: roompos.roomName, home: room.name, containerpos: sourcepos, nofear: centralroom});
         room.log('Spawning new slavetransporter: ' + newName);
-      } else if (dumperId && dumperId !== '') { // TODO check why the useage of ''
+      } else if (false && dumperId && dumperId !== '') { // TODO check why the useage of ''
         let roompos = JSON.parse(dumperId);
         let sourcepos = new RoomPosition(roompos.x, roompos.y, roompos.roomName);
         components = [CARRY, CARRY, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
 
         newName = spawns[firstfreespawn].createCreep(components, undefined, {role: 'dumper', room: roompos.roomName, home: room.name, sourcepos: sourcepos, nofear: true });
         room.log('Spawning new dumper: ' + newName);
-      } else if (keeperTransporterId && keeperTransporterId !== '') {
+      } else if (false && keeperTransporterId && keeperTransporterId !== '') {
         let roompos = JSON.parse(keeperTransporterId);
         let sourcepos = new RoomPosition(roompos.x, roompos.y, roompos.roomName);
 
