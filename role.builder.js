@@ -216,7 +216,7 @@ function repairContainer (creep) {
 
 function dropOnContainerOrFloor (creep) {
   let roompos = new RoomPosition(creep.memory.sourcepos.x, creep.memory.sourcepos.y, creep.memory.room);
-  let container = roompos.findInRange(FIND_STRUCTURES, 2).filter(function (structure) {
+  let container = roompos.findInRange(FIND_STRUCTURES, 2).filter(function (structure) { // TODO: do some cacheing
     return structure.structureType === STRUCTURE_CONTAINER;
   });
   if (container && container.length > 0) {
@@ -233,7 +233,17 @@ function dropOnContainerOrFloor (creep) {
       creep.moveTo(con);
       return true;
     }
+  } else {
+    creep.log('no container found -> check if next to source and then build one!');
+    if (creep.pos.findInRange(FIND_SOURCES, 1)) {
+      creep.log('creep is next to source -> build container');
+      creep.pos.createConstructionSite(STRUCTURE_CONTAINER);
+    } else {
+      creep.goTo(roompos);
+      creep.log('move next to source first');
+    }
   }
+  return true;
 }
 
 function upgradeController (creep) {
