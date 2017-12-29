@@ -1,4 +1,4 @@
-let roles = ['builder', 'upgrader', 'outsider', 'sltrans', 'harvester', 'transporter', 'reserver', 'defender',
+let roles = ['builder', 'upgrader', 'outsider', 'sltrans', 'keepTrans', 'harvester', 'dumper', 'transporter', 'reserver', 'defender',
   'attacker', 'healer', 'specialbuilder', 'mineral', 'mineraltransporter', 'dismantler', 'keeper', 'gatherer', 'Specialdefender', 'looter', 'claim' ];
 
 function addRolesToRoom (room) {

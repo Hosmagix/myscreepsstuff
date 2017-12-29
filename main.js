@@ -240,11 +240,47 @@ module.exports.loop = function () {
         });
       }
 
+      let keeperTransporterId = ''; // TODO refactor this: calculate this lazy only when needed.
+      let dumperId = '';
       if (room.memory.keeperrooms) {
+        let keeperTransporters = {};
+        let dumpers = {};
+
         room.memory.keeperrooms.forEach(function (roomname) {
           keepers[roomname] = 0;
-          gatherers[roomname] = 0;
+          gatherers[roomname] = 0; // the guy who helps all a bit
+
+          let keeperRoom = Game.rooms[roomname];
+          if (keeperRoom.memory.sources) {
+            keeperRoom.memory.sources.forEach((source) => {
+              let sourceString = JSON.stringify(source);
+              keeperTransporters[sourceString] = 0;
+              dumpers[sourceString] = 0;
+            });
+          }
         });
+
+        room.myCreeps.dumper.forEach((creep) => {
+          let sourceString = JSON.stringify(creep.memory.source); // TODO: create corresponding creep
+          dumpers[sourceString] = dumpers[sourceString] + 1;
+        });
+
+        for (let x in dumpers) {
+          if (dumpers[x] < 1) {
+            dumperId = x;
+          }
+        }
+
+        room.myCreeps.keepTrans.forEach((creep) => {
+          let sourceString = JSON.stringify(creep.memory.source);
+          keeperTransporters[sourceString] = keeperTransporters[sourceString] + 1;
+        });
+
+        for (let x in keeperTransporters) {
+          if (keeperTransporters[x] < 1) {
+            keeperTransporterId = x;
+          }
+        }
       }
 
       room.myCreeps.outsider.forEach((creep) => {
@@ -431,6 +467,7 @@ module.exports.loop = function () {
           ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK,
           HEAL, HEAL, HEAL, HEAL, HEAL, HEAL];
         newName = spawns[firstfreespawn].createCreep(components, undefined, {role: 'keeper', room: keeperid, home: room.name});
+        room.log('creating keeper was successful? : ' + newName);
       } else if (builders < numbuilder) {
         newName = spawns[firstfreespawn].createCreep(createCreepComponents(spawn), undefined, {role: 'builder', source: getHarvestID(room), home: room.name});
       } else if (specialbuilders < specializedbuilders) {
