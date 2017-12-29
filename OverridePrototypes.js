@@ -260,6 +260,7 @@ exports.overridePrototypes = function () {
   };
 
   Creep.prototype.checkForKeepers = function () {
+    let that = this;
     if (this.memory.home && this.room.name !== this.memory.home) {
       var targets = this.room.find(FIND_HOSTILE_CREEPS).filter(function (hc) {
         return (hc.getActiveBodyparts(ATTACK) > 0 || hc.getActiveBodyparts(RANGED_ATTACK) > 0 || hc.getActiveBodyparts(HEAL) > 0) && hc.owner.username !== 'Source Keeper';
@@ -285,7 +286,7 @@ exports.overridePrototypes = function () {
       return structure.structureType === STRUCTURE_KEEPER_LAIR && (structure.ticksToSpawn <= 7);
     });
 
-    if (this.hits < this.hitsMax) {
+    if (this.hits < this.hitsMax - 300) {
       let homeroom = Game.rooms[this.memory.home];
 
       if (homeroom.storage) {
@@ -298,12 +299,12 @@ exports.overridePrototypes = function () {
 
     // console.log('this.hits ' + this.hits+'/'+this.hitsMax);
     if (targets.length > 0 || lairs.length > 0) {
-      // console.log('thiss in 6: ' + targets.length + 'pos: ' + JSON.stringify(this.pos ));
+      // console.log('this in 6: ' + targets.length + 'pos: ' + JSON.stringify(this.pos ));
       targets = targets.filter(function (target) {
-        return this.pos.inRangeTo(target, 5);
+        return that.pos.inRangeTo(target, 5);
       });
       lairs = lairs.filter(function (target) {
-        return this.pos.inRangeTo(target, 5);
+        return that.pos.inRangeTo(target, 5);
       });
       // console.log('creeps in 5: ' + targets.length);
 
