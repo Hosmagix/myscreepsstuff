@@ -283,11 +283,33 @@ exports.createClaimCreep = function (spawn) {
 exports.createTransporterCreep = function (spawn, maxCarryParts) { // 1 move 2 carry
   let capacity = spawn.room.energyCapacityAvailable;
   let maxMove = Math.floor(capacity / 150);
-  let numMove = Math.min(maxCarryParts / 2, maxMove);
+  let numMove = Math.min(maxCarryParts / 2, maxMove, 16);
 
   let components = [];
 
   for (let i = 0; i < numMove * 2; i++) {
+    components.push(CARRY);
+  }
+
+  for (let i = 0; i < numMove; i++) {
+    components.push(MOVE);
+  }
+};
+
+exports.createTransporterCreepWithWork = function (spawn, maxCarryParts) { // 1 move 2 carry
+  let capacity = spawn.room.energyCapacityAvailable;
+  let workParts = maxCarryParts > 16 ? 2 : 1;
+
+  let maxMove = Math.floor((capacity - workParts * 50) / 150); // workParts cost 50 more than carry
+  let numMove = Math.min((maxCarryParts + workParts) / 2, maxMove, 16);
+
+  let components = [];
+
+  for (let i = 0; i < workParts; i++) {
+    components.push(WORK);
+  }
+
+  for (let i = 0; i < numMove * 2 - workParts; i++) {
     components.push(CARRY);
   }
 

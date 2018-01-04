@@ -581,9 +581,9 @@ module.exports.loop = function () {
         let sourcepos = new RoomPosition(roompos.x, roompos.y, roompos.roomName);
         sourcepos.container = roompos.container;
 
-        components = [WORK, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
+        components = creepUtils.createTransporterCreepWithWork(spawn, 16);
         newName = spawns[firstfreespawn].createCreep(components, undefined, {role: 'sltrans', room: roompos.roomName, home: room.name, containerpos: sourcepos});
-        room.log('Spawning new slavetransporter: ' + newName);
+        room.log('Spawning new slave Transporter: ' + newName);
       } else if (dumperId && dumperId !== '') { // TODO check why the useage of ''
         let roompos = JSON.parse(dumperId);
         let sourcepos = new RoomPosition(roompos.x, roompos.y, roompos.roomName);
