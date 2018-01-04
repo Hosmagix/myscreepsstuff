@@ -60,8 +60,6 @@ function goToOtherRoom (creep) {
     roompos = new RoomPosition(creep.memory.lasttarget.x, creep.memory.lasttarget.y, creep.memory.lasttarget.roomName);
   } else if (creep.memory.sourcepos) {
     roompos = new RoomPosition(creep.memory.sourcepos.x, creep.memory.sourcepos.y, creep.memory.room);
-  } else if (creep.memory.containerpos) {
-    roompos = new RoomPosition(creep.memory.containerpos.x, creep.memory.containerpos.y, creep.memory.room);
   } else if (targetroom && targetroom.controller) {
     roompos = targetroom.controller.pos;
   } else {
@@ -128,23 +126,6 @@ function getEnergyFromSource (creep) {
   let harvestresult = creep.harvest(source);
   if (harvestresult === ERR_NOT_IN_RANGE || harvestresult === ERR_NOT_ENOUGH_RESOURCES || harvestresult === ERR_INVALID_TARGET) {
     let status = creep.goTo(source.pos);
-  }
-  if (creep.memory.role === 'outsider' && !creep.memory.drop) {
-    // console.log('checking for finished container');
-    let container = roompos.findInRange(FIND_STRUCTURES, 2).filter(function (structure) {
-      // console.log('structure: ' + JSON.stringify(structure));
-      return structure.structureType === STRUCTURE_CONTAINER;
-    });
-    if (container && container.length > 0) {
-      // console.log('finished container found');
-      // console.log( Game.rooms[creep.memory.home].memory.slaverooms.length);
-      Game.rooms[creep.memory.home].memory.slaverooms.forEach(function (slaveroom) {
-        if (slaveroom && slaveroom.x === roompos.x && slaveroom.y === roompos.y && slaveroom.roomName === roompos.roomName) {
-          // console.log('setting flag for container');
-          slaveroom.container = true;
-        }
-      });
-    }
   }
   return true;
 }
@@ -475,7 +456,7 @@ let roleBuilder = {
       harvestQueue.push(goToOtherRoom);
     }
 
-    if (creep.memory.role !== 'dumper') {
+    if (creep.memory.role !== 'dumper' && creep.memory.role !== 'outsider') {
       harvestQueue.push(generalDroppedEnergy);
     }
 
@@ -607,11 +588,11 @@ let roleBuilder = {
 
     let spendEnergyQueue = [];
 
-    if (creep.memory.role === 'sltrans' || creep.memory.role === 'dumper') {
+    if (creep.memory.role === 'sltrans' || creep.memory.role === 'dumper' || creep.memory.role === 'outsider') {
       spendEnergyQueue.push(repairContainer);
     }
 
-    if (creep.memory.role === 'dumper' && creep.memory.room === creep.room.name) {
+    if ((creep.memory.role === 'dumper' || creep.memory.role === 'outsider') && creep.memory.room === creep.room.name) {
       spendEnergyQueue.push(dropOnContainerOrFloor);
     }
 
@@ -639,7 +620,7 @@ let roleBuilder = {
       spendEnergyQueue.push(bringEnergyToStorage);
     }
 
-    if (creep.room.storage && (creep.memory.role === 'sltrans' || creep.memory.role === 'keepTrans' || creep.memory.role === 'outsider' || creep.memory.role === 'gatherer' || creep.memory.role === 'looter') && creep.room.controller && creep.room.controller.my) {
+    if (creep.room.storage && (creep.memory.role === 'sltrans' || creep.memory.role === 'keepTrans' || creep.memory.role === 'gatherer' || creep.memory.role === 'looter') && creep.room.controller && creep.room.controller.my) {
       spendEnergyQueue.push(bringEnergyToStorageOrClosestLink);
     }
 

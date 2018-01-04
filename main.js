@@ -254,9 +254,7 @@ module.exports.loop = function () {
           // var roomName = roompos.roomName + ',' + roompos.x +',' + roompos.y;
           let roomName = JSON.stringify(roompos);
           slaves[roomName] = 0;
-          if (roompos.container) {
-            slavetransporter[roomName] = 0;
-          }
+          slavetransporter[roomName] = 0;
         });
       }
 
@@ -326,7 +324,7 @@ module.exports.loop = function () {
       });
 
       room.myCreeps.sltrans.forEach((creep) => {
-        let roomName = JSON.stringify(creep.memory.containerpos);
+        let roomName = JSON.stringify(creep.memory.sourcepos);
         if (slavetransporter[roomName]) {
           slavetransporter[roomName] = slavetransporter[roomName] + 1;
         } else {
@@ -550,31 +548,13 @@ module.exports.loop = function () {
       } else if (specialdefenders < 1 && room.memory.centralroom) {
         newName = spawns[firstfreespawn].createCreep(creepUtils.createRangedCreep(spawn, true), undefined, {role: 'Specialdefender', room: room.memory.centralroom, home: room.name, ignoreneutrals: true, wait: false});
         room.log('spawning new specialdefender');
-      } else if (slaveid && slaveid !== '') {
+      } else if (slaveid && slaveid !== '') { // TODO refactoring only half complete -> Create Support Creep Type.
         let roompos = JSON.parse(slaveid);
         let sourcepos = new RoomPosition(roompos.x, roompos.y, roompos.roomName);
 
-        let roomname = roompos.roomName;
-        let cords = roomname.substr(1).replace('N', ',').replace('S', ',').split(',');
-        console.log('cords: ' + JSON.stringify(cords));
-        let centralroom = false;
-        if (Number(cords[0]) % 10 > 3 && Number(cords[0]) % 10 < 7 && Number(cords[1]) % 10 > 3 && Number(cords[1]) % 10 < 7) {
-          centralroom = true;
-          console.log('central room');
-        }
+        components = [CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK];
 
-        components = [];
-        if (roompos.container && !centralroom) {
-          components = [CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK];
-        } else if (roompos.container && centralroom) {
-          components = [CARRY, CARRY, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
-        } else {
-          components = creepUtils.createCreepComponents(spawn);
-        }
-        let dump = !!roompos.container;
-        sourcepos.container = roompos.container;
-
-        newName = spawns[firstfreespawn].createCreep(components, undefined, {role: 'outsider', room: roompos.roomName, home: room.name, sourcepos: sourcepos, dump: dump, nofear: true });
+        newName = spawns[firstfreespawn].createCreep(components, undefined, {role: 'outsider', room: roompos.roomName, home: room.name, sourcepos: sourcepos });
         room.log('Spawning new outsider: ' + newName);
       } else if (slavetransid && slavetransid !== '') { // TODO: remove unnecessary stuff
         let roompos = JSON.parse(slavetransid);
@@ -582,7 +562,7 @@ module.exports.loop = function () {
         sourcepos.container = roompos.container;
 
         components = creepUtils.createTransporterCreepWithWork(spawn, 16);
-        newName = spawns[firstfreespawn].createCreep(components, undefined, {role: 'sltrans', room: roompos.roomName, home: room.name, containerpos: sourcepos});
+        newName = spawns[firstfreespawn].createCreep(components, undefined, {role: 'sltrans', room: roompos.roomName, home: room.name, sourcepos: sourcepos});
         room.log('Spawning new slave Transporter: ' + newName);
       } else if (dumperId && dumperId !== '') { // TODO check why the useage of ''
         let roompos = JSON.parse(dumperId);
