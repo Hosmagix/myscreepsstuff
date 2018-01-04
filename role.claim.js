@@ -8,26 +8,26 @@ let roleClaim = {
       if (creep.memory.role === 'reserver') {
         // console.log('bla');
         if (creep.reserveController(creep.room.controller) === ERR_NOT_IN_RANGE) {
-          creep.goTo(creep.room.controller.pos, 1, 3)
+          creep.goTo(creep.room.controller.pos, 1, 3);
         }
       } else {
         if (creep.claimController(creep.room.controller) === ERR_NOT_IN_RANGE) {
-          creep.goTo(creep.room.controller.pos, 1, 3)
+          creep.goTo(creep.room.controller.pos, 1, 3);
         }
       }
     } else {
-      let roompos = new RoomPosition(25, 25, creep.memory.room)
-      let controllerroom = Game.rooms[creep.memory.room]
+      let roompos = new RoomPosition(25, 25, creep.memory.room);
+      let controllerroom = Game.rooms[creep.memory.room];
       if (controllerroom && controllerroom.controller) {
-        roompos = controllerroom.controller.pos
+        roompos = controllerroom.controller.pos;
       } else if (creep.memory.lasttarget && creep.memory.lasttarget.roomName === creep.memory.room) {
-        roompos = new RoomPosition(creep.memory.lasttarget.x, creep.memory.lasttarget.y, creep.memory.lasttarget.roomName)
+        roompos = new RoomPosition(creep.memory.lasttarget.x, creep.memory.lasttarget.y, creep.memory.lasttarget.roomName);
       }
 
-      creep.goTo(roompos, 1, 3)
+      creep.goTo(roompos, 1, 3);
     }
     // find enemy room first
   }
-}
+};
 
-module.exports = roleClaim
+module.exports = roleClaim;

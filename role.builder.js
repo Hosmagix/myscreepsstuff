@@ -100,7 +100,7 @@ function getEnergyFromLink (creep) {
 
 function getEnergyFromContainer (creep) {
   // console.log('creep.name: ' +creep.name);
-  let roompos = new RoomPosition(creep.memory.containerpos.x, creep.memory.containerpos.y, creep.memory.room);
+  let roompos = new RoomPosition(creep.memory.sourcepos.x, creep.memory.sourcepos.y, creep.memory.room);
   // var source = roompos.lookFor(LOOK_SOURCES)[0];
   let container = roompos.findInRange(FIND_STRUCTURES, 3).filter(function (structure) {
     return structure.structureType === STRUCTURE_CONTAINER;
@@ -109,10 +109,12 @@ function getEnergyFromContainer (creep) {
     // console.log(creep.name + ' sltrans founc container');
     let con = roompos.findClosestByRange(container);
 
-    if (creep.withdraw(con, RESOURCE_ENERGY) !== OK) {
-      creep.goTo(con.pos);
+    if (con.store[RESOURCE_ENERGY] > 0) {
+      if (creep.withdraw(con, RESOURCE_ENERGY) !== OK) { // TODO: check first for distance
+        creep.goTo(con.pos);
+        return true;
+      }
     }
-    return true;
   } else {
     console.log('warning: no container found near pos: ' + JSON.stringify(roompos));
   }
@@ -126,10 +128,6 @@ function getEnergyFromSource (creep) {
   let harvestresult = creep.harvest(source);
   if (harvestresult === ERR_NOT_IN_RANGE || harvestresult === ERR_NOT_ENOUGH_RESOURCES || harvestresult === ERR_INVALID_TARGET) {
     let status = creep.goTo(source.pos);
-    if (status !== OK) {
-      // console.log(creep.name + 'cannot move to target ' + source.pos +' because: ' + status);
-      creep.goTo(creep.room.controller.pos);
-    }
   }
   if (creep.memory.role === 'outsider' && !creep.memory.drop) {
     // console.log('checking for finished container');
@@ -191,14 +189,15 @@ function getEnergyFromClosestLinkOrStorage (creep) {
 /// spend energy
 
 function repairContainer (creep) {
-  // creep.log('bla');
   let roompos = creep.pos;
-  let container = roompos.findInRange(FIND_STRUCTURES, 2).filter(function (structure) {
+  // creep.log('roompos: ' + roompos);
+  let container = roompos.findInRange(FIND_STRUCTURES, 3).filter(function (structure) {
     return structure.structureType === STRUCTURE_CONTAINER && structure.hits < structure.hitsMax;
   });
   if (container && container.length > 0) {
     // console.log('repairing containers')
     creep.repair(container[0]);
+    return true;
   }
 }
 
@@ -240,7 +239,7 @@ function dropOnContainerOrFloor (creep) {
     }
 
     creep.log('no container found -> check if next to source and then build one!');
-    if (creep.pos.findInRange(FIND_SOURCES, 1)) {
+    if (creep.pos.findInRange(FIND_SOURCES, 1).length > 0) {
       creep.log('creep is next to source -> build container');
       creep.pos.createConstructionSite(STRUCTURE_CONTAINER);
     } else {
@@ -484,7 +483,7 @@ let roleBuilder = {
       harvestQueue.push(getEnergyFromLink);
     }
 
-    if (creep.memory.containerpos && (creep.memory.role === 'sltrans' || creep.memory.role === 'keepTrans')) {
+    if (creep.memory.sourcepos && (creep.memory.role === 'sltrans' || creep.memory.role === 'keepTrans')) {
       harvestQueue.push(getEnergyFromContainer);
     }
 

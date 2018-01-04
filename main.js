@@ -189,6 +189,26 @@ module.exports.loop = function () {
         }
       });
     }
+
+    if (room.memory.keeperrooms && room.memory.keeperrooms.length > 0) {
+      //  console.log('room has keeperroomms: ' + room.memory.keeperrooms);
+      room.memory.keeperrooms.forEach(function (slaveroom, index) {
+        if (!slaveroom) {
+          return;
+        }
+        // console.log('room has keeperrooms2: ' + JSON.stringify(slaveroom));
+        // TODO: calculate distance
+
+        let room2 = Game.rooms[slaveroom];
+
+        if (room2 && room2.memory.dangertill && (room2.memory.dangertill > Game.time)) {
+          //  room2.log('endangered keeperRoom: ');
+          slaveRoomInDanger = true;
+          endangeredSlaveRoom = slaveroom;
+        }
+      });
+    }
+
     if (endangeredSlaveRoom) {
       room.log('endangered slaveroom is: ' + endangeredSlaveRoom);
       room.myCreeps.defender.forEach(function (creep) {
@@ -250,10 +270,10 @@ module.exports.loop = function () {
           gatherers[roomname] = 0; // the guy who helps all a bit
 
           let keeperRoom = Game.rooms[roomname];
-          if (keeperRoom.memory.sources) {
+          if (keeperRoom && keeperRoom.memory.sources) {
             keeperRoom.memory.sources.forEach((source) => {
               let sourceString = JSON.stringify(source);
-              console.log('sourceString before stringify: ' + sourceString);
+              // console.log('sourceString before stringify: ' + sourceString);
               keeperTransporters[sourceString] = 0;
               dumpers[sourceString] = 0;
             });
@@ -263,7 +283,7 @@ module.exports.loop = function () {
         room.myCreeps.dumper.forEach((creep) => {
           let sourceString = JSON.stringify(creep.memory.sourcepos);
           if (!dumpers[sourceString]) {
-            room.log('this sourceString is not found in dumpers: ' + sourceString + ' dumpers: ' + JSON.stringify(dumpers));
+            // room.log('this sourceString is not found in dumpers: ' + sourceString + ' dumpers: ' + JSON.stringify(dumpers));
           }
           if (sourceString) {
             dumpers[sourceString] = dumpers[sourceString] + 1;
@@ -575,7 +595,7 @@ module.exports.loop = function () {
       } else if (dumperId && dumperId !== '') { // TODO check why the useage of ''
         let roompos = JSON.parse(dumperId);
         let sourcepos = new RoomPosition(roompos.x, roompos.y, roompos.roomName);
-        components = [CARRY, CARRY, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
+        components = [ WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
 
         newName = spawns[firstfreespawn].createCreep(components, undefined, {role: 'dumper', room: roompos.roomName, home: room.name, sourcepos: sourcepos, nofear: true });
         room.log('Spawning new dumper: ' + newName);

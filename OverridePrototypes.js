@@ -283,16 +283,16 @@ exports.overridePrototypes = function () {
     var targets = this.pos.findInRange(FIND_HOSTILE_CREEPS, 6);
 
     let lairs = this.pos.findInRange(FIND_HOSTILE_STRUCTURES, 6).filter(function (structure) {
-      return structure.structureType === STRUCTURE_KEEPER_LAIR && (structure.ticksToSpawn <= 10);
+      return structure.structureType === STRUCTURE_KEEPER_LAIR && (structure.ticksToSpawn <= 15);
     });
 
     if (this.hits < this.hitsMax - 300) {
       let homeroom = Game.rooms[this.memory.home];
-
+      this.log('creep is damaged by more than 300 hp return');
       if (homeroom.storage) {
-        this.moveTo(homeroom.storage);
+        this.goTo(homeroom.storage.pos);
       } else {
-        this.moveTo(homeroom.controller);
+        this.goTo(homeroom.controller.pos);
       }
       return true;
     }
