@@ -294,6 +294,7 @@ exports.createTransporterCreep = function (spawn, maxCarryParts) { // 1 move 2 c
   for (let i = 0; i < numMove; i++) {
     components.push(MOVE);
   }
+  return components;
 };
 
 exports.createTransporterCreepWithWork = function (spawn, maxCarryParts) { // 1 move 2 carry
@@ -316,4 +317,5 @@ exports.createTransporterCreepWithWork = function (spawn, maxCarryParts) { // 1 
   for (let i = 0; i < numMove; i++) {
     components.push(MOVE);
   }
+  return components;
 };

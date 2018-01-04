@@ -123,7 +123,7 @@ function getEnergyFromSource (creep) {
   // var source = roompos.lookFor(LOOK_SOURCES)[0];
   let source = roompos.findClosestByRange(FIND_SOURCES);
 
-  if (!creep.isNearTo(source)) {
+  if (!creep.pos.isNearTo(source)) {
     creep.goTo(source.pos);
   } else if (source.energy > 0) {
     creep.harvest(source);
