@@ -279,3 +279,19 @@ exports.createClaimCreep = function (spawn) {
   // components.
   return components;
 };
+
+exports.createTransporterCreep = function (spawn, maxCarryParts) { // 1 move 2 carry
+  let capacity = spawn.room.energyCapacityAvailable;
+  let maxMove = Math.floor(capacity / 150);
+  let numMove = Math.min(maxCarryParts / 2, maxMove);
+
+  let components = [];
+
+  for (let i = 0; i < numMove * 2; i++) {
+    components.push(CARRY);
+  }
+
+  for (let i = 0; i < numMove; i++) {
+    components.push(MOVE);
+  }
+};

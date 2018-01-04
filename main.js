@@ -90,7 +90,7 @@ module.exports.loop = function () {
       room.memory.wallshp = 100000;
     }
 
-    var roomname = room.name;
+    let roomname = room.name;
 
     // activate safemode
 
@@ -469,7 +469,7 @@ module.exports.loop = function () {
         }
         if (room.storage && room.storage.store.energy >= 5000) {
           room.log('create transporter with reduced energy');
-          parts = [MOVE, MOVE, CARRY, CARRY, CARRY, CARRY];
+          parts = creepUtils.createTransporterCreep(spawn, 4);
 
           newName = spawns[firstfreespawn].createCreep(parts, undefined, { role: 'transporter', home: room.name});
           room.log('Spawning new reduced transporter: ' + newName);
@@ -479,12 +479,13 @@ module.exports.loop = function () {
         }
       } else
       if (room.myCreeps.transporter.length < 2 && room.storage && (room.storage.store.energy > 20000 || room.memory.haslinks)) {
-        parts = [MOVE, MOVE, MOVE, MOVE, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY];
+        let numCarry = 8;
         if (room.controller.level === 8) {
-          parts = [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY];
-        } else if (room.controller.level > 6) {
-          parts = [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY];
+          numCarry = 32;
+        } else if (room.controller.level === 7) {
+          numCarry = 16;
         }
+        parts = creepUtils.createTransporterCreep(spawn, numCarry);
         newName = spawns[firstfreespawn].createCreep(parts, undefined, { role: 'transporter', home: room.name});
       } else
 
@@ -554,9 +555,9 @@ module.exports.loop = function () {
         let sourcepos = new RoomPosition(roompos.x, roompos.y, roompos.roomName);
 
         let roomname = roompos.roomName;
-        var cords = roomname.substr(1).replace('N', ',').replace('S', ',').split(',');
+        let cords = roomname.substr(1).replace('N', ',').replace('S', ',').split(',');
         console.log('cords: ' + JSON.stringify(cords));
-        var centralroom = false;
+        let centralroom = false;
         if (Number(cords[0]) % 10 > 3 && Number(cords[0]) % 10 < 7 && Number(cords[1]) % 10 > 3 && Number(cords[1]) % 10 < 7) {
           centralroom = true;
           console.log('central room');
@@ -580,18 +581,8 @@ module.exports.loop = function () {
         let sourcepos = new RoomPosition(roompos.x, roompos.y, roompos.roomName);
         sourcepos.container = roompos.container;
 
-        var roomname = roompos.roomName;
-        var cords = roomname.substr(1).replace('N', ',').replace('S', ',').split(',');
-        var centralroom = false;
-        if (Number(cords[0]) % 10 > 3 && Number(cords[0]) % 10 < 7 && Number(cords[1]) % 10 > 3 && Number(cords[1]) % 10 < 7) {
-          centralroom = true;
-          room.log('central room');
-        }
-
-        components = centralroom ? [WORK, WORK, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE]
-          : [WORK, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
-
-        newName = spawns[firstfreespawn].createCreep(components, undefined, {role: 'sltrans', room: roompos.roomName, home: room.name, containerpos: sourcepos, nofear: centralroom});
+        components = [WORK, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
+        newName = spawns[firstfreespawn].createCreep(components, undefined, {role: 'sltrans', room: roompos.roomName, home: room.name, containerpos: sourcepos});
         room.log('Spawning new slavetransporter: ' + newName);
       } else if (dumperId && dumperId !== '') { // TODO check why the useage of ''
         let roompos = JSON.parse(dumperId);
