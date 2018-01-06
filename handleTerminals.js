@@ -52,9 +52,12 @@ exports.handleTerminals = function (room) {
   // Sell stuff
   if (Game.time % 50 === 0) {
     for (let key in room.terminal.store) {
+      if (key === RESOURCE_ENERGY) {
+        return;
+      }
       if (Object.prototype.hasOwnProperty.call(room.terminal.store, key)) {
         let resource = room.terminal.store[key];
-        let storageResource = room.store.store[key];
+        let storageResource = room.storage.store[key];
 
         if (resource > 5000 && room.terminal.store.energy >= 30000 && storageResource > 50000) {
           let orders = Game.market.getAllOrders().filter(function (order) {
