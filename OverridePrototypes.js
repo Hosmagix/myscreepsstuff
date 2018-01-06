@@ -50,7 +50,7 @@ exports.overridePrototypes = function () {
       });
 
       this.find(FIND_CONSTRUCTION_SITES).forEach(function (construcitonsite) {
-        if (construcitonsite.structureType !== STRUCTURE_ROAD) {
+        if (construcitonsite.structureType !== STRUCTURE_ROAD && construcitonsite.structureType !== STRUCTURE_CONTAINER && construcitonsite.structureType !== STRUCTURE_RAMPART) {
           costs.set(construcitonsite.pos.x, construcitonsite.pos.y, 0xff);
         }
       });
