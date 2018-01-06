@@ -500,7 +500,7 @@ module.exports.loop = function () {
         parts = [CARRY, CARRY, MOVE, MOVE, WORK, WORK, WORK, WORK, WORK, WORK, WORK];
         newName = spawns[firstfreespawn].createCreep(parts, undefined, {role: 'harvester', home: room.name});
       } else if ((danger && (room.myCreeps.defender.length < Math.min(2, numinvaders))) || (room.myCreeps.defender.length < 1 && slaveRoomInDanger)) {
-        newName = spawns[firstfreespawn].createCreep(creepUtils.createRangedCreep(spawn), undefined, {role: 'defender', room: room.name, home: room.name, ignoreneutrals: true, wait: false});
+        newName = spawns[firstfreespawn].createCreep(creepUtils.createRangedCreep(spawn, true), undefined, {role: 'defender', room: room.name, home: room.name, ignoreneutrals: true, wait: false});
         room.log('Spawning new defender: ' + newName);
       } else if (keeperid && keeperid !== '') {
         components = [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,
@@ -545,7 +545,7 @@ module.exports.loop = function () {
         newName = spawns[firstfreespawn].createCreep(components, undefined, {role: 'upgrader', home: room.name });
         room.log('Spawning new upgrader: ' + newName);
       } else if (attackers < 1 && room.memory.attackinprogress) {
-        let body = creepUtils.createRangedCreep(spawn);
+        let body = creepUtils.createRangedCreep(spawn, true);
         creationpossible = spawns[firstfreespawn].canCreateCreep(body);
         if (creationpossible === OK) {
           newName = spawns[firstfreespawn].createCreep(body, undefined, {role: 'attacker', room: room.memory.warroom, home: room.name});

@@ -180,10 +180,16 @@ exports.createRangedCreep = function (spawn, someheal) {
   let heal = 0;
   let remainingcapacity = capacity;
 
-  if (someheal) {
+  if (someheal && remainingcapacity > 2500) {
+    parts = 8;
+    heal = 4;
+    move = 4;
+    remainingcapacity = capacity - 1200;
+  } else if (someheal && remainingcapacity > 600) {
     parts = 2;
-    heal = 2;
-    remainingcapacity = capacity - 500;
+    heal = 1;
+    move = 1;
+    remainingcapacity = capacity - 300;
   }
 
   while (remainingcapacity >= 200 && parts <= 48) {
