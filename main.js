@@ -191,7 +191,7 @@ module.exports.loop = function () {
       });
     }
 
-    if (room.memory.keeperrooms && room.memory.keeperrooms.length > 0) {
+    if (room.memory.keeperrooms && room.memory.keeperrooms.length > 0) { // TODO maybe remove because centralroom
       //  console.log('room has keeperroomms: ' + room.memory.keeperrooms);
       room.memory.keeperrooms.forEach(function (slaveroom, index) {
         if (!slaveroom) {
@@ -278,6 +278,21 @@ module.exports.loop = function () {
             });
           }
         });
+        if (room.memory.centralroom) {
+          let centralRoom = room.memory.centralroom;
+
+          gatherers[centralRoom] = 0; // the guy who helps all a bit
+
+          let keeperRoom = Game.rooms[centralRoom];
+          if (keeperRoom && keeperRoom.memory.sources) {
+            keeperRoom.memory.sources.forEach((source) => {
+              let sourceString = JSON.stringify(source);
+              // console.log('sourceString before stringify: ' + sourceString);
+              keeperTransporters[sourceString] = 0;
+              dumpers[sourceString] = 0;
+            });
+          }
+        }
 
         room.myCreeps.dumper.forEach((creep) => {
           let sourceString = JSON.stringify(creep.memory.sourcepos);
