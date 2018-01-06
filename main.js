@@ -1,6 +1,5 @@
 let handleFlags = require('handleFlags');
 let moveCreeps = require('moveCreeps');
-let sellResources = require('sellResources');
 let overridePrototypes = require('OverridePrototypes');
 let handleTerminals = require('handleTerminals');
 let creepStatus = require('CreepStatus');
@@ -149,11 +148,6 @@ module.exports.loop = function () {
     // terminal
 
     handleTerminals.handleTerminals(room);
-
-    // sell ressources
-    if (Game.time % 50 === 1) {
-      //    sellResources.sellResources()
-    }
 
     // mineralregen
     if (!room.memory.mineralregentime) {

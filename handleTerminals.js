@@ -1,6 +1,9 @@
 exports.handleTerminals = function (room) {
-  if (Game.time % 10 === 2 && room.terminal && room.terminal.store) {
-    var transitiondone = false;
+  if (!room.terminal || !room.terminal.store) {
+    return;
+  }
+  if (Game.time % 10 === 2) {
+    let transitiondone = false;
     //   console.log(JSON.stringify(room.terminal));
     Object.keys(room.terminal.store).forEach(function (key) {
       // key: the name of the object key
@@ -46,15 +49,48 @@ exports.handleTerminals = function (room) {
       return;
     }
   }
+  // Sell stuff
+  if (Game.time % 50 === 0) {
+    for (let key in room.terminal.store) {
+      if (Object.prototype.hasOwnProperty.call(room.terminal.store, key)) {
+        let resource = room.terminal.store[key];
+        let storageResource = room.store.store[key];
 
-  if (room.terminal && room.terminal.store.energy > 70000 && room.controller.level === 8 && Game.time % 50 === 0 && Memory.energytarget) {
+        if (resource > 5000 && room.terminal.store.energy >= 30000 && storageResource > 50000) {
+          let orders = Game.market.getAllOrders().filter(function (order) {
+            return order.resourceType === key && order.type === ORDER_BUY && Game.market.calcTransactionCost(1000, room.name, order.roomName) < 2000;
+          });
+          console.log('orders:' + JSON.stringify(orders));
+
+          let price = 0;
+          let orderid = null;
+          let maxamount = 0;
+          orders.forEach(function (order) {
+            if (order.price > price) {
+              price = order.price;
+              orderid = order.id;
+              maxamount = order.amount;
+            }
+          });
+          if (orderid) {
+            let amount = Math.min(Math.min(maxamount, resource), 15000);
+            room.log('maxamount: ' + maxamount + ' resource: ' + resource + 'resultingamount: ' + amount);
+
+            let result = Game.market.deal(orderid, amount, room.name);
+            room.log('selling ' + key + ': ' + amount + ' result: ' + result);
+          }
+        }
+      }
+    }
+  }
+
+  if (room.terminal.store.energy > 70000 && room.controller.level === 8 && Game.time % 50 === 0 && Memory.energytarget) {
     room.log(room.name + ': found level 8 room -> prepare sending energy away');
     let targetroom = Game.rooms[Memory.energytarget];
     if (targetroom.terminal && targetroom.terminal.store.energy < 150000) {
       let destination = Memory.energytarget;
       let amount = 30000;
       room.terminal.send('energy', amount, destination);
-      transitiondone = true;
       room.log('transfering ' + amount + ' energy to ' + destination);
     }
   }
