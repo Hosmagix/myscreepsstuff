@@ -197,7 +197,7 @@ let roleAttacker = {
           console.log('Warning: distance is: ' + distance + 'but should be smaller than 3');
         }
       });
-      var target = creep.pos.findClosestByRange();
+      var target = creep.pos.findClosestByRange(targets);
 
       if ((creep.pos.x === 49 || creep.pos.y === 49 || creep.pos.x === 0 || creep.pos.y === 0) && creep.hits > creep.hitsMax * 0.7) {
         console.log('creep is at border -> move out');
