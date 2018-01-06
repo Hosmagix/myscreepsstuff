@@ -259,8 +259,7 @@ let roleAttacker = {
           // console.log('creep is at border -> move out');
           var center = new RoomPosition(25, 25, creep.room.name);
           creep.moveTo(center);
-        } else {
-          // console.log('creep has stil enough health -> fight');
+        } else if (creep.hits < creep.hitsMax * 0.7) {
           creep.moveTo(target, {reusePath: 0});
         }
         return true;
