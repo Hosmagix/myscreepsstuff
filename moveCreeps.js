@@ -29,7 +29,7 @@ exports.moveCreeps = function () {
       roleMineral.run(creep);
     } else if (creep.memory.role === 'dismantler') {
       roleDismantler.run(creep);
-    } else if (creep.memory.role === 'keeper') {
+    } else if (creep.memory.role === 'keeper' ) {
       roleKeeper.run(creep);
       // var diff = Game.cpu.getUsed() - before;
       // keeper++;

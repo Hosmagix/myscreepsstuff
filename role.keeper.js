@@ -2,7 +2,9 @@ let roleKeeper = {
 
   act: function (creep) {
     if (creep.memory.ranged) {
-      return this.ranged_act(creep);
+      var result = this.ranged_act(creep);
+      this.afteract(creep); // heal and ranged_attack are both possible at the same time
+      return result;
     }
 
     // adjacent creeps
@@ -235,7 +237,7 @@ let roleKeeper = {
         nextrespawn = lair;
       }
     });
-    if (!creep.pos.inRangeTo(nextrespawn)) {
+    if (nextrespawn && !creep.pos.inRangeTo(nextrespawn)) {
       creep.goTo(nextrespawn.pos);
     }
   }
