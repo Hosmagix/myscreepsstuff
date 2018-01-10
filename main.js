@@ -4,6 +4,7 @@ let overridePrototypes = require('OverridePrototypes');
 let handleTerminals = require('handleTerminals');
 let creepStatus = require('CreepStatus');
 let creepUtils = require('CreepComponentUtils');
+let findReaction = require('findReaction');
 
 module.exports.loop = function () {
   let startcpu = Game.cpu.getUsed();
@@ -745,7 +746,7 @@ module.exports.loop = function () {
       });
     }
 
-    if (Game.time & 10 === 0) {
+    if (Game.time % 10 === 0) {
       let labs = room.find(FIND_STRUCTURES, {
         filter: (i) => i.structureType === STRUCTURE_LAB
       });
@@ -781,6 +782,18 @@ module.exports.loop = function () {
         } else {
           // pick a reaction:
           // TODO:
+          let reaction = findReaction.findFreeReaction();
+          room.memory.reaction = reaction;
+          room.log('newly picking a reaction: ' + reaction);
+          Memory.reactions[reaction.res] = Memory.reactions[reaction.res] || [];
+          Memory.reactions[reaction.res].push(room.name);
+
+          // TODO check if material is producedin room itself ???
+          Memory.requesting[reaction.m1] = Memory.requesting[reaction.m1] || [];
+          Memory.requesting[reaction.m1].push(room.name);
+
+          Memory.requesting[reaction.m2] = Memory.requesting[reaction.m2] || [];
+          Memory.requesting[reaction.m2].push(room.name);
         }
       }
     }
