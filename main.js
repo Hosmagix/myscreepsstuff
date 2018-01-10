@@ -45,9 +45,7 @@ module.exports.loop = function () {
     }
   });
 
-  if (!Memory.masterroom) {
-    Memory.masterroom = Game.spawns.Spawn1.room.name;
-  }
+  Memory.masterroom = Memory.masterroom || Game.spawns.Spawn1.room.name;
 
   if (Game.time % 100 === 3 || !Memory.energytarget) {
     let mincontrollerlevel = 8;
