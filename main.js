@@ -745,86 +745,43 @@ module.exports.loop = function () {
       });
     }
 
-    var labs = room.find(FIND_STRUCTURES, {
-      filter: (i) => i.structureType === STRUCTURE_LAB
-    });
-    if (false && labs.length > 0 && Game.time % 10 === 0) {
-      room.memory.haslabs = true;
+    if (Game.time & 10 === 0) {
+      let labs = room.find(FIND_STRUCTURES, {
+        filter: (i) => i.structureType === STRUCTURE_LAB
+      });
+      if (labs.length > 0) {
+        room.memory.haslabs = true;
 
-      let requesting = {};
-      requesting.O = ['W15N67'];
-      requesting.L = ['W15N67', 'W17N68'];
-      requesting.Z = ['W14N69'];
-      requesting.H = ['W14N69'];
-      requesting.LO = ['W12N69', 'W13N65'];
-      requesting.ZH2O = ['W12N69', 'W13N65'];
-      requesting.ZHO2 = ['W12N69', 'W13N65'];
-      requesting.ZH = ['W13N65'];
-      requesting.Z = ['W19N66'];
-      requesting.K = ['W19N66'];
-      requesting.U = ['W17N68'];
-      Memory.requesting = requesting;
-
-      let fullreaction = function (mineral1, mineral2, result) {
-        let lab1 = null;
-        let lab2 = null;
-        let targets = [];
-        labs.forEach(function (lab) {
-          if (!lab.mineralType) {
-            targets.push(lab);
-          } else if (lab.mineralType === mineral1) {
-            lab1 = lab;
-          } else if (lab.mineralType === mineral2) {
-            lab2 = lab;
-          } else if (lab.mineralType === result) {
-            targets.push(lab);
-          }
-        });
-
-        if (lab1 && lab2) {
-          targets.forEach(function (target) {
-            target.runReaction(lab1, lab2);
+        let fullreaction = function (mineral1, mineral2, result) {
+          let lab1 = null;
+          let lab2 = null;
+          let targets = [];
+          labs.forEach(function (lab) {
+            if (!lab.mineralType) {
+              targets.push(lab);
+            } else if (lab.mineralType === mineral1) {
+              lab1 = lab;
+            } else if (lab.mineralType === mineral2) {
+              lab2 = lab;
+            } else if (lab.mineralType === result) {
+              targets.push(lab);
+            }
           });
-        }
-      };
 
-      if (room.name === 'W13N65') {
-        var reaction = {};
-        reaction.m1 = 'H';
-        reaction.m2 = 'Z';
-        reaction.res = 'ZH';
-        // room.memory.reaction = reaction;
-        room.memory.reaction = null;
-        // fullreaction(reaction.m1, reaction.m2, reaction.res);
-      } else if (room.name === 'W15N67') {
-        var reaction = {};
-        reaction.m1 = 'O';
-        reaction.m2 = 'L';
-        reaction.res = 'LO';
-        room.memory.reaction = reaction;
-        fullreaction(reaction.m1, reaction.m2, reaction.res);
-      } else if (room.name === 'W14N69') {
-        // room.log('hi');
-        var reaction = {};
-        reaction.m1 = 'Z';
-        reaction.m2 = 'H';
-        reaction.res = 'ZH';
-        room.memory.reaction = reaction;
-        fullreaction(reaction.m1, reaction.m2, reaction.res);
-      } else if (room.name === 'W19N66') {
-        var reaction = {};
-        reaction.m1 = 'Z';
-        reaction.m2 = 'K';
-        reaction.res = 'ZK';
-        room.memory.reaction = reaction;
-        fullreaction(reaction.m1, reaction.m2, reaction.res);
-      } else if (room.name === 'W17N68') {
-        var reaction = {};
-        reaction.m1 = 'U';
-        reaction.m2 = 'L';
-        reaction.res = 'UL';
-        room.memory.reaction = reaction;
-        fullreaction(reaction.m1, reaction.m2, reaction.res);
+          if (lab1 && lab2) {
+            targets.forEach(function (target) {
+              target.runReaction(lab1, lab2);
+            });
+          }
+        };
+
+        if (room.memory.reaction) {
+          let reaction = room.memory.reaction;
+          fullreaction(reaction.m1, reaction.m2, reaction.res);
+        } else {
+          // pick a reaction:
+          // TODO:
+        }
       }
     }
   }
