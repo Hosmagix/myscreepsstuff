@@ -373,6 +373,24 @@ let roleAttacker = {
       return true;
     }
 
+    // don't reenter a fight in another room if just slightly above hitpoint minimum
+
+    if (creep.hits < creep.hitsMax) {
+      console.log(creep.name + ' is damaged: ' + creep.hits + '/' + creep.hitsMax);
+
+      if (creep.memory.home && creep.memory.home !== creep.room.name) {
+        // console.log('creep is outside -> go home');
+        let homeroom = Game.rooms[creep.memory.home];
+        let exitDir = creep.room.findExitTo(homeroom);
+        let exit = creep.pos.findClosestByRange(exitDir);
+        creep.moveTo(exit);
+      } else {
+        // console.log('creep is at home');
+        creep.moveTo(creep.room.controller);
+      }
+      return true;
+    }
+
     /* var targets = creep.room.find(FIND_HOSTILE_CONSTRUCTION_SITES);
 
             if (targets.length > 0) {
