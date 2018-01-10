@@ -23,7 +23,10 @@ exports.AddCreepStatusToRoomInfo = function () {
       if (creep.ticksToLive > 100 || creep.spawning) {
         let home = creep.memory.home;
         let room = Game.rooms[home];
-        room.myCreeps[creep.memory.role].push(creep); // TODO add array in other for loop
+        if (room) {
+          room.myCreeps[creep.memory.role].push(creep); // TODO add array in other for loop
+        }
+
         // console.log(JSON.stringify(room.myCreeps));
       }
     }

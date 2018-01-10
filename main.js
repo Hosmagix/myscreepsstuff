@@ -202,6 +202,14 @@ module.exports.loop = function () {
           endangeredSlaveRoom = slaveroom;
         }
       });
+
+      if (room.memory.centralroom && !slaveRoomInDanger) {
+        let centralRoom = Game.rooms[room.memory.centralroom];
+        if (centralRoom && centralRoom.memory.dangertill && (centralRoom.memory.dangertill > Game.time)) {
+          slaveRoomInDanger = true;
+          endangeredSlaveRoom = room.memory.centralroom;
+        }
+      }
     }
 
     if (endangeredSlaveRoom) {

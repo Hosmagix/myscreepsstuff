@@ -201,7 +201,7 @@ let roleAttacker = {
 
       if ((creep.pos.x === 49 || creep.pos.y === 49 || creep.pos.x === 0 || creep.pos.y === 0) && creep.hits > creep.hitsMax * 0.7) {
         console.log('creep is at border -> move out');
-        var center = new RoomPosition(25, 25, creep.room.name);
+        let center = new RoomPosition(25, 25, creep.room.name);
         creep.moveTo(center);
         if (dmg >= 10) {
           console.log('dmg ist: ' + dmg);
@@ -255,11 +255,7 @@ let roleAttacker = {
           creep.rangedAttack(target);
         }
 
-        if (creep.pos.x === 49 || creep.pos.y === 49 || creep.pos.x === 0 || creep.pos.y === 0) {
-          // console.log('creep is at border -> move out');
-          var center = new RoomPosition(25, 25, creep.room.name);
-          creep.moveTo(center);
-        } else if (creep.hits < creep.hitsMax * 0.7) {
+        if (creep.hits < creep.hitsMax * 0.7) {
           creep.moveTo(target, {reusePath: 0});
         }
         return true;
@@ -297,15 +293,9 @@ let roleAttacker = {
           creep.rangedAttack(target);
         }
       }
-      if (creep.pos.x === 49 || creep.pos.y === 49 || creep.pos.x === 0 || creep.pos.y === 0) {
-        console.log('creep is at border -> move out');
-        var center = new RoomPosition(25, 25, creep.room.name);
-        creep.moveTo(center);
-      } else if (creep.hits > creep.hitsMax * 0.8 && closestTarget >= 3) {
+      if (creep.hits > creep.hitsMax * 0.8) {
         console.log('creep has stil enough health -> fight');
         creep.moveTo(target, {reusePath: 0});
-      } else if (creep.hits > creep.hitsMax * 0.8 && closestTarget === 2) {
-        console.log('range 2 -> wait');
       } else {
         var roompos = new RoomPosition(creep.memory.safepoint.x, creep.memory.safepoint.y, creep.room.name);
         creep.moveTo(roompos, {reusePath: 0});

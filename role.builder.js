@@ -127,6 +127,12 @@ function getEnergyFromSource (creep) {
     creep.goTo(source.pos);
   } else if (source.energy > 0) {
     creep.harvest(source);
+    
+    var workParts = creep.getActiveBodyparts(WORK);
+    if (creep.carry.energy + workParts*4 > creep.carryCapacity){
+       creep.memory.building = true; 
+    } // 2*2 -> check after gathering if a work part is still necessary
+    
   }
   return true;
 }
