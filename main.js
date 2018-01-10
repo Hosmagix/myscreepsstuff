@@ -788,6 +788,7 @@ module.exports.loop = function () {
           Memory.reactions[reaction.res] = Memory.reactions[reaction.res] || [];
           Memory.reactions[reaction.res].push(room.name);
 
+          Memory.requesting = Memory.requesting || {};
           // TODO check if material is producedin room itself ???
           Memory.requesting[reaction.m1] = Memory.requesting[reaction.m1] || [];
           Memory.requesting[reaction.m1].push(room.name);
