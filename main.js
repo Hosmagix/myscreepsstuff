@@ -750,7 +750,7 @@ module.exports.loop = function () {
     var labs = room.find(FIND_STRUCTURES, {
       filter: (i) => i.structureType === STRUCTURE_LAB
     });
-    if (labs.length > 0 && Game.time % 10 === 0) {
+    if (false && labs.length > 0 && Game.time % 10 === 0) {
       room.memory.haslabs = true;
 
       let requesting = {};
