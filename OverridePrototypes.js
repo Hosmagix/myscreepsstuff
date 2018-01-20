@@ -365,7 +365,7 @@ exports.overridePrototypes = function () {
 
   let reactions;
 
-  Game.prototype.getReactions = function () {
+  Game.getReactions = function () {
     if (!reactions) {
       reactions = findReaction.updateReactionsByRoom();
     }
