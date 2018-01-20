@@ -144,6 +144,10 @@ module.exports.loop = function () {
       continue;
     }
 
+    if (Game.time % 100 === 0) {
+      findReaction.checkIfFunctionShouldBeChanged();
+    }
+
     // terminal
 
     handleTerminals.handleTerminals(room);
