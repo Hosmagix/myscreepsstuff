@@ -137,7 +137,7 @@ function updateReactionsByRoom () {
 }
 
 function deleteRoom (roomId) {
-  let room = Game[roomId];
+  let room = Game.rooms[roomId];
   room.memory.reaction = undefined;
 }
 
