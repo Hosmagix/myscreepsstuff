@@ -55,7 +55,8 @@ let findFreeReaction = function () {
   for (let key in reactions) {
     if (Object.prototype.hasOwnProperty.call(reactions, key)) {
       let reaction = reactions[key];
-      if (availableMinerals[reaction.m1] < minMinerals || availableMinerals[reaction.m2] < minMinerals) {
+      if (!availableMinerals[reaction.m1] || availableMinerals[reaction.m1] < minMinerals ||
+        !availableMinerals[reaction.m2] || availableMinerals[reaction.m2] < minMinerals) {
         console.log("reaction doesn't have enough supply" + JSON.stringify(key));
       } else if (!Memory.reactions[key]) {
         console.log('reaction is still free' + JSON.stringify(key));
