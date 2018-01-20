@@ -32,7 +32,7 @@ function createReactionsData () {
   for (let key in REACTIONS.OH) {
     if (REACTIONS.OH.hasOwnProperty(key)) {
       let result = REACTIONS.OH[key];
-      let reaction = {m1: 'OH', m2: 'key', res: result};
+      let reaction = {m1: 'OH', m2: key, res: result};
       reactions[result] = reaction;
     }
   }
@@ -40,7 +40,7 @@ function createReactionsData () {
   for (let key in REACTIONS.X) {
     if (REACTIONS.X.hasOwnProperty(key)) {
       let result = REACTIONS.X[key];
-      let reaction = {m1: 'X', m2: 'key', res: result};
+      let reaction = {m1: 'X', m2: key, res: result};
       reactions[result] = reaction;
     }
   }
