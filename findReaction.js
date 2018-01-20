@@ -15,7 +15,10 @@ let createReceipe = function (name) {
 // UL
 // G
 
+const minMinerals = 20000;
+
 let findFreeReaction = function () {
+  let availableMinerals = updateTotalMinerals();
   // TODO refactor: this is only a dummy implementation
   // it should offer support if all reactions are taken.
   // there should be ways the prioritize stuff.
@@ -35,7 +38,10 @@ let findFreeReaction = function () {
 
   for (let key in reactions) {
     if (Object.prototype.hasOwnProperty.call(reactions, key)) {
-      if (!Memory.reactions[key]) {
+      let reaction = reactions[key];
+      if (availableMinerals[reaction.m1] < minMinerals || availableMinerals[reaction.m2] < minMinerals) {
+        console.log("reaction doesn't have enough supply" + JSON.stringify(key));
+      } else if (!Memory.reactions[key]) {
         console.log('reaction is still free' + JSON.stringify(key));
         freeReactions.push(reactions[key]);
       }
@@ -77,6 +83,7 @@ function updateTotalMinerals () {
     }
   }
   console.log(JSON.stringify(totalMinerals));
+  return totalMinerals;
 }
 
 module.exports = {findFreeReaction, updateTotalMinerals};
