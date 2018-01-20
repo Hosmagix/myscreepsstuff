@@ -15,7 +15,7 @@ let createReceipe = function (name) {
 // UL
 // G
 
-module.exports.findFreeReaction = function () {
+let findFreeReaction = function () {
   // TODO refactor: this is only a dummy implementation
   // it should offer support if all reactions are taken.
   // there should be ways the prioritize stuff.
@@ -47,3 +47,37 @@ module.exports.findFreeReaction = function () {
     return freeReactions[0];
   }
 };
+
+let addMinerals = function (totalMinerals, storage) { // actually adds energy to but doesn't matter
+  for (let mineral in storage.store) {
+    if (storage.store.hasOwnProperty(mineral)) {
+      let amount = storage.store[mineral];
+      let totalAmount = totalMinerals[mineral] || 0;
+      totalAmount += amount;
+      totalMinerals[mineral] = totalAmount;
+    }
+  }
+};
+
+function updateTotalMinerals () {
+  let totalMinerals = {};
+  for (let i in Game.rooms) {
+    if (Game.rooms.hasOwnProperty(i)) {
+      let room = Game.rooms[i];
+
+      if (!room.controller || !room.controller.my) {
+        // no room with a controller -> do nothing
+        continue;
+      }
+      if (room.storage) {
+        addMinerals(totalMinerals, room.storage);
+      }
+      if (room.terminal) {
+        addMinerals(totalMinerals, room.terminal);
+      }
+    }
+  }
+  console.log(JSON.stringify(totalMinerals));
+}
+
+module.exports = {findFreeReaction, updateTotalMinerals};
