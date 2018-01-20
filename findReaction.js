@@ -103,4 +103,25 @@ function updateTotalMinerals () {
   return totalMinerals;
 }
 
-module.exports = {findFreeReaction, updateTotalMinerals};
+function updateReactionsByRoom () {
+  let reactions = {};
+  for (let i in Game.rooms) {
+    if (Game.rooms.hasOwnProperty(i)) {
+      let room = Game.rooms[i];
+
+      if (!room.controller || !room.controller.my) {
+        // no room with a controller -> do nothing
+        continue;
+      }
+      if (room.memory.reaction) {
+        let reaction = room.memory.reaction;
+        reactions[reaction.res] = reactions[reaction.res] || [];
+        reactions[reaction.res].push(room.name);
+      }
+    }
+  }
+  console.log(JSON.stringify(reactions));
+  return reactions;
+}
+
+module.exports = {findFreeReaction, updateTotalMinerals, updateReactionsByRoom};
