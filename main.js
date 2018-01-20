@@ -781,21 +781,23 @@ module.exports.loop = function () {
           fullreaction(reaction.m1, reaction.m2, reaction.res);
         } else {
           // pick a reaction:
-          // TODO:
+          // TODO: remove Memory.reactions because it's a pain in the ass to update
           let reaction = findReaction.findFreeReaction();
-          room.memory.reaction = reaction;
-          room.memory.display = false;
-          room.log('newly picking a reaction: ' + reaction);
-          Memory.reactions[reaction.res] = Memory.reactions[reaction.res] || [];
-          Memory.reactions[reaction.res].push(room.name);
+          if (reaction) {
+            room.memory.reaction = reaction;
+            room.memory.display = false;
+            room.log('newly picking a reaction: ' + reaction);
+            Memory.reactions[reaction.res] = Memory.reactions[reaction.res] || [];
+            Memory.reactions[reaction.res].push(room.name);
 
-          Memory.requesting = Memory.requesting || {};
-          // TODO check if material is producedin room itself ???
-          Memory.requesting[reaction.m1] = Memory.requesting[reaction.m1] || [];
-          Memory.requesting[reaction.m1].push(room.name);
+            Memory.requesting = Memory.requesting || {};
+            // TODO check if material is produced in room itself ???
+            Memory.requesting[reaction.m1] = Memory.requesting[reaction.m1] || [];
+            Memory.requesting[reaction.m1].push(room.name);
 
-          Memory.requesting[reaction.m2] = Memory.requesting[reaction.m2] || [];
-          Memory.requesting[reaction.m2].push(room.name);
+            Memory.requesting[reaction.m2] = Memory.requesting[reaction.m2] || [];
+            Memory.requesting[reaction.m2].push(room.name);
+          }
         }
       }
     }
