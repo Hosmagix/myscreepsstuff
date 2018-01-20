@@ -1,3 +1,5 @@
+let findReaction = require('findReaction');
+
 exports.overridePrototypes = function () {
   Creep.prototype.log = function (message) {
     console.log(this.name + '/' + this.memory.role + ':' + this.room.name + ' : ' + message);
@@ -359,5 +361,14 @@ exports.overridePrototypes = function () {
         }
       }
     }
+  };
+
+  let reactions;
+
+  Game.prototype.getReactions = function () {
+    if (!reactions) {
+      reactions = findReaction.updateReactionsByRoom();
+    }
+    return reactions;
   };
 };

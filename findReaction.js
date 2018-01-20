@@ -45,12 +45,11 @@ let findFreeReaction = function () {
     }
   }
 
-  Memory.reactions = Memory.reactions || {};
-
+  let takenReactions = Game.getReactions();
   let freeReactions = [];
 
   console.log('reactions: ' + JSON.stringify(reactions));
-  console.log('takenReactions: ' + JSON.stringify(Memory.reactions));
+  console.log('takenReactions: ' + JSON.stringify(takenReactions));
 
   for (let key in reactions) {
     if (Object.prototype.hasOwnProperty.call(reactions, key)) {
@@ -58,7 +57,7 @@ let findFreeReaction = function () {
       if (!availableMinerals[reaction.m1] || availableMinerals[reaction.m1] < minMinerals ||
         !availableMinerals[reaction.m2] || availableMinerals[reaction.m2] < minMinerals) {
         console.log("reaction doesn't have enough supply" + JSON.stringify(key));
-      } else if (!Memory.reactions[key]) {
+      } else if (!takenReactions[key]) {
         console.log('reaction is still free' + JSON.stringify(key));
         freeReactions.push(reactions[key]);
       }
