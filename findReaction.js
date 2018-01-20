@@ -61,13 +61,14 @@ let findFreeReaction = function () {
 
   console.log('reactions: ' + JSON.stringify(reactions));
   console.log('takenReactions: ' + JSON.stringify(takenReactions));
+  console.log('availableMinerals: ' + JSON.stringify(availableMinerals));
 
   for (let key in reactions) {
     if (Object.prototype.hasOwnProperty.call(reactions, key)) {
       let reaction = reactions[key];
       if (!availableMinerals[reaction.m1] || availableMinerals[reaction.m1] < minMinerals ||
         !availableMinerals[reaction.m2] || availableMinerals[reaction.m2] < minMinerals) {
-        console.log("reaction doesn't have enough supply" + JSON.stringify(key));
+        // console.log("reaction doesn't have enough supply" + JSON.stringify(key));
       } else if (availableMinerals[reaction.res] && availableMinerals[reaction.res] > hasEnough) {
         console.log('reaction already has enough of its products: ' + JSON.stringify(key));
       } else if (!takenReactions[key]) {
@@ -79,6 +80,8 @@ let findFreeReaction = function () {
 
   if (freeReactions.length > 0) {
     return freeReactions[0];
+  } else {
+    console.log('failed to find a free reaction');
   }
 };
 
