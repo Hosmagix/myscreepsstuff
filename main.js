@@ -122,7 +122,7 @@ module.exports.loop = function () {
       towers.forEach(function (tower) {
         let hostileCreeps = room.findHostileCreeps();
         let closest = tower.pos.findClosestByRange(hostileCreeps);
-        console.log('attacking closest enemy');
+        // console.log('attacking closest enemy');
         tower.attack(closest);
       });
     } else {
@@ -801,7 +801,7 @@ module.exports.loop = function () {
     }
   }
 
-  console.log('Time:' + Game.time % 100 + ' start: ' + startcpu + ' flags: ' + flagcpu + ' creeps: ' + creepscpu + ' rooms: ' + Game.cpu.getUsed() + 'bucket: ' + Game.cpu.bucket);
+  // console.log('Time:' + Game.time % 100 + ' start: ' + startcpu + ' flags: ' + flagcpu + ' creeps: ' + creepscpu + ' rooms: ' + Game.cpu.getUsed() + 'bucket: ' + Game.cpu.bucket);
 };
 
 var positionFree = function (roomposition) {

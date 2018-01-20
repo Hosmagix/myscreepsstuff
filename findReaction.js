@@ -35,9 +35,8 @@ let findFreeReaction = function () {
 
   for (let key in reactions) {
     if (Object.prototype.hasOwnProperty.call(reactions, key)) {
-      console.log('key: ' + key);
       if (!Memory.reactions[key]) {
-        console.log('reaction is still free' + key);
+        console.log('reaction is still free' + JSON.stringify(key));
         freeReactions.push(reactions[key]);
       }
     }

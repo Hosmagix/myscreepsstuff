@@ -29,7 +29,7 @@ exports.moveCreeps = function () {
       roleMineral.run(creep);
     } else if (creep.memory.role === 'dismantler') {
       roleDismantler.run(creep);
-    } else if (creep.memory.role === 'keeper' ) {
+    } else if (creep.memory.role === 'keeper') {
       roleKeeper.run(creep);
       // var diff = Game.cpu.getUsed() - before;
       // keeper++;
@@ -54,9 +54,9 @@ exports.moveCreeps = function () {
   }
   if (keeper > 0) {
     let average = total / keeper;
-    console.log(keeper + 'builders used ' + average + ' cpu on average per creep');
+    // console.log(keeper + 'builders used ' + average + ' cpu on average per creep');
     if (maxcpu > 10) {
-      maxcreep.log(' I am ashamed for using ' + maxcpu);
+      //  maxcreep.log(' I am ashamed for using ' + maxcpu);
     }
   }
 };
