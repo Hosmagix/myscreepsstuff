@@ -12,6 +12,7 @@ let roleMineral = {
     let room = that.creep.room;
     let res = room.memory.reaction && (room.memory.reaction.m1 === mineral || room.memory.reaction.m2 === mineral) || room.memory.display;
     // that.creep.log('labneeds: ' + res + ' reaction: ' + JSON.stringify(room.memory.reaction));
+    // room.log('labneeds: ' + 'reaction: ' + JSON.stringify(room.memory.reaction) + room.memory.display);
     return res;
   },
 
@@ -181,12 +182,12 @@ let roleMineral = {
 
     let targets = creep.room.find(FIND_STRUCTURES, {
       filter: (structure) => {
-        return (structure.structureType === STRUCTURE_LAB) && structure.mineralType && creep.room.memory.reaction && structure.mineralType === creep.room.memory.reaction.res && (structure.mineralAmount > 2000);
+        return (structure.structureType === STRUCTURE_LAB) && structure.mineralType && creep.room.memory.reaction && structure.mineralType !== creep.room.memory.reaction.m1 && structure.mineralType !== creep.room.memory.reaction.m2 && (structure.mineralAmount > 2000 || structure.mineralType !== creep.room.memory.reaction.res);
       }
     });
     if (targets.length > 0) {
-      // console.log('target found');
       var target = targets[0];
+      // creep.log('target found: ' + target.mineralType + ' reaction: ' + JSON.stringify(creep.room.memory.reaction));
       if (creep.withdraw(target, target.mineralType) !== OK) {
         creep.moveTo(target);
       }
@@ -287,6 +288,7 @@ let roleMineral = {
     }
 
     if (creep.memory.role === 'mineraltransporter' && that.labneeds(mineral)) {
+      //  creep.log('labneeds mineral:' + mineral);
       // bring energy to lab
       // filled labs
       var targets = creep.room.find(FIND_STRUCTURES, {

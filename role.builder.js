@@ -127,12 +127,11 @@ function getEnergyFromSource (creep) {
     creep.goTo(source.pos);
   } else if (source.energy > 0) {
     creep.harvest(source);
-    
-    var workParts = creep.getActiveBodyparts(WORK);
-    if (creep.carry.energy + workParts*4 > creep.carryCapacity){
-       creep.memory.building = true; 
+
+    let workParts = creep.getActiveBodyparts(WORK);
+    if (creep.carry.energy + workParts * 4 > creep.carryCapacity) {
+      creep.memory.building = true;
     } // 2*2 -> check after gathering if a work part is still necessary
-    
   }
   return true;
 }
@@ -454,13 +453,13 @@ let roleBuilder = {
   harvest: function (creep) {
     let harvestQueue = [];
 
-    if (creep.memory.role === 'gatherer') {
-      harvestQueue.push(gathererDroppedEnergy);
-    }
-
     // other room
     if (creep.memory.room && creep.room.name !== creep.memory.room) {
       harvestQueue.push(goToOtherRoom);
+    }
+
+    if (creep.memory.role === 'gatherer') {
+      harvestQueue.push(gathererDroppedEnergy);
     }
 
     if (creep.memory.role !== 'dumper' && creep.memory.role !== 'outsider') {

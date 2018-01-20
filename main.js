@@ -784,6 +784,7 @@ module.exports.loop = function () {
           // TODO:
           let reaction = findReaction.findFreeReaction();
           room.memory.reaction = reaction;
+          room.memory.display = false;
           room.log('newly picking a reaction: ' + reaction);
           Memory.reactions[reaction.res] = Memory.reactions[reaction.res] || [];
           Memory.reactions[reaction.res].push(room.name);

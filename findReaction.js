@@ -23,15 +23,19 @@ module.exports.findFreeReaction = function () {
   let reactions = {};
   let basicReactions = ['UH', 'KO', 'LO', 'LH', 'ZH', 'ZO', 'ZK', 'UL', 'GO', 'GH', 'OH'];
 
-  basicReactions.forEach(rea => { reactions.rea = createReceipe(rea); });
+  basicReactions.forEach(rea => { reactions[rea] = createReceipe(rea); });
   reactions.G = {m1: 'ZK', m2: 'UL', res: 'G'};
 
   Memory.reactions = Memory.reactions || {};
 
   let freeReactions = [];
 
+  console.log('reactions: ' + JSON.stringify(reactions));
+  console.log('takenReactions: ' + JSON.stringify(Memory.reactions));
+
   for (let key in reactions) {
     if (Object.prototype.hasOwnProperty.call(reactions, key)) {
+      console.log('key: ' + key);
       if (!Memory.reactions[key]) {
         console.log('reaction is still free' + key);
         freeReactions.push(reactions[key]);
