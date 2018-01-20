@@ -29,6 +29,22 @@ let findFreeReaction = function () {
   basicReactions.forEach(rea => { reactions[rea] = createReceipe(rea); });
   reactions.G = {m1: 'ZK', m2: 'UL', res: 'G'};
 
+  for (let key in REACTIONS.OH) {
+    if (REACTIONS.OH.hasOwnProperty(key)) {
+      let result = REACTIONS.OH[key];
+      let reaction = {m1: 'OH', m2: 'key', res: result};
+      reactions.push(reaction);
+    }
+  }
+
+  for (let key in REACTIONS.X) {
+    if (REACTIONS.X.hasOwnProperty(key)) {
+      let result = REACTIONS.X[key];
+      let reaction = {m1: 'X', m2: 'key', res: result};
+      reactions.push(reaction);
+    }
+  }
+
   Memory.reactions = Memory.reactions || {};
 
   let freeReactions = [];
