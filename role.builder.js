@@ -422,9 +422,16 @@ function buildStuff (creep) {
 }
 
 function increaseWallHp (creep) {
-  console.log(creep.room.name + ' increasing wallshp');
-  creep.room.memory.wallshp += 300000;
-  buildStuff(creep);
+  let hasWalls = creep.pos.findClosestByRange(FIND_STRUCTURES, {
+    filter: object => object.hits < object.hitsMax
+  });
+
+  if (hasWalls) {
+    console.log(creep.room.name + ' increasing wallshp');
+    creep.room.memory.wallshp += 300000;
+    buildStuff(creep);
+  }
+  // TODO: suicide if RCL8
 }
 
 function returnHome (creep) {
