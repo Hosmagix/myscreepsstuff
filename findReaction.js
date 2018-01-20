@@ -16,13 +16,13 @@ let createReceipe = function (name) {
 // G
 
 const minMinerals = 20000;
+const hasEnough = 200000;
 
-let findFreeReaction = function () {
-  let availableMinerals = updateTotalMinerals();
-  // TODO refactor: this is only a dummy implementation
-  // it should offer support if all reactions are taken.
-  // there should be ways the prioritize stuff.
-  // calculate the required minerals -> priotize OH higher.
+let cachedReactions;
+function createReactionsData () {
+  if (cachedReactions) {
+    return cachedReactions;
+  }
   let reactions = {};
   let basicReactions = ['UH', 'KO', 'LO', 'LH', 'ZH', 'ZO', 'ZK', 'UL', 'GO', 'GH', 'OH'];
 
@@ -44,6 +44,17 @@ let findFreeReaction = function () {
       reactions[result] = reaction;
     }
   }
+  cachedReactions = reactions;
+  return reactions;
+}
+
+let findFreeReaction = function () {
+  let availableMinerals = updateTotalMinerals();
+  // TODO refactor: this is only a dummy implementation
+  // it should offer support if all reactions are taken.
+  // there should be ways the prioritize stuff.
+  // calculate the required minerals -> priotize OH higher.
+  let reactions = createReactionsData();
 
   let takenReactions = Game.getReactions();
   let freeReactions = [];
@@ -57,6 +68,8 @@ let findFreeReaction = function () {
       if (!availableMinerals[reaction.m1] || availableMinerals[reaction.m1] < minMinerals ||
         !availableMinerals[reaction.m2] || availableMinerals[reaction.m2] < minMinerals) {
         console.log("reaction doesn't have enough supply" + JSON.stringify(key));
+      } else if (availableMinerals[reaction.res] && availableMinerals[reaction.res] > hasEnough) {
+        console.log('reaction already has enough of its products: ' + JSON.stringify(key));
       } else if (!takenReactions[key]) {
         console.log('reaction is still free' + JSON.stringify(key));
         freeReactions.push(reactions[key]);
@@ -123,4 +136,31 @@ function updateReactionsByRoom () {
   return reactions;
 }
 
-module.exports = {findFreeReaction, updateTotalMinerals, updateReactionsByRoom};
+function deleteRoom (roomId) {
+  let room = Game[roomId];
+  room.memory.reaction = undefined;
+}
+
+function checkIfFunctionShouldBeChanged () {
+  let currentReactions = Game.getReactions();
+  let availableMinerals = updateTotalMinerals();
+  let reactionsInfo = createReactionsData();
+  for (let result in currentReactions) {
+    if (currentReactions.hasOwnProperty(result)) {
+      let rooms = currentReactions[result];
+      let reaction = reactionsInfo[result];
+      if (availableMinerals[result] > hasEnough) {
+        console.log('there are already enough minerals of: ' + result);
+        console.log(JSON.stringify(rooms) + 'shall stop producing ' + result);
+        rooms.forEach(deleteRoom);
+      } else if (!availableMinerals[reaction.m1] || availableMinerals[reaction.m1] < minMinerals ||
+        !availableMinerals[reaction.m2] || availableMinerals[reaction.m2] < minMinerals) {
+        console.log("reaction doesn't have enough supply" + result);
+        console.log(JSON.stringify(rooms) + 'shall stop producing ' + result);
+        rooms.forEach(deleteRoom);
+      }
+    }
+  }
+}
+
+module.exports = {findFreeReaction, updateTotalMinerals, updateReactionsByRoom, checkIfFunctionShouldBeChanged};
