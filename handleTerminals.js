@@ -38,7 +38,7 @@ exports.handleTerminals = function (room) {
           }
           if (roomMinerals < minMinerals) {
             transitiondone = true;
-            room.log('transfering ' + amount + ' ' + key + ' to ' + roomName);
+            room.log('transfering ' + minMinerals + ' ' + key + ' to ' + roomName);
             room.terminal.send(key, minMinerals, roomName);
             break;
           }
