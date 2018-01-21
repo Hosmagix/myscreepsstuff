@@ -9,8 +9,9 @@ exports.handleTerminals = function (room) {
     Object.keys(room.terminal.store).forEach(function (key) { // TODO: remove forEach
       // key: the name of the object key
       let amount = room.terminal.store[key];
+      let roomOwned = amount + room.storage.store[key];
       if (amount < minMinerals || transitiondone || key === RESOURCE_ENERGY) return;
-      if (amount < 20000 && room.memory.reaction && (room.memory.reaction.m1 === key || room.memory.reaction.m2 === key)) {
+      if (roomOwned < 20000 && room.memory.reaction && (room.memory.reaction.m1 === key || room.memory.reaction.m2 === key)) {
         return;
       }
 
