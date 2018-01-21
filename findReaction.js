@@ -139,6 +139,29 @@ function updateReactionsByRoom () {
   return reactions;
 }
 
+function updateRequestingByRoom () {
+  let requesting = {};
+  for (let i in Game.rooms) {
+    if (Game.rooms.hasOwnProperty(i)) {
+      let room = Game.rooms[i];
+
+      if (!room.controller || !room.controller.my) {
+        // no room with a controller -> do nothing
+        continue;
+      }
+      if (room.memory.reaction) {
+        let reaction = room.memory.reaction;
+        requesting[reaction.m1] = requesting[reaction.m1] || [];
+        requesting[reaction.m1].push(room.name);
+        requesting[reaction.m2] = requesting[reaction.m2] || [];
+        requesting[reaction.m2].push(room.name);
+      }
+    }
+  }
+  console.log('requesting' + JSON.stringify(requesting));
+  return requesting;
+}
+
 function deleteRoom (roomId) {
   let room = Game.rooms[roomId];
   room.memory.reaction = undefined;
@@ -166,4 +189,4 @@ function checkIfFunctionShouldBeChanged () {
   }
 }
 
-module.exports = {findFreeReaction, updateTotalMinerals, updateReactionsByRoom, checkIfFunctionShouldBeChanged};
+module.exports = {findFreeReaction, updateTotalMinerals, updateReactionsByRoom, checkIfFunctionShouldBeChanged, updateRequestingByRoom};

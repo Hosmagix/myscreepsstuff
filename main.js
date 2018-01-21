@@ -791,12 +791,7 @@ module.exports.loop = function () {
             room.memory.display = false;
             room.log('newly picking a reaction: ' + reaction);
 
-            Memory.requesting = Memory.requesting || {};
-            Memory.requesting[reaction.m1] = Memory.requesting[reaction.m1] || [];
-            Memory.requesting[reaction.m1].push(room.name);
-
-            Memory.requesting[reaction.m2] = Memory.requesting[reaction.m2] || [];
-            Memory.requesting[reaction.m2].push(room.name);
+            Memory.requesting = findReaction.updateRequestingByRoom();
           }
         }
       }
