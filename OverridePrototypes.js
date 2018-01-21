@@ -290,7 +290,7 @@ exports.overridePrototypes = function () {
 
     if (this.hits < this.hitsMax - 300) {
       let homeroom = Game.rooms[this.memory.home];
-      this.log('creep is damaged by more than 300 hp return');
+      // this.log('creep is damaged by more than 300 hp return');
       if (homeroom.storage) {
         this.goTo(homeroom.storage.pos);
       } else {
