@@ -552,7 +552,7 @@ module.exports.loop = function () {
         } else {
           components = creepUtils.createWorkFocussedCreep(spawn);
         }
-        room.log('components for upgrader: ' + JSON.stringify(components));
+        // room.log('components for upgrader: ' + JSON.stringify(components));
         newName = spawns[firstfreespawn].createCreep(components, undefined, {role: 'upgrader', home: room.name });
         room.log('Spawning new upgrader: ' + newName);
       } else if (attackers < 1 && room.memory.attackinprogress) {
