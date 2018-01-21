@@ -39,7 +39,7 @@ exports.handleTerminals = function (room) {
           }
           if (roomMinerals < minMinerals) {
             transitiondone = true;
-            room.log('transfering ' + minMinerals + ' ' + key + ' to ' + roomName);
+            room.log('transfering ' + minMinerals + ' ' + key + ' to ' + roomName + 'roomOwned: ' + roomOwned + JSON.stringify(room.memory.reaction));
             room.terminal.send(key, minMinerals, roomName);
             break;
           }
