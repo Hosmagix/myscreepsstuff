@@ -4,44 +4,44 @@ exports.handleTerminals = function (room) {
   }
   if (Game.time % 10 === 2) {
     let transitiondone = false;
+    let minMinerals = 10000;
     //   console.log(JSON.stringify(room.terminal));
-    Object.keys(room.terminal.store).forEach(function (key) {
+    Object.keys(room.terminal.store).forEach(function (key) { // TODO: remove forEach
       // key: the name of the object key
       let amount = room.terminal.store[key];
-      if (amount < 1000 || transitiondone || key === RESOURCE_ENERGY) return;
-      if (room.memory.reaction && (room.memory.reaction.m1 === key || room.memory.reaction.m2 === key)) {
+      if (amount < minMinerals || transitiondone || key === RESOURCE_ENERGY) return;
+      if (amount < 20000 && room.memory.reaction && (room.memory.reaction.m1 === key || room.memory.reaction.m2 === key)) {
+        return;
+      }
+
+      if (transitiondone) {
         return;
       }
 
       if (Memory.requesting && Memory.requesting[key]) {
         let rooms = Memory.requesting[key];
         //  room.log('requesting rooms are: ' + rooms);
-        let targetroom = null; // only transfer up to 10k minerals
-        let mineral = 9000;
-        for (let i in rooms) {
-          let name = rooms[i];
-          let roomi = Game.rooms[name];
-          // console.log('roomi: ' + JSON.stringify(roomi));
-          let minerals = roomi.terminal.store[key] || 0;
-          // console.log('minerals: ' + minerals);
-          if (minerals < mineral && (name !== room.name)) {
-            mineral = minerals;
-            targetroom = name;
-          }
-          // room.log('name: ' + name + 'room.name' + room.name +'' + (name === room.name) );
-          if (name === room.name) {
-            // room.log('room: ' + name + 'is the same room -> therefore material is needed itself -> donnot send');
-            minerals = -1;
-            targetroom = null;
-          }
-        }
-        // room.log('targetroom for ' + key + ' is: ' + targetroom);
-        // Game.rooms[room_id]
 
-        if (targetroom && !transitiondone && key !== RESOURCE_ENERGY) {
-          let res = room.terminal.send(key, amount, targetroom);
-          transitiondone = true;
-          room.log('transfering ' + amount + ' ' + key + ' to ' + targetroom + ': ' + res);
+        for (let i = 0; i < rooms.length; i++) {
+          let roomName = rooms[i];
+          let roomObject = Game.rooms[roomName];
+          let roomMinerals = 0;
+          if (roomName === room.name) {
+            continue;
+            // this is the same room
+          }
+          if (roomObject.terminal && roomObject.terminal.store[key]) {
+            roomMinerals += roomObject.terminal.store[key];
+          }
+          if (roomObject.storage && roomObject.storage.store[key]) {
+            roomMinerals += roomObject.storage.store[key];
+          }
+          if (roomMinerals < minMinerals) {
+            transitiondone = true;
+            room.log('transfering ' + amount + ' ' + key + ' to ' + roomName);
+            room.terminal.send(key, minMinerals, roomName);
+            break;
+          }
         }
       }
     });
