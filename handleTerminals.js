@@ -11,7 +11,7 @@ exports.handleTerminals = function (room) {
       let amount = room.terminal.store[key];
       let roomOwned = amount + room.storage.store[key];
       if (amount < minMinerals || transitiondone || key === RESOURCE_ENERGY) return;
-      if (roomOwned < 20000 && room.memory.reaction && (room.memory.reaction.m1 === key || room.memory.reaction.m2 === key)) {
+      if (roomOwned < 30000 && room.memory.reaction && (room.memory.reaction.m1 === key || room.memory.reaction.m2 === key)) {
         return;
       }
 
