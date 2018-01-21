@@ -9,7 +9,7 @@ exports.handleTerminals = function (room) {
     Object.keys(room.terminal.store).forEach(function (key) { // TODO: remove forEach
       // key: the name of the object key
       let amount = room.terminal.store[key];
-      let roomOwned = amount + room.storage.store[key];
+      let roomOwned = room.storage.store[key] ? amount + room.storage.store[key] : amount;
       if (amount < minMinerals || transitiondone || key === RESOURCE_ENERGY) return;
       if (roomOwned < 30000 && room.memory.reaction && (room.memory.reaction.m1 === key || room.memory.reaction.m2 === key)) {
         return;
@@ -39,7 +39,7 @@ exports.handleTerminals = function (room) {
           }
           if (roomMinerals < minMinerals) {
             transitiondone = true;
-            room.log('transfering ' + minMinerals + ' ' + key + ' to ' + roomName + 'roomOwned: ' + roomOwned + JSON.stringify(room.memory.reaction));
+            room.log('transfering ' + minMinerals + ' ' + key + ' to ' + roomName); // + 'roomOwned: ' + roomOwned +JSON.stringify(room.memory.reaction));
             room.terminal.send(key, minMinerals, roomName);
             break;
           }
