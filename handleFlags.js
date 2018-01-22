@@ -46,6 +46,9 @@ exports.handleflags = function () {
         sourceRoomName = Utils.findClosestRoom(flag.pos);
         console.log('found claimroom: ' + sourceRoomName);
         Game.rooms[sourceRoomName].memory.claimroom = flag.pos.roomName;
+        let supportedRooms = Game.rooms[sourceRoomName].memory.supportedRooms || [];
+        supportedRooms.push(flag.pos.roomName);
+        Game.rooms[sourceRoomName].memory.supportedRooms = supportedRooms;
         flag.memory.remove = true;
         flag.remove();
         break;
