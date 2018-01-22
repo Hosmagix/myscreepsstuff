@@ -286,7 +286,6 @@ module.exports.loop = function () {
             return;
           }
           let roomName = JSON.stringify(roompos);
-          childBuilders[roomName] = 0;
 
           let roomInstance = Game.rooms[roomname];
           if (roomInstance && roomInstance.memory.sources) {
