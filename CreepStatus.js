@@ -1,5 +1,6 @@
-let roles = ['builder', 'upgrader', 'outsider', 'sltrans', 'keepTrans', 'harvester', 'dumper', 'transporter', 'reserver', 'defender',
-  'attacker', 'healer', 'specialbuilder', 'mineral', 'mineraltransporter', 'dismantler', 'keeper', 'gatherer', 'Specialdefender', 'looter', 'claim' ];
+let roles = ['builder', 'upgrader', 'outsider', 'sltrans', 'keepTrans', 'harvester', 'dumper', 'transporter', 'reserver',
+  'defender', 'attacker', 'healer', 'specialbuilder', 'mineral', 'mineraltransporter', 'dismantler', 'keeper',
+  'gatherer', 'Specialdefender', 'looter', 'claim', 'supporter' ];
 
 function addRolesToRoom (room) {
   room.myCreeps = {};
