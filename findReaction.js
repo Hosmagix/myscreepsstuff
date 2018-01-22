@@ -189,4 +189,13 @@ function checkIfFunctionShouldBeChanged () {
   }
 }
 
-module.exports = {findFreeReaction, updateTotalMinerals, updateReactionsByRoom, checkIfFunctionShouldBeChanged, updateRequestingByRoom};
+function showMineralOverview () {
+  console.log('mineral overview:');
+  console.log('');
+  console.log('available Minerals: ' + updateTotalMinerals());
+  console.log('reactions by room: ' + updateReactionsByRoom());
+  console.log('requesting by room: ' + updateRequestingByRoom());
+  console.log('');
+}
+
+module.exports = {findFreeReaction, updateTotalMinerals, updateReactionsByRoom, checkIfFunctionShouldBeChanged, updateRequestingByRoom, showMineralOverview};
