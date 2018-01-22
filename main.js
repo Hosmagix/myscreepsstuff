@@ -179,10 +179,25 @@ module.exports.loop = function () {
           slaveRoomInDanger = true;
           endangeredSlaveRoom = slaveroom.roomName;
         }
+      });
+    }
+
+    if (room.memory.supportedRooms && room.memory.supportedRooms.length > 0) {
+      room.memory.supportedRooms.forEach(function (childRoom, index) {
+        if (!childRoom) {
+          return;
+        }
+
+        let room2 = Game.rooms[childRoom.roomName];
+
+        if (room2 && room2.memory.dangertill && (room2.memory.dangertill > Game.time)) {
+          slaveRoomInDanger = true;
+          endangeredSlaveRoom = childRoom.roomName;
+        }
         let supportTill = room.controller.level >= 5 ? 3 : 2;
         if (room2 && room2.controller && room2.controller.level > supportTill) {
           // room is self sustainable -> remove help
-          room.memory.slaverooms.splice(index, 1);
+          room.memory.supportedRooms.splice(index, 1);
           room.log('freeing slaveroom because it needs no help: ' + endangeredSlaveRoom);
         }
       });
@@ -247,20 +262,56 @@ module.exports.loop = function () {
       var reserving = {};
       var keepers = {};
       var gatherers = {};
+      let childBuilders = {};
 
       // let roles = ['builder', 'upgrader', 'outsider', 'sltrans', 'harvester', 'transporter', 'reserver', 'defender',
-      //   'attacker', 'healer', 'specialbuilder', 'mineral', 'mineraltransporter', 'dismantler', 'keeper', 'gatherer', 'Specialdefender', 'looter' ]
+      //   'attacker', 'healer', 'specialbuilder', 'mineral', 'mineraltransporter', 'dismantler', 'keeper', 'gatherer',
+      // 'Specialdefender', 'looter' ]
 
       if (room.memory.slaverooms) {
         room.memory.slaverooms.forEach(function (roompos) {
           if (!roompos) {
             return;
           }
-          // var roomName = roompos.roomName + ',' + roompos.x +',' + roompos.y;
           let roomName = JSON.stringify(roompos);
           slaves[roomName] = 0;
           slavetransporter[roomName] = 0;
         });
+      }
+
+      let supporterId = '';
+      if (room.memory.supportedRooms) {
+        room.memory.supportedRooms.forEach(function (roompos) {
+          if (!roompos) {
+            return;
+          }
+          let roomName = JSON.stringify(roompos);
+          childBuilders[roomName] = 0;
+
+          let roomInstance = Game.rooms[roomname];
+          if (roomInstance && roomInstance.memory.sources) {
+            roomInstance.memory.sources.forEach((source) => {
+              let sourceString = JSON.stringify(source);
+              // console.log('sourceString before stringify: ' + sourceString);
+              childBuilders[sourceString] = 0;
+            });
+          }
+        });
+
+        room.myCreeps.supporter.forEach((creep) => {
+          let roomName = JSON.stringify(creep.memory.sourcepos);
+          if (childBuilders[roomName]) {
+            childBuilders[roomName] = childBuilders[roomName] + 1;
+          } else {
+            childBuilders[roomName] = 1;
+          }
+        });
+
+        for (let x in childBuilders) {
+          if (childBuilders[x] < 1) {
+            supporterId = x;
+          }
+        }
       }
 
       let keeperTransporterId = ''; // TODO refactor this: calculate this lazy only when needed.
@@ -568,7 +619,7 @@ module.exports.loop = function () {
       } else if (specialdefenders < 1 && room.memory.centralroom) {
         newName = spawns[firstfreespawn].createCreep(creepUtils.createRangedCreep(spawn, true), undefined, {role: 'Specialdefender', room: room.memory.centralroom, home: room.name, ignoreneutrals: true, wait: false});
         room.log('spawning new specialdefender');
-      } else if (slaveid && slaveid !== '') { // TODO refactoring only half complete -> Create Support Creep Type.
+      } else if (slaveid && slaveid !== '') {
         let roompos = JSON.parse(slaveid);
         let sourcepos = new RoomPosition(roompos.x, roompos.y, roompos.roomName);
 
@@ -576,6 +627,12 @@ module.exports.loop = function () {
 
         newName = spawns[firstfreespawn].createCreep(components, undefined, {role: 'outsider', room: roompos.roomName, home: room.name, sourcepos: sourcepos });
         room.log('Spawning new outsider: ' + newName);
+      } else if (supporterId && supporterId !== '') { // TODO refactoring only half complete -> Create Support Creep Type.
+        let roompos = JSON.parse(supporterId);
+        let sourcepos = new RoomPosition(roompos.x, roompos.y, roompos.roomName);
+        components = creepUtils.createCreepComponents(spawn);
+        newName = spawns[firstfreespawn].createCreep(components, undefined, {role: 'supporter', room: roompos.roomName, home: room.name, sourcepos: sourcepos });
+        room.log('Spawning new supporter: ' + newName);
       } else if (slavetransid && slavetransid !== '') { // TODO: remove unnecessary stuff
         let roompos = JSON.parse(slavetransid);
         let sourcepos = new RoomPosition(roompos.x, roompos.y, roompos.roomName);
