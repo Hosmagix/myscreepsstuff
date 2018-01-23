@@ -154,6 +154,11 @@ exports.overridePrototypes = function () {
         console.log('wrong tempos' + JSON.stringify(temppos));
         return this.moveTo(roompos);
       }
+
+      if (temppos.x === this.pos.x && temppos.y === this.pos.y && this.memory.path.length > 0) {
+        temppos = this.memory.path.shift(); // at border it might be possible that the creep gets ported a step further ...
+      }
+
       let next = new RoomPosition(temppos.x, temppos.y, temppos.roomName);
 
       if (next && this.pos.isNearTo(next)) {
