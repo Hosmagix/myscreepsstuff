@@ -281,12 +281,7 @@ module.exports.loop = function () {
 
       let supporterId = '';
       if (room.memory.supportedRooms) {
-        room.memory.supportedRooms.forEach(function (roompos) {
-          if (!roompos) {
-            return;
-          }
-          let roomName = JSON.stringify(roompos);
-
+        room.memory.supportedRooms.forEach(function (roomname) {
           let roomInstance = Game.rooms[roomname];
           if (roomInstance && roomInstance.memory.sources) {
             roomInstance.memory.sources.forEach((source) => {
