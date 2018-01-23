@@ -89,7 +89,7 @@ exports.handleTerminals = function (room) {
   }
 
   if (room.terminal.store.energy > 70000 && room.controller.level === 8 && Memory.energytarget) {
-    room.log(room.name + ': found level 8 room -> prepare sending energy away');
+    // room.log(room.name + ': found level 8 room -> prepare sending energy away');
     let targetroom = Game.rooms[Memory.energytarget];
     if (targetroom.terminal && targetroom.terminal.store.energy < 150000) {
       let destination = Memory.energytarget;
