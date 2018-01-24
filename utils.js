@@ -8,8 +8,11 @@ utils.findClosestRoom = function (start, minlevel) {
   console.log('center: ' + center);
 
   let goals = [];
-  for (let spawn in Game.spawns) {
-    goals.push({ pos: Game.spawns[spawn].pos, range: 2 });
+  for (let spawnName in Game.spawns) {
+    let spawn = Game.spawns[spawnName];
+    if (spawn.room.controller.level >= minlevel) {
+      goals.push({ pos: spawn.pos, range: 2 });
+    }
   }
   let res = PathFinder.search(start, goals, {
     plainCost: 1,
