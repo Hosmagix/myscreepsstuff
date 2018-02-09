@@ -72,10 +72,12 @@ exports.handleflags = function () {
         flag.remove();
         break;
       case COLOR_RED:
-        sourceRoomName = Utils.findClosestRoom(flag.pos);
-        Game.rooms[sourceRoomName].memory.guidedattack = true;
+        sourceRoomName = Utils.findClosestRoom(flag.pos, 8);
+        if (!sourceRoomName) {
+          sourceRoomName = Utils.findClosestRoom(flag.pos);
+        }
+        Game.rooms[sourceRoomName].memory.createSquad = { targetRoom: flag.pos.roomName, type: 'war', squad: 'squad001'};
         flag.remove();
-        Memory.gatheringpoint = null;
         break;
       case COLOR_CYAN:
         sourceRoomName = Utils.findClosestRoom(flag.pos);

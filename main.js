@@ -477,11 +477,9 @@ module.exports.loop = function () {
       let maxhealers = 3;
       let maxdismantlers = 2;
       if (attackers >= maxattackers && healers >= maxhealers && dismantlers >= maxdismantlers) {
-        // Memory.attackinprogress = false;
-        room.memory.guidedattack = false;
+        room.memory.createSquad = undefined;
       }
-      // Memory.attackinprogress = false;
-      let war = Memory.attackinprogress && room.controller.level >= 7 || room.memory.guidedattack;
+      let war = room.memory.createSquad;
       let numbuilder = 3;
       let specializedbuilders = 0;
       let numupgrader = 1;
@@ -580,13 +578,13 @@ module.exports.loop = function () {
           room.log('Would like to create claimcreep but cannot: ' + creationpossible);
         }
       } else if (war && healers < maxhealers) {
-        newName = spawns[firstfreespawn].createCreep(creepUtils.createHealCreep(spawn), undefined, {role: 'healer', room: warroom, home: room.name, gatheringpoint: gatheringpoint, globalguidance: true, boost: true});
+        newName = spawns[firstfreespawn].createCreep(creepUtils.createHealCreep(spawn), undefined, {role: 'healer', room: room.memory.createSquad.targetRoom, home: room.name, squad: room.memory.createSquad.squad, globalguidance: true});
         room.log('Spawning new healer: ' + newName);
       } else if (war && attackers < maxattackers) {
-        newName = spawns[firstfreespawn].createCreep(creepUtils.createWarCreep(spawn), undefined, {role: 'attacker', room: warroom, home: room.name, gatheringpoint: gatheringpoint, ignoreneutrals: true, globalguidance: true});
+        newName = spawns[firstfreespawn].createCreep(creepUtils.createWarCreep(spawn), undefined, {role: 'attacker', room: room.memory.createSquad.targetRoom, home: room.name, squad: room.memory.createSquad.squad, ignoreneutrals: true, globalguidance: true});
         room.log('Spawning new attacker: ' + newName);
       } else if (war && dismantlers < maxdismantlers) {
-        newName = spawns[firstfreespawn].createCreep(creepUtils.createDismantleCreep(spawn, 2), undefined, {role: 'dismantler', room: warroom, home: room.name, gatheringpoint: gatheringpoint, globalguidance: true});
+        newName = spawns[firstfreespawn].createCreep(creepUtils.createDismantleCreep(spawn, 2), undefined, {role: 'dismantler', room: room.memory.createSquad.targetRoom, home: room.name, squad: room.memory.createSquad.squad, globalguidance: true});
         room.log('Spawning new dismantler: ' + newName);
       } else if (upgraders < numupgrader) {
         components = [];
