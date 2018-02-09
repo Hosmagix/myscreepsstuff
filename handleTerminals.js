@@ -1,7 +1,9 @@
+let allowedResourcesToSell = ['U', 'K', 'O', 'Z'];
+
 function sellResourcesByRoom (room) {
   for (let key in room.terminal.store) {
-    if (key === RESOURCE_ENERGY) {
-      return;
+    if (key === RESOURCE_ENERGY || !allowedResourcesToSell.includes(key)) {
+      continue;
     }
     if (Object.prototype.hasOwnProperty.call(room.terminal.store, key)) {
       let resource = room.terminal.store[key];
@@ -90,44 +92,11 @@ exports.handleTerminals = function (room) {
     }
   }
   // Sell stuff
-  if (Game.time % 50 === 0) {
-    for (let key in room.terminal.store) {
-      if (key === RESOURCE_ENERGY) {
-        return;
-      }
-      if (Object.prototype.hasOwnProperty.call(room.terminal.store, key)) {
-        let resource = room.terminal.store[key];
-        let storageResource = room.storage.store[key];
-
-        if (resource > 5000 && room.terminal.store.energy >= 30000 && storageResource > 50000) {
-          let orders = Game.market.getAllOrders().filter(function (order) {
-            return order.resourceType === key && order.type === ORDER_BUY && Game.market.calcTransactionCost(1000, room.name, order.roomName) < 2000;
-          });
-          console.log('orders:' + JSON.stringify(orders));
-
-          let price = 0;
-          let orderid = null;
-          let maxamount = 0;
-          orders.forEach(function (order) {
-            if (order.price > price) {
-              price = order.price;
-              orderid = order.id;
-              maxamount = order.amount;
-            }
-          });
-          if (orderid) {
-            let amount = Math.min(Math.min(maxamount, resource), 15000);
-            room.log('maxamount: ' + maxamount + ' resource: ' + resource + 'resultingamount: ' + amount);
-
-            let result = Game.market.deal(orderid, amount, room.name);
-            room.log('selling ' + key + ': ' + amount + ' result: ' + result);
-          }
-        }
-      }
-    }
+  if (Game.time % 20 === 0) {
+    sellResourcesByRoom(room);
   }
 
-  if (room.terminal.store.energy > 70000 && room.controller.level === 8 && Memory.energytarget) {
+  if (Game.time % 20 === 1 && room.terminal.store.energy > 70000 && room.controller.level === 8 && Memory.energytarget) {
     // room.log(room.name + ': found level 8 room -> prepare sending energy away');
     let targetroom = Game.rooms[Memory.energytarget];
     if (targetroom.terminal && targetroom.terminal.store.energy < 150000) {
