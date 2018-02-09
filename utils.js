@@ -70,7 +70,6 @@ utils.deleteAllReactions = function () {
   for (let room in Memory.rooms) {
     let memory = Memory.rooms[room];
     delete memory.reaction;
-    console.log('deleted all reactions');
   }
 };
 
