@@ -27,7 +27,7 @@ function sellResourcesByRoom (room) {
         });
         if (orderid) {
           let amount = Math.min(Math.min(maxamount, resource), 15000);
-          room.log('maxamount: ' + maxamount + ' resource: ' + resource + 'resultingamount: ' + amount);
+          room.log('maxamount: ' + maxamount + ' resource: ' + resource + ' resultingamount: ' + amount);
 
           let result = Game.market.deal(orderid, amount, room.name);
           room.log('selling ' + key + ': ' + amount + ' result: ' + result);
