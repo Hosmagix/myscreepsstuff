@@ -9,9 +9,9 @@ function sellResourcesByRoom (room) {
       let resource = room.terminal.store[key];
       let storageResource = room.storage.store[key];
 
-      if (resource > 5000 && room.terminal.store.energy >= 30000 && storageResource > 50000) {
+      if (resource > 5000 && room.terminal.store.energy >= 30000 && storageResource > 100000) {
         let orders = Game.market.getAllOrders().filter(function (order) {
-          return order.resourceType === key && order.type === ORDER_BUY && Game.market.calcTransactionCost(1000, room.name, order.roomName) < 2000;
+          return order.resourceType === key && order.type === ORDER_BUY && order.price > 0.1 && Game.market.calcTransactionCost(1000, room.name, order.roomName) < 2000;
         });
         console.log('orders:' + JSON.stringify(orders));
 
