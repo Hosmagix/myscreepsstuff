@@ -72,7 +72,9 @@ module.exports.loop = function () {
 
   moveCreeps.moveCreeps();
 
-  let creepscpu = Game.cpu.getUsed();
+  if (Game.time % 100 === 0) {
+    findReaction.checkIfFunctionShouldBeChanged();
+  }
 
   let targets;
   for (let room_id in Game.rooms) {
@@ -142,10 +144,6 @@ module.exports.loop = function () {
     let spawn = spawns[0];
     if (!spawn) {
       continue;
-    }
-
-    if (Game.time % 100 === 0) {
-      findReaction.checkIfFunctionShouldBeChanged();
     }
 
     // terminal
@@ -806,7 +804,7 @@ module.exports.loop = function () {
       if (labs.length > 0) {
         room.memory.haslabs = true;
 
-        let fullreaction = function (mineral1, mineral2, result) {
+        let fullreaction = function (mineral1, mineral2, result) { // TODO: move
           let lab1 = null;
           let lab2 = null;
           let targets = [];

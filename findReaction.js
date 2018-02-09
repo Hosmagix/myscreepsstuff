@@ -15,8 +15,8 @@ let createReceipe = function (name) {
 // UL
 // G
 
-const minMinerals = 30000;
-const hasEnough = 250000;
+const minMinerals = 50000;
+const hasEnough = 350000;
 
 let cachedReactions;
 function createReactionsData () {
