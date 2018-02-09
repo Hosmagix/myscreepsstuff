@@ -66,4 +66,12 @@ utils.findClosestRoom = function (start, minlevel) {
   return res.path[res.path.length - 1].roomName;
 };
 
+utils.deleteAllReactions = function () {
+  for (let room in Memory.rooms) {
+    let memory = Memory.rooms[room];
+    delete memory.reaction;
+    console.log('deleted all reactions');
+  }
+};
+
 module.exports = utils;
