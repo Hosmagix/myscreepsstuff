@@ -56,8 +56,11 @@ let findFreeReaction = function () {
   // calculate the required minerals -> priotize OH higher.
   let reactions = createReactionsData();
 
-  let takenReactions = Game.getReactions();
+  // let takenReactions = Game.getReactions();
+  // don't cache here since this function may be called multiple times per tick.
+  let takenReactions = updateReactionsByRoom();
   let freeReactions = [];
+  let backUpReactions = [];
 
   console.log('reactions: ' + JSON.stringify(reactions));
   console.log('takenReactions: ' + JSON.stringify(takenReactions));
@@ -74,12 +77,16 @@ let findFreeReaction = function () {
       } else if (!takenReactions[key]) {
         console.log('reaction is still free' + JSON.stringify(key));
         freeReactions.push(reactions[key]);
+      } else {
+        backUpReactions.push(reactions[key]);
       }
     }
   }
 
   if (freeReactions.length > 0) {
     return freeReactions[0];
+  } else if (backUpReactions.length > 0) {
+    return backUpReactions[0];
   } else {
     console.log('failed to find a free reaction');
   }
