@@ -30,7 +30,7 @@ let roleMineral = {
         return res.resourceType === creep.memory.mineral;
       });
 
-      var target = creep.pos.findClosestByRange(resources);
+      let target = creep.pos.findClosestByRange(resources);
       if (target) {
         let range = creep.pos.getRangeTo(target);
         if (range <= 1) {
@@ -124,7 +124,7 @@ let roleMineral = {
     if (targets.length > 0) {
       let labToWithdraw = targets[0];
       // creep.log('target found: ' + target.mineralType + ' reaction: ' + JSON.stringify(creep.room.memory.reaction));
-      if (creep.withdraw(labToWithdraw, target.mineralType) !== OK) {
+      if (creep.withdraw(labToWithdraw, labToWithdraw.mineralType) !== OK) {
         creep.moveTo(labToWithdraw);
       }
       return;
