@@ -16,7 +16,7 @@ let createReceipe = function (name) {
 // G
 
 const minMinerals = 50000;
-const hasEnough = 350000;
+const hasEnough = 500000;
 
 let cachedReactions;
 function createReactionsData () {
@@ -50,10 +50,6 @@ function createReactionsData () {
 
 let findFreeReaction = function () {
   let availableMinerals = updateTotalMinerals();
-  // TODO refactor: this is only a dummy implementation
-  // it should offer support if all reactions are taken.
-  // there should be ways the prioritize stuff.
-  // calculate the required minerals -> priotize OH higher.
   let reactions = createReactionsData();
 
   // let takenReactions = Game.getReactions();
@@ -77,6 +73,7 @@ let findFreeReaction = function () {
       } else if (!takenReactions[key]) {
         console.log('reaction is still free' + JSON.stringify(key));
         freeReactions.push(reactions[key]);
+        backUpReactions.push(reactions[key]);
       } else {
         backUpReactions.push(reactions[key]);
       }
@@ -103,7 +100,11 @@ let addMinerals = function (totalMinerals, storage) { // actually adds energy to
   }
 };
 
+let updateTotalMineralsCached;
 function updateTotalMinerals () {
+  if (updateTotalMineralsCached) {
+    return updateTotalMineralsCached;
+  }
   let totalMinerals = {};
   for (let i in Game.rooms) {
     if (Game.rooms.hasOwnProperty(i)) {
@@ -122,6 +123,7 @@ function updateTotalMinerals () {
     }
   }
   console.log(JSON.stringify(totalMinerals));
+  updateTotalMineralsCached = totalMinerals;
   return totalMinerals;
 }
 
@@ -169,6 +171,19 @@ function updateRequestingByRoom () {
   return requesting;
 }
 
+function calculateMineralAvailabilityScore () {
+  let minerals = updateTotalMinerals();
+  let requesting = updateRequestingByRoom();
+  let result = {};
+  for (let key in minerals) {
+    let mineral = minerals[key];
+    if (requesting[key] && requesting[key].length) {
+      mineral -= 40000 * requesting[key].length;
+    }
+    result[key] = mineral;
+  }
+}
+
 function deleteRoom (roomId) {
   let room = Game.rooms[roomId];
   room.memory.reaction = undefined;
@@ -205,4 +220,10 @@ function showMineralOverview () {
   console.log('');
 }
 
-module.exports = {findFreeReaction, updateTotalMinerals, updateReactionsByRoom, checkIfFunctionShouldBeChanged, updateRequestingByRoom, showMineralOverview};
+module.exports = {findFreeReaction,
+  updateTotalMinerals,
+  updateReactionsByRoom,
+  checkIfFunctionShouldBeChanged,
+  updateRequestingByRoom,
+  showMineralOverview,
+  calculateMineralAvailabilityScore};
