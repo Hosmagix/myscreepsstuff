@@ -182,6 +182,8 @@ function calculateMineralAvailabilityScore () {
     }
     result[key] = mineral;
   }
+  console.log(JSON.stringify(result));
+  return result;
 }
 
 function deleteRoom (roomId) {
