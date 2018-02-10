@@ -115,6 +115,21 @@ let roleMineral = {
       return;
     }
 
+    // TODO fix performance
+    let targets = creep.room.find(FIND_STRUCTURES, {
+      filter: (structure) => {
+        return (structure.structureType === STRUCTURE_LAB) && structure.mineralType && creep.room.memory.reaction && structure.mineralType !== creep.room.memory.reaction.m1 && structure.mineralType !== creep.room.memory.reaction.m2 && (structure.mineralAmount > 2000 || structure.mineralType !== creep.room.memory.reaction.res);
+      }
+    });
+    if (targets.length > 0) {
+      let labToWithdraw = targets[0];
+      // creep.log('target found: ' + target.mineralType + ' reaction: ' + JSON.stringify(creep.room.memory.reaction));
+      if (creep.withdraw(labToWithdraw, target.mineralType) !== OK) {
+        creep.moveTo(labToWithdraw);
+      }
+      return;
+    }
+
     // storage
 
     let terminal = creep.room.terminal;
@@ -177,19 +192,6 @@ let roleMineral = {
       });
       if (creep.withdraw(terminal, mineral) !== OK) {
         creep.moveTo(terminal);
-      }
-    }
-
-    let targets = creep.room.find(FIND_STRUCTURES, {
-      filter: (structure) => {
-        return (structure.structureType === STRUCTURE_LAB) && structure.mineralType && creep.room.memory.reaction && structure.mineralType !== creep.room.memory.reaction.m1 && structure.mineralType !== creep.room.memory.reaction.m2 && (structure.mineralAmount > 2000 || structure.mineralType !== creep.room.memory.reaction.res);
-      }
-    });
-    if (targets.length > 0) {
-      var target = targets[0];
-      // creep.log('target found: ' + target.mineralType + ' reaction: ' + JSON.stringify(creep.room.memory.reaction));
-      if (creep.withdraw(target, target.mineralType) !== OK) {
-        creep.moveTo(target);
       }
     }
 
