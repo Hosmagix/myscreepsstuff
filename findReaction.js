@@ -83,7 +83,19 @@ let findFreeReaction = function () {
   if (freeReactions.length > 0) {
     return freeReactions[0];
   } else if (backUpReactions.length > 0) {
-    return backUpReactions[0];
+    let length = backUpReactions.length;
+    let mineralScore = calculateMineralAvailabilityScore();
+    let bestScore = -100000000;
+    let bestReaction;
+    for (let i = 0; i < length; i++) {
+      let reaction = backUpReactions[i];
+      let score = Math.min(mineralScore[reaction.m1], mineralScore[reaction.m2]);
+      if (score > bestScore) {
+        bestReaction = reaction;
+        bestScore = score;
+      }
+    }
+    return bestReaction;
   } else {
     console.log('failed to find a free reaction');
   }
